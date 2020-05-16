@@ -25,7 +25,7 @@ all: mywizard
 
 mywizard: clean-mywizard generate-mywizard prepare-mywizard exec-mywizard 
 
-mywizard-conf:
+conf-mywizard:
 	cp src/conf/mywizard.conf ./
 	
 generate-mywizard:
