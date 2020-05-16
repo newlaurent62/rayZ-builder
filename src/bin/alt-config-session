@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# alt-config-session
+#
+# (c) 2020 Laurent Schwartz, license GPLv3
+#
+
+function error() {
+  echo -e "\e[1m\e[31man error occured !\e[0m"
+  exit 1
+}
+
+
+function help() {
+  echo "Usage: "
+  echo "  alt-config-session [ (-x|--xdg_config_home) path ] -- 'executable args'"
+  echo ""
+  echo " Replace the string 'xxx-RAYSESSION_PATH-xxx' with its value given by ray_control."
+  echo " Example:"
+  echo "  alt-config-session -x ~/.config2 -- 'mumble -m'"
+}
+
+PARAMS=""
+raysession_path="$(ray_control get_session_path)"
+if [ $? -ne 0 ]
+then
+  echo "could not get ray_session_path ! Is there a raysession document opened ?"
+  error
+fi
+
+while (( "$#" )); do
+  case "$1" in
+    -x|--xdg_config_home)
+      echo "arg xdg_config_home=$2"
+      export XDG_CONFIG_HOME="$(echo "$2" | perl -p -e "s|xxx-RAYSESSION_PATH-xxx|$raysession_path|g;")"
+      if [ $? -ne 0 ]
+      then
+        error
+      fi
+      shift 2
+      ;;
+    -x|--localbin)
+      echo "arg localbin=$2"
+      # This path should not have space !
+      if [ -d ~/.local/share/raysession-templates/$2/bin ]
+      then
+        export PATH="/home/$USER/.local/share/raysession-templates/$2/bin:$PATH"
+      else
+        echo "localbin has not been found !"
+      fi
+      shift 2
+      ;;
+    -h|--help)
+      echo 
+      help
+      exit 0
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*=) # unsupported flags
+      echo "error: unrecognized parameter '$1'"
+      exit 1
+      ;;
+  esac
+done
+
+argc=$#
+cmd=("$@")
+for (( j=0; j<argc; j++ )); do
+    cmd[$j]="$(echo "${cmd[$j]}" | perl -p -e "s|xxx-RAYSESSION_PATH-xxx|$raysession_path|g")" 
+    if [ $? -ne 0 ]
+    then
+      error
+    fi
+done
+
+COMMAND="${cmd[0]}"
+
+cd "$raysession_path" || error
+echo "- pwd: $(pwd)"
+echo "- PATH: $PATH"
+echo "- XDG_CONFIG_HOME resolved to: $XDG_CONFIG_HOME"
+echo "- Executing: '${cmd[@]}'"
+echo "- Command(which $COMMAND): '$(which "$COMMAND")'"
+echo "Starting command ..."
+exec "${cmd[@]}" || error

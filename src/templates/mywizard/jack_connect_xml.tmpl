@@ -1,0 +1,35 @@
+<RAY-JACKPATCH>
+ <connection to="PulseAudio JACK Source:front-left" from="system:capture_1"/>
+ <connection to="PulseAudio JACK Source:front-right" from="system:capture_2"/>
+ <connection to="system:playback_1" from="PulseAudio JACK Sink:front-left"/>
+ <connection to="system:playback_2" from="PulseAudio JACK Sink:front-right"/>
+#for $user in $datamodel['userlist']
+#if 'jack_connections' in $user
+#if 'left_inputs' in $user['jack_connections']
+#for $input in $user['jack_connections']['left_inputs']
+ <connection to="Jamulus $user.name:input left" from="$input"/>
+#end for
+#end if
+#if 'right_inputs' in $user['jack_connections']
+#for $input in $user['jack_connections']['right_inputs']
+ <connection to="Jamulus $user.name:input right" from="$input"/>
+#end for
+#end if
+#if 'left_outputs' in $user['jack_connections']
+#for $output in $user['jack_connections']['left_outputs']
+ <connection to="$output" from="Jamulus $user.name:output left"/>
+#end for
+#end if
+#if 'right_outputs' in $user['jack_connections']
+#for $output in $user['jack_connections']['right_outputs']
+ <connection to="$output" from="Jamulus $user.name:output right"/>
+#end for
+#end if
+#end if
+#end for
+#if $datamodel['global.bool_jack_capture_connect'] == 'True'
+#set $user=$datamodel['userlist'][0]
+ <connection to="jack_capture:input1" from="Jamulus $user.name:output left"/>
+ <connection to="jack_capture:input2" from="Jamulus $user.name:output right"/>
+#end if
+</RAY-JACKPATCH>

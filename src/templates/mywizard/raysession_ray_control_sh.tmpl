@@ -1,0 +1,126 @@
+#!/bin/bash -x
+#
+# $1 : new_raysession_name
+# $2 : copy the fill in config files to the new raysession name
+#
+
+LOCALTMPLPATH=/home/\$USER/.local/share/raysession-templates/$datamodel['wizard.id']
+
+function error() {
+  ray_control abort
+  ray_control stop
+  yad --error --title "Raysession creation" --text="An error occured during the raysession creation ! (see logs for more details)"
+  exit 1
+}
+
+if [ $# -ne 2 ]
+then
+  echo "Usage:"
+  echo "  raysession.sh NEW_RAYSESSION_NAME TEMPLATE_DIR"
+  exit 1
+fi
+raysession_name="\$1"
+template_dir="\$2"
+
+jack_control status
+if [ \$? -ne 0 ]
+then
+  yad --error --title "Raysession creation" --text="You must start the jack server before proceeding ! (Please do it now, or the process will be cancelled)"
+  jack_control status
+  if [ \$? -ne 0 ]
+  then
+    error
+  fi
+fi
+ray_control close
+ray_control stop
+ray_control start || error
+
+ray_control new_session "\$1" || error
+patchID=\$(ray_control add_executable ray-jackpatch)
+if [ \$? -ne 0 ]
+then  
+  error
+fi
+raysession_path=\$(ray_control get_session_path)
+if [ \$? -ne 0 ]
+then
+  error
+fi
+
+# copy $2 (e.g. directory containing all default config files) to raysession_path
+if [ -d "\$template_dir" ]
+then
+  cp -rf "\$template_dir/templates" "\$raysession_path/" || error
+  cp -rf "\$template_dir/templates" "\$LOCALTMPLPATH" || error 
+  cp "\$template_dir/templates/patch.xml" "\$raysession_path/\$raysession_name.\$patchID.xml" || error
+  chmod 755 "\$LOCALTMPLPATH"/bin/Jamulus || error
+fi
+
+echo "-- template_dir: \$template_dir"
+echo "-- PATH: \$PATH"
+
+mkdir -p "\$raysession_path/etc/" "\$raysession_path/bin/" "\$raysession_path/data/" || error
+
+#set $jamulus_server='localhost'
+
+#set $jamulus_port=22124
+
+
+#if $datamodel['global.bool_start_jamulus_server'] == 'True'
+  clientID=\$(ray_control add_executable "Jamulus" )
+  if [ \$? -ne 0 ]
+  then
+    error
+  fi
+    ray_control client "\$clientID" set_properties name:"Jamulus server" executable:"alt-config-session" arguments:"--localbin $datamodel['wizard.id'] -- Jamulus -s -p $jamulus_port" launched:"1" label:"Jamulus server on localhost:" icon:"/usr/share/icons/jamulus/jamulus-client.png"
+#end if
+
+#for $device in $datamodel['userlist.alsa_in_devices']
+  clientID=\$(ray_control add_executable "$device" )
+  if [ \$? -ne 0 ]
+  then
+    error
+  fi
+  ray_control client "\$clientID" set_properties executable:"alsa_in" name:"capture $device" arguments:"-j in_$device -d hw:$device" launched:"1" label:"add the capture device $device to the jack setup." icon:"/usr/share/icons/jamulus-os-utils/alsa_in_x11.png" || error
+#end for
+
+#for $device in $datamodel['userlist.alsa_out_devices']
+  clientID=\$(ray_control add_executable "$device" )
+  if [ \$? -ne 0 ]
+  then
+    error
+  fi
+  ray_control client "\$clientID" set_properties executable:"alsa_out" name:"capture $device" arguments:"-j out_$device -d hw:$device" launched:"1" label:"add the playback device $device to the jack setup." icon:"/usr/share/icons/jamulus-os-utils/alsa_in_x11.png" || error
+#end for
+
+#for $user in $datamodel['userlist']
+  clientID=\$(ray_control add_executable "Jamulus" )
+  if [ \$? -ne 0 ]
+  then
+    error
+  fi
+  #if $datamodel['global.bool_start_jamulus_server'] == 'True'
+    ray_control client "\$clientID" set_properties name:"Jamulus $user.name" executable:"alt-config-session" arguments:"--localbin $datamodel['wizard.id'] -- Jamulus -j -c $jamulus_server:$jamulus_port -i \"xxx-RAYSESSION_PATH-xxx/etc/\$clientID/${user.name}.ini\" --clientname \"$user.name\"" launched:"1" label:"Jamulus for $user.name connect to $jamulus_server:$jamulus_port" icon:"/usr/share/icons/jamulus/jamulus-client.png"
+  #else
+    ray_control client "\$clientID" set_properties name:"Jamulus $user.name" executable:"alt-config-session" arguments:"--localbin $datamodel['wizard.id'] -- Jamulus -j -i \"xxx-RAYSESSION_PATH-xxx/etc/\$clientID/${user.name}.ini\" --clientname \"$user.name\"" launched:"1" label:"Jamulus for $user.name no initial connection" icon:"/usr/share/icons/jamulus/jamulus-client.png"
+  #end if
+  mkdir "\$raysession_path/etc/\$clientID"
+  ln -rs "\$raysession_path/etc/\$clientID" "\$raysession_path/etc/Jamulus-$user.name" || error
+#end for
+
+#if $datamodel['global.bool_jack_capture_connect'] == 'True'
+  clientID=\$(ray_control add_executable "jack_capture" )
+  if [ \$? -ne 0 ]
+  then
+    error
+  fi
+  ##-- jack_capture --manual-connections -b 16 -c 2 --filename-prefix data/jamulus -f $datamodel['global.audioformat'] 
+    ray_control client "\$clientID" set_properties name:"jack_capture" executable:"alt-config-session" arguments:" -- jack_capture --manual-connections -b 16 -c 2 --filename-prefix data/jamulus -f $datamodel['global.audioformat'] " launched:"1" label:"jack_capture recording jamulus $datamodel['userlist'][0]['name']" icon:"/usr/share/icons/jamulus/jamulus-client.png"
+#end if
+
+ray_control save || error
+ray_control close || error
+ray_control stop || error
+
+

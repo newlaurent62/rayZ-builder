@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wizard id='mywizard'>
+  
+  <title>jack_capture wizard</title>
+  <description>Configure a simple recording session.</description>
+  <width>800</width>
+  <height>600</height>
+  
+  <!-- PAGES -->
+  <page id='First' type='first'>
+    <title>Recording Jamulus session with jack_capture</title>
+    <description>This wizard let you create a raysession that starts Jamulus server and clients + jack_capture.</description>
+  </page>
+  <page id='Global' type='input-data' section-name='global'>
+    <title>Ray Session section</title>
+    <field type='SessionNameCheckLineEdit' id='raysession_name' format='filename'>
+      <label>The RaySession filename</label>
+      <default>My jack capture session</default>
+    </field>
+    <field type='CheckLineEdit' id='users' format='regexp'>
+      <format>
+        <input-regexp>^\w+(,\w+)*$</input-regexp>
+      </format>
+      <output to='userlist'>
+        <split seperator=','/>
+      </output>
+      <label>The user names of the musician connected on this computer (each have a channel on the server)</label>
+      <default>user1_vocal,user2_guitar</default>
+    </field>
+    <field type='QCheckBox' id='bool_jack_capture_connect'>
+      <label>Check if you want to record your Jamulus session using jack_capture</label>
+      <default>True</default>
+    </field>
+    <field type='QCheckBox' id='bool_start_jamulus_server'>
+      <label>Start and connect to localhost Jamulus server (on this machine)</label>
+      <default>True</default>
+    </field>
+    <field type='QComboBox' id='audioformat'>
+      <label>The output audio format</label>
+      <item id='mp3' label='MP3 format file'/>
+      <item id='oga' label='OGG audio format file'/>
+      <item id='wav' label='WAV format file'/>
+      <default>mp3</default>
+    </field>
+  </page>
+  <page id='Jamulus' type='input-data' section-name='jamulus'>
+    <title>Jamulus users section</title>
+    <field type='UsersListEdit' id='user' max-count='5' inputs="True" outputs='True' datamodel-list-id='userlist'>
+      <label>Set the input for each user</label>
+      <default>
+        <item inputs='1->L' outputs='L->1 R->2'/>
+        <item inputs='2->L'/>
+        <item inputs='3->L'/>
+        <item inputs='4->L'/>
+        <item inputs='5->L'/>
+      </default>
+    </field>
+  </page>
+  <page id='Last' type='last'>
+    <title>Validate</title>
+    <description>...</description>
+  </page>
+  <do>  
+  </do>
+</wizard>

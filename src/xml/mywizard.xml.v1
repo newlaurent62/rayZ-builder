@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wizard id='mywizard'>
+  
+  <title>jack_capture wizard</title>
+  <description>Configure a simple recording session.</description>
+  <width>800</width>
+  <height>600</height>
+  
+  <!-- PAGES -->
+  <page id='First' type='first'>
+    <title>Recording with jack_capture</title>
+    <description>This wizard let you set a raysession with jack_capture.</description>
+  </page>
+  <page id='Global' type='input-data' section-name='global'>
+    <title>Ray Session section</title>
+    <field type='SessionNameCheckLineEdit' id='raysession_name' format='filename'>
+      <label>The RaySession filename</label>
+      <default>My jack capture session</default>
+    </field>
+    <field type='PathLineEdit' id='audiofilepath' format='directory'>
+      <label>The directory where to find the audio files for each track</label>
+      <default>My audio file</default>
+    </field>
+    <field type='CheckLineEdit' id='audiofile_prefix' format='regexp'>
+      <format>
+        <input-regexp>^[a-zA-Z]\w+$</input-regexp>
+      </format>
+      <label>The prefix of the track audio file to send to jack_capture</label>
+      <default>My audio file</default>
+    </field>
+    <field type='CheckLineEdit' id='trackcount' format='range'>
+      <format>
+        <min>0</min>
+        <max>10</max>
+      </format>
+      <label>The number of track to send</label>
+      <default>My audio file</default>
+    </field>
+  </page>
+  <page id='JackCapture' type='input-data' section-name='jack-capture'>
+    <title>Jack capture section</title>
+    <field type='CheckLineEdit' id='jack_inputs' format='jack_inputs'>
+      <label>The jack capture inputs</label>
+      <default>1->L 2->R</default>
+    </field>  
+    <field type='QComboBox' id='audioformat'>
+      <label>The output audio format</label>
+      <item id='mp3' label='MP3 format file'/>
+      <item id='ogg' label='OGG format file'/>
+      <item id='wav' label='WAV format file'/>
+      <default>mp3</default>
+    </field>
+  </page>
+  <page id='Last' type='last'>
+    <title>Validate</title>
+    <description>...</description>
+  </page>
+  <do>  
+  </do>
+</wizard>
