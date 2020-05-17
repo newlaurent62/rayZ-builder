@@ -268,6 +268,8 @@ class UsersListEdit(QtWidgets.QWidget):
           for dev in datamodel.alsa_in_devices(value):
             if not (dev in datamodel.data[datamodel_listid + ".alsa_in_devices"]):
               datamodel.data[datamodel_listid + ".alsa_in_devices"].append(dev) 
+            if not (dev in datamodel.data["alsa_in_devices"]):
+              datamodel.data["alsa_in_devices"].append(dev) 
       
       if self.outputs:
         if config[sectionName][self.property_hided + str(i) + '-outputs-hide'] != '':
@@ -281,6 +283,8 @@ class UsersListEdit(QtWidgets.QWidget):
           for dev in datamodel.alsa_out_devices(value):
             if not (dev in datamodel.data[datamodel_listid + ".alsa_out_devices"]):
               datamodel.data[datamodel_listid + ".alsa_out_devices"].append(dev) 
+            if not (dev in datamodel.data["alsa_out_devices"]):
+              datamodel.data["alsa_out_devices"].append(dev) 
 
     if self.property_checked:
       config[sectionName][self.property_checked] = property_checked_idx

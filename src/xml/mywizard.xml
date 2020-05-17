@@ -7,46 +7,47 @@
   <height>600</height>
   
   <!-- PAGES -->
-  <page id='First' type='first'>
+  <first-page id='First'>
     <title>Recording Jamulus session with jack_capture</title>
     <description>This wizard let you create a raysession that starts Jamulus server and clients + jack_capture.</description>
-  </page>
-  <page id='Global' type='input-data' section-name='global'>
+  </first-page>
+  <page id='Global' section-name='global'>
     <title>Ray Session section</title>
-    <field type='SessionNameCheckLineEdit' id='raysession_name' format='filename'>
+    <field id='raysession_name' type='SessionNameCheckLineEdit'>
       <label>The RaySession filename</label>
-      <default>My jack capture session</default>
-    </field>
-    <field type='CheckLineEdit' id='users' format='regexp'>
-      <format>
-        <input-regexp>^\w+(,\w+)*$</input-regexp>
-      </format>
-      <output to='userlist'>
-        <split seperator=','/>
-      </output>
+      <input type="filename"/>
+      <default value="My jack capture session"/>
+    </field> 
+    <field id='users' type='CheckLineEdit' >
       <label>The user names of the musician connected on this computer (each have a channel on the server)</label>
-      <default>user1_vocal,user2_guitar</default>
+      <input type='regexp'><regexp>^\w+(,\w+)*$</regexp></input>
+      <output split-seperator="," datamodel-id='userlist'/>
+      <default value="user1_vocal,user2_guitar"/>
     </field>
-    <field type='QCheckBox' id='bool_jack_capture_connect'>
+    <field id='bool_jack_capture_connect' type='QCheckBox'>
       <label>Check if you want to record your Jamulus session using jack_capture</label>
-      <default>True</default>
+      <default value="True"/>
     </field>
-    <field type='QCheckBox' id='bool_start_jamulus_server'>
+    <field id='bool_start_jamulus_server' type='QCheckBox'>
       <label>Start and connect to localhost Jamulus server (on this machine)</label>
-      <default>True</default>
+      <default value="True"/>
     </field>
-    <field type='QComboBox' id='audioformat'>
+    <field id='audioformat' type='QComboBox'>
       <label>The output audio format</label>
-      <item id='mp3' label='MP3 format file'/>
-      <item id='oga' label='OGG audio format file'/>
-      <item id='wav' label='WAV format file'/>
-      <default>mp3</default>
+      <input>
+        <item id='mp3' label='MP3 format file'/>
+        <item id='oga' label='OGG audio format file'/>
+        <item id='wav' label='WAV format file'/>
+      </input>
+      <default value="mp3"/>
     </field>
   </page>
-  <page id='Jamulus' type='input-data' section-name='jamulus'>
+  <page id='Jamulus' section-name='jamulus'>
     <title>Jamulus users section</title>
-    <field type='UsersListEdit' id='user' max-count='5' inputs="True" outputs='True' datamodel-list-id='userlist'>
+    <field id='user' type='UsersListEdit'>
       <label>Set the input for each user</label>
+      <input list-id="userlist" max-count='5' inputs="True" outputs='True'/>
+      <output datamodel-id='userlist'/>
       <default>
         <item inputs='1->L' outputs='L->1 R->2'/>
         <item inputs='2->L'/>
@@ -56,10 +57,8 @@
       </default>
     </field>
   </page>
-  <page id='Last' type='last'>
+  <last-page id='Last'>
     <title>Validate</title>
     <description>...</description>
-  </page>
-  <do>  
-  </do>
+  </last-page>
 </wizard>

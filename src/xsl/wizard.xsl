@@ -290,16 +290,29 @@ class SessionNameCheckLineEdit(CheckLineEdit):
 
 class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidgets.QWizard):
 
+
+    Page_<xsl:value-of select='first-page/@id'/> = 1
+
     <xsl:for-each select='//page'>
-    Page_<xsl:value-of select='@id'/> = <xsl:value-of select='position()'/>
+    Page_<xsl:value-of select='@id'/> = <xsl:value-of select='position() + 1'/>
     </xsl:for-each>
+
+    Page_<xsl:value-of select='last-page/@id'/> = <xsl:value-of select='count(//page) + 2'/>
     
     def __init__(self, parent=None, templatesdir='./'):
         super(<xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard, self).__init__(parent)
+
+        self._<xsl:value-of select='first-page/@id'/>Page = <xsl:value-of select='first-page/@id'/>Page(self)
+        self.setPage(self.Page_<xsl:value-of select='first-page/@id'/>, self._<xsl:value-of select='first-page/@id'/>Page)
+        
         <xsl:for-each select='//page'>
         self._<xsl:value-of select='@id'/>Page = <xsl:value-of select='@id'/>Page(self)
         self.setPage(self.Page_<xsl:value-of select='@id'/>, self._<xsl:value-of select='@id'/>Page)
         </xsl:for-each>
+        
+        self._<xsl:value-of select='last-page/@id'/>Page = <xsl:value-of select='last-page/@id'/>Page(self)
+        self.setPage(self.Page_<xsl:value-of select='last-page/@id'/>, self._<xsl:value-of select='last-page/@id'/>Page)
+
         self.resize(<xsl:value-of select='width'/>,<xsl:value-of select='height'/>)
         self.datamodel = DataModel(self)
         self.datamodel.readConf()
@@ -308,7 +321,7 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
         
     def enableButtons(self):
       id = self.currentId()
-      if id == self.Page_<xsl:value-of select='//page[1]/@id'/> or id == self.Page_<xsl:value-of select='//page[last()]/@id'/>:
+      if id == self.Page_<xsl:value-of select='first-page/@id'/> or id == self.Page_<xsl:value-of select='last-page/@id'/>:
         self.button(QtWidgets.QWizard.CustomButton1).setEnabled(False)
         self.button(QtWidgets.QWizard.CustomButton2).setEnabled(False)      
       else:
@@ -352,11 +365,9 @@ class BasePage(QtWidgets.QWizardPage):
     def initFieldsOfSection(self):
       self.wizard().datamodel.initFieldsOfSection(self)      
 
-<xsl:for-each select='page'>
-<xsl:if test='@type="first"'>
-class FirstPage(BasePage):
+class <xsl:value-of select='first-page/@id'/>Page(BasePage):
     def __init__(self, parent=None):
-        super(FirstPage, self).__init__(parent)
+        super(<xsl:value-of select='first-page/@id'/>Page, self).__init__(parent)
         self.labelDescription = QtWidgets.QLabel()
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.labelDescription)
@@ -364,12 +375,11 @@ class FirstPage(BasePage):
         self.sectionName = None
 
     def initializePage(self):
-        self.setTitle('<xsl:value-of select='//page[1]/title'/>')
-        self.labelDescription.setText('<xsl:value-of select='//page[1]/description'/>')
-</xsl:if>
+        self.setTitle('<xsl:value-of select='first-page/title'/>')
+        self.labelDescription.setText('<xsl:value-of select='first-page/description'/>')
 
+<xsl:for-each select='page'>
 
-<xsl:if test='@type = "input-data"'>
 class <xsl:value-of select='@id'/>Page(BasePage):
     def __init__(self, parent=None):
         super(<xsl:value-of select='@id'/>Page, self).__init__(parent)
@@ -380,23 +390,23 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         <xsl:choose>
         <xsl:when test='@type = "QLineEdit"'>
           <xsl:choose>
-            <xsl:when test='@format = "filename"'>
+            <xsl:when test='input/@type = "filename"'>
         _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(filenameQregexp, self)
         self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)                        
             </xsl:when>
-            <xsl:when test='@format = "directory"'>
+            <xsl:when test='input/@type = "directory"'>
         _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(directoryQregexp, self)
         self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)            
             </xsl:when>
-            <xsl:when test='@format = "path"'>
+            <xsl:when test='input/@type = "path"'>
         _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(pathQregexp, self)
         self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)            
             </xsl:when>
-            <xsl:when test='@format = "regexp"'>
+            <xsl:when test='input/@type = "regexp"'>
         _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='format/input-regexp'/>'), self)
         self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)
             </xsl:when>
-            <xsl:when test='@format = "range"'>
+            <xsl:when test='input/@type = "range"'>
         _validator_<xsl:value-of select='@id'/> = QtGui.QIntValidator(<xsl:value-of select='format/min'/>,<xsl:value-of select='format/max'/>, self)            
         self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)
             </xsl:when>
@@ -410,10 +420,10 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         </xsl:when>
         <xsl:when test='@type = "PathLineEdit"'>
           <xsl:choose>
-            <xsl:when test='@format = "filename"'>        
+            <xsl:when test='input/@type = "filename"'>        
         self._<xsl:value-of select='@id'/> = PathLineEdit(self, filedialogtype=PathLineEdit.Type_File)
             </xsl:when>
-            <xsl:when test='@format = "directory"'>
+            <xsl:when test='input/@type = "directory"'>
         self._<xsl:value-of select='@id'/> = PathLineEdit(self, filedialogtype=PathLineEdit.Type_Dir)
             </xsl:when>
           </xsl:choose>
@@ -421,16 +431,16 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         <xsl:when test='@type = "CheckLineEdit"'>
         self._<xsl:value-of select='@id'/> = CheckLineEdit(self)        
           <xsl:choose>
-            <xsl:when test='@format = "regexp"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='format/input-regexp'/>'), self)
+            <xsl:when test='input/@type = "regexp"'>
+        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='input/regexp'/>'), self)
         self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)
             </xsl:when>
-            <xsl:when test='@format = "range"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QIntValidator(<xsl:value-of select='format/min'/>,<xsl:value-of select='format/max'/>, self)            
+            <xsl:when test='input/@type = "range"'>
+        _validator_<xsl:value-of select='@id'/> = QtGui.QIntValidator(<xsl:value-of select='input/@min'/>,<xsl:value-of select='input/@max'/>, self)            
         self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)
             </xsl:when>
             <xsl:otherwise>
-            # GENERATION ERROR: unhandled format "<xsl:value-of select='@format'/>"
+            # GENERATION ERROR: unhandled input/@type "<xsl:value-of select='input/@type'/>"
             </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
@@ -439,12 +449,12 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         </xsl:when>
         <xsl:when test='@type = "QComboBox"'>
         self._<xsl:value-of select='@id'/> = QtWidgets.QComboBox(self)
-        <xsl:for-each select='item'>
-        self._<xsl:value-of select='../@id'/>.addItem("<xsl:value-of select='@id'/>","<xsl:value-of select='@label'/>")
+        <xsl:for-each select='input/item'>
+        self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@id'/>","<xsl:value-of select='@label'/>")
         </xsl:for-each>
         </xsl:when>
         <xsl:when test='@type = "UsersListEdit"'>
-        self._<xsl:value-of select='@id'/> = UsersListEdit(self, property_hided='<xsl:value-of select='@id'/>',property_checked=None, usercountmax=<xsl:value-of select='@max-count'/>, inputs=<xsl:value-of select='@inputs'/>,outputs=<xsl:value-of select='@outputs'/>)
+        self._<xsl:value-of select='@id'/> = UsersListEdit(self, property_hided='<xsl:value-of select='@id'/>'<xsl:if test="output/property_checked">, property_checked=None</xsl:if><xsl:if test="input/@max-count">, usercountmax=<xsl:value-of select='input/@max-count'/></xsl:if><xsl:if test="input/@inputs">, inputs=<xsl:value-of select='input/@inputs'/></xsl:if><xsl:if test="input/@outputs">,outputs=<xsl:value-of select='input/@outputs'/></xsl:if>)
         </xsl:when>
         </xsl:choose>
         </xsl:for-each>
@@ -502,11 +512,7 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         self.initFieldsOfSection()
         <xsl:for-each select='field'>
         <xsl:if test='@type = "UsersListEdit"'>
-        self._<xsl:value-of select='@id'/>.initialize(data['<xsl:value-of select='@datamodel-list-id'/>'])
-        </xsl:if>
-        </xsl:for-each>
-        <xsl:for-each select='field'>
-        <xsl:if test='@type = "UsersListEdit"'>
+        self._<xsl:value-of select='@id'/>.initialize(data['<xsl:value-of select='input/@list-id'/>'])
         self._<xsl:value-of select='@id'/>.readConf(config)
         </xsl:if>
         </xsl:for-each>
@@ -522,15 +528,23 @@ class <xsl:value-of select='@id'/>Page(BasePage):
           data = datamodel.data
           config = datamodel.config
           <xsl:for-each select='field'>
-            <xsl:if test='@type = "UsersListEdit"'>
-          self._<xsl:value-of select='@id'/>.updateConf(config,'<xsl:value-of select='@datamodel-list-id'/>')
+            <xsl:if test="output/@datamodel-id">
+              <xsl:choose>
+                <xsl:when test='@type = "UsersListEdit"'>
+          self._<xsl:value-of select='@id'/>.updateConf(config,'<xsl:value-of select='output/@datamodel-id'/>')
+                </xsl:when>
+                <xsl:otherwise>
+          data['<xsl:value-of select='output/@datamodel-id'/>'] = config['<xsl:value-of select='../@section-name'/>']['<xsl:value-of select='@id'/>']
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:if>
           </xsl:for-each>
-          <xsl:for-each select='.//output'>
+          <xsl:for-each select='.//output[@split-seperator]'>
             <xsl:if test='../@type = "CheckLineEdit" or ../@type = "QLineEdit"'>
-          data['<xsl:value-of select='@to'/>'] = config['<xsl:value-of select='../../@section-name'/>']['<xsl:value-of select='../@id'/>'].split('<xsl:value-of select='split/@seperator'/>')
+          data['<xsl:value-of select='@datamodel-id'/>'] = config['<xsl:value-of select='../../@section-name'/>']['<xsl:value-of select='../@id'/>'].split('<xsl:value-of select='@split-seperator'/>')
             </xsl:if>
           </xsl:for-each>
+          print (data)
           return True
         return False
     
@@ -539,11 +553,11 @@ class <xsl:value-of select='@id'/>Page(BasePage):
       <xsl:for-each select='field'>
         <xsl:choose>
           <xsl:when test='@type = "UsersListEdit"'>
-      for i in range(<xsl:value-of select='@max-count'/>):
+      for i in range(<xsl:value-of select='input/@max-count'/>):
         self.setField(self.sectionName + '.<xsl:value-of select='@id'/>' + str(i) + '-name-hide', '') 
-        property_checked = ('<xsl:value-of select='@property_checked'/>' != '')
-        inputs = <xsl:value-of select='@inputs'/>
-        outputs = <xsl:value-of select='@outputs'/>
+        property_checked = ('<xsl:value-of select='output/@property_checked'/>' != '')
+        inputs = <xsl:value-of select='input/@inputs'/>
+        outputs = <xsl:value-of select='input/@outputs'/>
         if property_checked != None:
           self.setField(self.sectionName + '.<xsl:value-of select='@id'/>' + str(i) + '-checked-hide', '') 
         if inputs == True:
@@ -551,10 +565,10 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         if outputs == True:
           self.setField(self.sectionName + '.<xsl:value-of select='@id'/>' + str(i) + '-outputs-hide', '')
       
-      listlabel = self.wizard().datamodel.data['<xsl:value-of select='@datamodel-list-id'/>']
+      listlabel = self.wizard().datamodel.data['<xsl:value-of select='output/@datamodel-id'/>']
       for i in range(len(listlabel)):
         self.setField(self.sectionName + '.<xsl:value-of select='@id'/>' + str(i) + '-name-hide', listlabel[i] ) 
-          <xsl:for-each select='default/item'>
+          <xsl:for-each select='./default/item'>
             <xsl:if test='@checked'>
       self.setField(self.sectionName + '.<xsl:value-of select='@id'/>' + str(i) + '-checked-hide', <xsl:value-of select='@checked'/>) 
             </xsl:if>
@@ -567,19 +581,18 @@ class <xsl:value-of select='@id'/>Page(BasePage):
           </xsl:for-each>
         </xsl:when>
         <xsl:when test='@type = "QCheckBox"'>
-      self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='default'/>' == True) 
+      self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='./default/@value'/>' == True) 
         </xsl:when>
         <xsl:otherwise>
-      self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='default'/>') 
+      self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='./default/@value'/>') 
         </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>
-</xsl:if>
-<xsl:if test='@type = "last"'>
+</xsl:for-each>
       
-class LastPage(BasePage):
+class <xsl:value-of select="last-page/@id"/>Page(BasePage):
     def __init__(self, parent=None):
-      super(LastPage, self).__init__(parent)
+      super(<xsl:value-of select="last-page/@id"/>Page, self).__init__(parent)
       self.labelDescription = QtWidgets.QLabel()
       self.textEdit = QtWidgets.QPlainTextEdit()
       layout = QtWidgets.QVBoxLayout()
@@ -590,8 +603,8 @@ class LastPage(BasePage):
       self.sectionName = None
 
     def initializePage(self):
-      self.setTitle('<xsl:value-of select='title'/>')
-      self.labelDescription.setText('<xsl:value-of select='description'/>')
+      self.setTitle('<xsl:value-of select='last-page/title'/>')
+      self.labelDescription.setText('<xsl:value-of select='last-page/description'/>')
       
       self.textEdit.setPlainText(self.wizard().datamodel.cleanConfAsString())
       self.textEdit.setReadOnly(True)
@@ -609,10 +622,10 @@ class LastPage(BasePage):
         datamodelfile= datamodeldir + os.sep + 'datamodel.json'
         self.wizard().datamodel.writeJSON(datamodelfile)
         
-        templatedir = self.wizard().templatesdir + os.sep + '<xsl:value-of select='../@id'/>'
+        templatedir = self.wizard().templatesdir + os.sep + '<xsl:value-of select='@id'/>'
         sys.path.append(templatedir)
 
-        from tmpl_<xsl:value-of select='lower-case(../@id)'/> import RaySessionTemplate
+        from tmpl_<xsl:value-of select='lower-case(@id)'/> import RaySessionTemplate
 
         
         print ('--' + str(datamodelfile) + '\n--' + str(templatedir) + '\n--' + str(tmpdir) + '\n--' + str(outdir) + '\n')
@@ -628,8 +641,6 @@ class LastPage(BasePage):
                                             "RaySessionn creation ...",
                                             "The RaySession name is already in use ! Please set another one.")
       return False
-</xsl:if>
-</xsl:for-each>
     
 if __name__ == '__main__':
     import sys
