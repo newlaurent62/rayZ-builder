@@ -29,6 +29,7 @@ conf-mywizard:
 	cp src/conf/mywizard.conf ./
 	
 generate-mywizard:
+	xmllint --schema src/xsd/mywizard.xsd src/xml/mywizard.xml --noout
 	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:"./src/xml/mywizard.xml" -xsl:"./src/xsl/wizard.xsl" -o:"./build/mywizard.py"
 	cheetah c -R --idir src/templates/mywizard --odir build
 	mkdir -p $(TMPL_RAY)
@@ -58,6 +59,10 @@ clean: clean-mywizard
 clean-conf: clean-conf-mywizard
 
 clean-all: clean clean-conf
+
+prepare-ubuntu:
+	echo "-- Instructions on ubuntu 20.04"
+	sudo apt install python3-cheetah libxml2-utils
 	
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
