@@ -29,7 +29,7 @@ conf-mywizard:
 	cp src/conf/mywizard.conf ./
 	
 generate-mywizard:
-	xmllint --schema src/xsd/mywizard.xsd src/xml/mywizard.xml --noout
+	xmllint --schema src/xsd/wizard.xsd src/xml/mywizard.xml --noout
 	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:"./src/xml/mywizard.xml" -xsl:"./src/xsl/wizard.xsl" -o:"./build/mywizard.py"
 	cheetah c -R --idir src/templates/mywizard --odir build
 	mkdir -p $(TMPL_RAY)
