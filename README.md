@@ -1,36 +1,28 @@
 # raysession-wizard-builder
-Tool to create a wizard that fill in a ray session template. 
+
+Tool to create a wizard to fill a ray session template (also created by this tool). 
 
 The template engine used is cheetah (python3). It lets you use various flow control and variables.
 
-1) You fill in an xml file then apply an xsl to generate the wizard in python.
+You might need XML, XSL, bash, Cheetah (python related) programming skills.
 
-2) you have to create three files:
-for example with mywizard project:
+if your use case is simple, then you only need to fill one XML file and to create three Cheetah templates (ray_session_sh, ray_session_xml, patch_xml).
 
-- tmpl_mywizard.py                   # load the following two templates
+## Try the wizards
 
-- raysession_ray_control_sh.tmpl     # template using cheetah
+make : generates all wizards
 
-- jack_connect_xml.tmpl              # template using cheetah
+make build : generates DEFAULT_WIZARD
 
+make exec : start the DEFAULT_WIZARD wizard
 
-The mywizard example should give you a good start.
+make test-template : fill the DEFAULT_WIZARD template using test-data
 
-The wizard read mywizard.conf in the calling directory
+make fill-template : fill the DEFAULT_WIZARD template and start raysession gui
 
+make install : install the script wrapper needed to start client in the created raysession
 
-## Test mywizard
-
-to test the example:
-
-$ make conf-mywizard
-
-$ make mywizard
-
-or
-
-$ make
+make uninstall : uninstall the script wrapper 
 
 ## Clean and uninstall raysession-template
 
