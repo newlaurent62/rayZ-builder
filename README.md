@@ -1,8 +1,8 @@
-# raysession-wizard-builder
+# rayZ-builder
 
-Tool to create a wizard to fill a ray session template (also created by this tool). 
+Tool to create wizards to fill ray session templates. 
 
-The template engine used is cheetah (python3). It lets you use various flow control and variables.
+The template engine used is cheetah (python3). It lets you use various flow controls and variables.
 
 You might need XML, XSL, bash, Cheetah (python related) programming skills.
 
