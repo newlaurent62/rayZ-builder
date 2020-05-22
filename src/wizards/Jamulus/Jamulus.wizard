@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wizard id='Jamulus' xmlns:xi="http://www.w3.org/2001/XInclude">
+  <info>
+    <title>Jamulus and related applications</title>
+    <category>jamulus</category>
+    <keywords>jamulus,streaming,recording,audio,video</keywords>
+    <version>1</version>
+    <description>Select your applications and configure a simple or a complex virtual studio setup using RaySession.</description>
+    <author>Laurent Schwartz</author>
+    <email>newlaurent@gmail.com</email>
+  </info>
+  <width>800</width>
+  <height>600</height>
+  <!-- PAGES -->
+  <first-page id='First'>
+    <title>Jamulus and related applications</title>
+    <description>This wizard let you create a raysession with Jamulus and other related applications.</description>
+  </first-page>
+  <!-- SINGLE PAGES -->
+  <xi:include href='global_with_users.page'/>
+  <xi:include href='jamulus.page'/>
+  <xi:include href='jack_capture_for_jamulus.page'/>
+  <!-- GROUPS OF EXCLUSIVE PAGES / CAN ONLY HAVE ONE AT A TIME IN WIZARD-->
+  <page-group>
+    <title>Obs Streaming audio and video</title>
+    <short-title>Obs streaming</short-title>
+    <description>Obs studio let you stream audio or video to icecast2, Facebook, Youtube and more !</description>
+<!--    <xi:include href='obs_for_jamulus_facebook.page'/> -->
+    <xi:include href='obs_for_jamulus_icecast2_audio.page'/>
+    <xi:include href='obs_for_jamulus_icecast2_video.page'/>
+<!--    <xi:include href='obs_for_jamulus_youtube.page'/> -->
+  </page-group>
+  <last-page id='Last'>
+    <title>Validate</title>
+    <description>...</description>
+  </last-page>
+  <template>
+    <copy-tree src="ray-scripts" dest="ray-scripts"/>
+    <!--raysession xml-->
+    <fill-template id="raysession_xml" type="conf" dest="default/raysession.xml.backup"/>
+    <!-- session script -->
+    <fill-template id="ray_script_load_sh" type="conf" dest="ray-scripts/load.sh"/>
+    <!-- in patch_xml.tmpl -->
+    <fill-template id="patch_xml" type="conf" dest="default/patch.xml"/>
+    <!-- in raysession_ray_control_sh.tmpl -->
+    <fill-template id="raysession_sh" type="create-raysession" dest="default/raysession.sh"/>
+  </template>
+</wizard>

@@ -1,0 +1,45 @@
+
+# add=add_proxy
+# set_properties=set_proxy_properties
+#if 'jamulus'  in $data['wizard.sectionnamelist']
+#set $jamulus_server=$data['jamulus.server']
+#set $jamulus_port=$data['jamulus.port']
+
+
+#if $data['jamulus.bool_start_server'] == 'True'
+#set $clientCount = $clientCount + 1
+#set $clientID = str($clientCount) + "_" + "jamsrv"
+mkdir -p "\$raysession_path/\$raysession_name.$clientID" || error
+#if $data['jamulus.bool_multitrack_record'] == 'True'
+cat<<EOF_$clientID > "\$raysession_path/\$raysession_name.$clientID/ray-proxy.xml" || error
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE RAY-PROXY>
+<RAY-PROXY wait_window="0" config_file="" no_save_level="2" arguments="--nsm-client-id $clientID -- Jamulus --server --port $jamulus_port --recording data" VERSION="0.9.0" save_signal="0" executable="alt-config-session" stop_signal="15"/>
+EOF_$clientID
+#else
+cat<<EOF_$clientID > "\$raysession_path/\$raysession_name.$clientID/ray-proxy.xml" || error
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE RAY-PROXY>
+<RAY-PROXY wait_window="0" config_file="" no_save_level="2" arguments="--nsm-client-id $clientID -- Jamulus --server --port $jamulus_port" VERSION="0.9.0" save_signal="0" executable="alt-config-session" stop_signal="15"/>
+EOF_$clientID
+#end if
+
+echo "------ RAY-PROXY for jamulus_server created"
+
+#end if
+#for $username in $data['global.userlist']
+#set $clientCount = $clientCount + 1
+#set $clientID = str($clientCount) + "_" + "jam"
+
+  mkdir -p "\$raysession_path/\$raysession_name.$clientID/.config/Jamulus" || error
+  
+cat<<EOF_$clientID > "\$raysession_path/\$raysession_name.$clientID/ray-proxy.xml" || error
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE RAY-PROXY>
+<RAY-PROXY wait_window="0" config_file="" no_save_level="2" arguments="--nsm-client-id $clientID -- Jamulus --nojackconnect --connect $jamulus_server:$jamulus_port --inifile &quot;.config/Jamulus/${username}.ini&quot; --clientname &quot;$username&quot;" VERSION="0.9.0" save_signal="0" executable="alt-config-session" stop_signal="15"/>
+EOF_$clientID
+
+echo "------ RAY-PROXY for jamulus $username created"
+
+#end for
+#end if

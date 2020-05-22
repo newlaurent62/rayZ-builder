@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='Jack_capture_for_jamulus' section-name='jack_capture' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Jack_capture section (stereo recording)</title>
+  <short-title>Jack capture</short-title>
+  
+  <requires executable="jack_capture" version="0.9.73"/> 
+
+  <field id='audioformat' type='QComboBox'>
+    <label>The output audio format</label>
+    <input>
+      <item id='mp3' label='MP3 format file'/>
+      <item id='oga' label='OGG audio format file'/>
+      <item id='wav' label='WAV format file'/>
+    </input>
+    <default value="wav"/>
+  </field>
+  <field id='user' type='UsersListEdit'>
+    <label>Set the user connected to jack_capture</label>
+    <input list-id="global.userlist" max-count='5' min="1" max="2"/>
+    <output property-checked-name="jack_capture_connected"/>
+    <default>
+      <item checked="True"/>
+      <item checked="False"/>
+      <item checked="False"/>
+    </default>
+  </field>
+  <template-snippet ref-id="raysession_xml">
+    <xi:include href="jack_capture_for_jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
+  </template-snippet>  
+  <template-snippet ref-id="raysession_sh">
+    <xi:include href="jack_capture_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+  </template-snippet>
+  <template-snippet ref-id="patch_xml">
+    <xi:include href="jack_capture_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+  </template-snippet>
+</page>

@@ -1,0 +1,15 @@
+#if 'obs_facebook' in $data['wizard.sectionnamelist'] or 'obs_youtube' in $data['wizard.sectionnamelist'] or 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] or 'obs_icecast2_video' in $data['wizard.sectionnamelist']
+#if 'obs_facebook' in $data['wizard.sectionnamelist'] 
+#set obssection = 'obs_facebook'
+#elif 'obs_youtube' in $data['wizard.sectionnamelist'] 
+#set obssection = 'obs_youtube'
+#elif 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] 
+#set obssection = 'obs_icecast2_audio'
+#elif 'obs_icecast2_video' in $data['wizard.sectionnamelist']
+#set obssection = 'obs_icecast2_video'
+#end if
+#for $username in $data[$obssection + '.user.obs_connectedlist']
+ <connection to="OBS Stream:in_1" from="Jamulus $username:output left"/>
+ <connection to="OBS Stream:in_2" from="Jamulus $username:output right"/>
+#end for
+#end if

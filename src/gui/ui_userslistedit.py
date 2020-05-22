@@ -6,130 +6,119 @@ from PyQt5 import QtWidgets
 import re
 from ui_checklineedit import CheckLineEdit
 
-inputsregexp = "((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*->(LR|L|R|)\s*"
-inputsre = re.compile(inputsregexp)
-outputsregexp = "(LR|L|R)->(([a-zA-Z]\w*):)?([0-9]+)(,(([a-zA-Z]\w*):)?([0-9]+))*\s*"
-outputsre = re.compile(outputsregexp)
-inputsQregexp = QtCore.QRegularExpression('^(' + inputsregexp + ')*$')
-outputsQregexp = QtCore.QRegularExpression('^(' + outputsregexp + ')*$')
+jack_inputsregexp = "((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*->(LR|L|R|)\s*"
+jack_inputsre = re.compile(jack_inputsregexp)
+jack_outputsregexp = "(LR|L|R)->(([a-zA-Z]\w*):)?([0-9]+)(,(([a-zA-Z]\w*):)?([0-9]+))*\s*"
+jack_outputsre = re.compile(jack_outputsregexp)
+jack_inputsQregexp = QtCore.QRegularExpression('^(' + jack_inputsregexp + ')*$')
+jack_outputsQregexp = QtCore.QRegularExpression('^(' + jack_outputsregexp + ')*$')
 
 
 class UsersListEdit(QtWidgets.QWidget):
-  def __init__(self, parent=None, sectionName=None, usercountmax=5, property_hided='user', property_checked=None,inputs=True, outputs=True):
+  def __init__(self, parent=None, sectionName=None, countmax=5, minchecked=0, maxchecked=None, property_checked=None, property_name='user', jack_inputs=False, jack_outputs=False):
       super(UsersListEdit, self).__init__(parent)
       
-      self.usercountmax = usercountmax
-      self.inputs = inputs
-      self.outputs = outputs
+      self.countmax = countmax
+      self.jack_inputs = jack_inputs
+      self.jack_outputs = jack_outputs
       self.labelMessage = QtWidgets.QLabel()
-      self.checkConnected = []
-      self.lineEditInputs = [] 
-      self.lineEditOutputs = [] 
-      self.lineEditNames = []     
+      self.checkName = []
+      self.lineEditJackInputs = [] 
+      self.lineEditJackOutputs = [] 
+      self.lineEditName = []     
       self.labelUsername = QtWidgets.QLabel()
-      self.labelConnected = QtWidgets.QLabel()
-      self.labelInputs = QtWidgets.QLabel()
-      self.labelOutputs = QtWidgets.QLabel()
+      self.labelChecked = QtWidgets.QLabel()
+      self.labelJackInputs = QtWidgets.QLabel()
+      self.labelJackOutputs = QtWidgets.QLabel()
       self.page = parent
-      self.userindexConnected = QtWidgets.QLineEdit(self)
-      self.listnamesConnected = QtWidgets.QLineEdit(self)
       self.listnames = []
+      self.listchecked = []
+      self.property_name = property_name
       self.property_checked = property_checked
-      self.property_hided = property_hided
       self.datalist = []
-      if self.property_checked != None:
-        parent.registerField(self.property_checked, self.userindexConnected)
-        self.userindexConnected.textChanged.check(self.updateChecks)
-        parent.registerField(self.property_checked.replace('-hide',''), self.listnamesConnected)
-
-      inputsValidator = QtGui.QRegularExpressionValidator(inputsQregexp, self)
-      outputsValidator = QtGui.QRegularExpressionValidator(outputsQregexp, self)
-      for i in range(self.usercountmax):
-        if self.property_checked != None:
-          self.checkConnected.append(QtWidgets.QCheckBox(self))
-        self.lineEditNames.append(QtWidgets.QLineEdit(self))
-        if inputs:
-          self.lineEditInputs.append(CheckLineEdit(self,message=False))
-          self.lineEditInputs[i].setValidator(inputsValidator)
-        if outputs:
-          self.lineEditOutputs.append(CheckLineEdit(self,message=False))
-          self.lineEditOutputs[i].setValidator(outputsValidator)
-        
-        parent.registerField(parent.sectionName + '.' + self.property_hided + str(i) + '-name-hide', self.lineEditNames[i])
-        if self.property_checked:
-          parent.registerField(parent.sectionName + '.bool' + self.property_hided + str(i) + '-checked-hide', self.checkConnected[i])
-        if self.inputs:
-          parent.registerField(parent.sectionName + '.' + self.property_hided + str(i) + '-inputs-hide', self.lineEditInputs[i].lineEdit)
-        if self.outputs:
-          parent.registerField(parent.sectionName + '.' + self.property_hided + str(i) + '-outputs-hide', self.lineEditOutputs[i].lineEdit)
-
-  def updateChecks(self):
-    print ('+++updatechecks+++')
-    if self.property_checked != None:
-      listnamesSelected = []
-      indexes = self.page.field(self.property_checked)
-      print (indexes)
-      for i in range(self.usercountmax):
-        self.checkConnected[i].show()
-        if str(i) in indexes:
-          listnamesSelected.append(self.lineEditNames[i].text())
-          self.checkConnected[i].setChecked(True)
+      self.minchecked = None
+      self.maxchecked = None
+      if self.property_checked:
+        self.minchecked = minchecked
+        if maxchecked == None:
+          self.maxchecked = countmax
         else:
-          self.checkConnected[i].setChecked(False)
-      self.listnamesConnected.setText(','.join(listnamesSelected))
-    print (self.listnamesConnected.text() + ' => ' + self.userindexConnected.text())
+          self.maxchecked = maxchecked
+
+      jack_inputsValidator = QtGui.QRegularExpressionValidator(jack_inputsQregexp, self)
+      jack_outputsValidator = QtGui.QRegularExpressionValidator(jack_outputsQregexp, self)
+      for i in range(self.countmax):
+        if self.property_checked:
+          self.checkName.append(QtWidgets.QCheckBox(self))
+        self.lineEditName.append(QtWidgets.QLineEdit(self))
+        if jack_inputs:
+          self.lineEditJackInputs.append(CheckLineEdit(self,message=False))
+          self.lineEditJackInputs[i].setValidator(jack_inputsValidator)
+        if jack_outputs:
+          self.lineEditJackOutputs.append(CheckLineEdit(self,message=False))
+          self.lineEditJackOutputs[i].setValidator(jack_outputsValidator)
+        
+        parent.registerField(parent.sectionName + '.' + self.property_name + str(i) + '-name-hide', self.lineEditName[i])
+        if self.property_checked:
+          parent.registerField(parent.sectionName + '.bool' + self.property_name + str(i) + '-checked-hide', self.checkName[i])
+        if self.jack_inputs:
+          parent.registerField(parent.sectionName + '.' + self.property_name + str(i) + '-jack_inputs-hide', self.lineEditJackInputs[i].lineEdit)
+        if self.jack_outputs:
+          parent.registerField(parent.sectionName + '.' + self.property_name + str(i) + '-jack_outputs-hide', self.lineEditJackOutputs[i].lineEdit)
     
   def initialize(self, listnames):
     print ('initialize')
     self.listnames = listnames
+    if self.property_checked:
+      self.labelChecked.show()
+      self.labelChecked.setText('Selection')
     self.labelUsername.setText('User name')
-    if self.inputs:
-      self.labelInputs.show()
-      self.labelInputs.setText('Inputs')
+    if self.jack_inputs:
+      self.labelJackInputs.show()
+      self.labelJackInputs.setText('Jack Inputs')
     else:
-      self.labelInputs.hide()
+      self.labelJackInputs.hide()
 
-    if self.outputs:
-      self.labelOutputs.show()
-      self.labelOutputs.setText('Outputs')
+    if self.jack_outputs:
+      self.labelJackOutputs.show()
+      self.labelJackOutputs.setText('Jack Outputs')
     else:
-      self.labelOutputs.hide()
-    
-    self.userindexConnected.hide()
-    self.listnamesConnected.hide()
-    
-    for i in range(self.usercountmax):
+      self.labelJackOutputs.hide()
+        
+    for i in range(self.countmax):
       if i < len(self.listnames):
         name = self.listnames[i]
-        if self.inputs:
-          self.lineEditInputs[i].show()
-        if self.outputs:
-          self.lineEditOutputs[i].show()
-        self.lineEditNames[i].setText(name)
-        self.lineEditNames[i].show()
-        self.lineEditNames[i].setEnabled(False)
         if self.property_checked:
-          self.checkConnected[i].show()
+          self.checkName[i].show()
+        if self.jack_inputs:
+          self.lineEditJackInputs[i].show()
+        if self.jack_outputs:
+          self.lineEditJackOutputs[i].show()
+        self.lineEditName[i].setText(name)
+        self.lineEditName[i].show()
+        self.lineEditName[i].setEnabled(False)
+        if self.property_checked:
+          self.checkName[i].show()
       else:        
         if self.property_checked:
-          self.checkConnected[i].hide()          
-          self.checkConnected[i].setChecked(False)
-        if self.inputs:
-          self.lineEditInputs[i].setText('')
-          self.lineEditInputs[i].hide()
-        if self.outputs:
-          self.lineEditOutputs[i].setText('')        
-          self.lineEditOutputs[i].hide()
+          self.checkName[i].hide()          
+          self.checkName[i].setChecked(False)
+        if self.jack_inputs:
+          self.lineEditJackInputs[i].setText('')
+          self.lineEditJackInputs[i].hide()
+        if self.jack_outputs:
+          self.lineEditJackOutputs[i].setText('')        
+          self.lineEditJackOutputs[i].hide()
         
-        self.lineEditNames[i].setText('')
-        self.lineEditNames[i].hide()
+        self.lineEditName[i].setText('')
+        self.lineEditName[i].hide()
       
   def hasAcceptableInput(self):
     if self.check():
       for i in range(len(self.listnames)):
-        if self.inputs and not self.lineEditInputs[i].hasAcceptableInput():
+        if self.jack_inputs and not self.lineEditJackInputs[i].hasAcceptableInput():
           return False
-        if self.outputs and not self.lineEditOutputs[i].hasAcceptableInput():
+        if self.jack_outputs and not self.lineEditJackOutputs[i].hasAcceptableInput():
           return False
       return True
     else:
@@ -137,38 +126,48 @@ class UsersListEdit(QtWidgets.QWidget):
     
   def check(self):        
     self.labelMessage.setText('')
-    if self.inputs:
-      for i in range(len(self.listnames), self.usercountmax):
-        self.lineEditInputs[i].setText('')
+    if self.property_checked:
+      for i in range(len(self.listnames), self.countmax):
+        self.checkName[i].setChecked(False)
+      
+    if self.jack_inputs:
+      for i in range(len(self.listnames), self.countmax):
+        self.lineEditJackInputs[i].setText('')
 
-    if self.outputs:
-      for i in range(len(self.listnames), self.usercountmax):
-        self.lineEditOutputs[i].setText('')
+    if self.jack_outputs:
+      for i in range(len(self.listnames), self.countmax):
+        self.lineEditJackOutputs[i].setText('')
 
     if self.property_checked:
-      userschecked = []
+      checked = []
       for i in range(len(self.listnames)):
-        if self.checkConnected[i].isChecked():
-          userschecked.append(str(i))
-      self.userindexConnected.setText(','.join(userschecked))
-            
-    if self.inputs:
-      for i in range(len(self.listnames)):
-        if self.lineEditInputs[i].text() != '':
-          for j in range(len(self.listnames)):
-            if i != j:
-              if self.lineEditInputs[i].text() != '' and self.lineEditInputs[i].text() == self.lineEditInputs[j].text():
-                self.labelMessage.setText('<span style="color:red">Inputs must be different for each user ! (You can leave blank if no checkions is needed) </span>')
-                return False
+        if self.checkName[i].isChecked():
+          checked.append(str(i))
+      print ("checked:" + str(len(checked)) + ' ' + str(self.minchecked) + ' ' + str(self.maxchecked))
+      if len(checked) < self.minchecked or len(checked) > self.maxchecked:
+        if self.minchecked == self.maxchecked:
+          self.labelMessage.setText('<span style="color:red">You must select %d user(s)</span>' % self.minchecked)
+        else:
+          self.labelMessage.setText('<span style="color:red">You must select between %d and %d user(s)</span>' % (self.minchecked, self.maxchecked))
+        return False
+      
+    #if self.jack_inputs:
+      #for i in range(len(self.listnames)):
+        #if self.lineEditJackInputs[i].text() != '':
+          #for j in range(len(self.listnames)):
+            #if i != j:
+              #if self.lineEditJackInputs[i].text() != '' and self.lineEditJackInputs[i].text() == self.lineEditJackInputs[j].text():
+                #self.labelMessage.setText('<span style="color:red">JackInputs must be different for each user ! (You can leave blank if no checkions is needed) </span>')
+                #return False
 
-    if self.outputs:
-      for i in range(len(self.listnames)):
-        if self.lineEditOutputs[i].text() != '':
-          for j in range(len(self.listnames)):
-            if i != j:
-              if self.lineEditOutputs[i].text() != '' and self.lineEditOutputs[i].text() == self.lineEditOutputs[j].text():
-                self.labelMessage.setText('<span style="color:red">Outputs must be different for each user ! (You can leave blank if no checkions is needed) </span>')
-                return False
+    #if self.jack_outputs:
+      #for i in range(len(self.listnames)):
+        #if self.lineEditJackOutputs[i].text() != '':
+          #for j in range(len(self.listnames)):
+            #if i != j:
+              #if self.lineEditJackOutputs[i].text() != '' and self.lineEditJackOutputs[i].text() == self.lineEditJackOutputs[j].text():
+                #self.labelMessage.setText('<span style="color:red">JackOutputs must be different for each user ! (You can leave blank if no checkions is needed) </span>')
+                #return False
               
     return True
       
@@ -177,28 +176,28 @@ class UsersListEdit(QtWidgets.QWidget):
     #layout.addWidget(self.listnamesConnected)
     
     grid_layout = QtWidgets.QGridLayout()
-    if self.property_checked != None:
-      grid_layout.addWidget(self.labelConnected,0,0)
+    if self.property_checked:
+      grid_layout.addWidget(self.labelChecked,0,0)
     grid_layout.addWidget(self.labelUsername,0,1)
-    if self.inputs:
-      grid_layout.addWidget(self.labelInputs,0,3)
-    if self.outputs:
-      grid_layout.addWidget(self.labelOutputs,0,5)
+    if self.jack_inputs:
+      grid_layout.addWidget(self.labelJackInputs,0,3)
+    if self.jack_outputs:
+      grid_layout.addWidget(self.labelJackOutputs,0,5)
 
-    for i in range(self.usercountmax):
-      if self.property_checked != None:
-        grid_layout.addWidget(self.checkConnected[i],i+1,0)
-      grid_layout.addWidget(self.lineEditNames[i],i+1,1)
-      if self.inputs:
-        self.lineEditInputs[i].addWidgetsTo(grid_layout,i+1,3)
-      if self.outputs:
-        self.lineEditOutputs[i].addWidgetsTo(grid_layout,i+1,5)
+    for i in range(self.countmax):
+      if self.property_checked:
+        grid_layout.addWidget(self.checkName[i],i+1,0)
+      grid_layout.addWidget(self.lineEditName[i],i+1,1)
+      if self.jack_inputs:
+        self.lineEditJackInputs[i].addWidgetsTo(grid_layout,i+1,3)
+      if self.jack_outputs:
+        self.lineEditJackOutputs[i].addWidgetsTo(grid_layout,i+1,5)
     
     layout.addLayout(grid_layout)
  
 
   def readConf(self, config):
-    print('Reading ' + self.property_hided + '...')
+    print('Reading ' + self.property_name + '...')
     sectionName = self.page.sectionName
     
     listnames = self.listnames
@@ -207,87 +206,108 @@ class UsersListEdit(QtWidgets.QWidget):
       listnamesidx[listnames[i]] = str(i)
     
     if self.property_checked:
-      property_checked_values = config[sectionName][property_checked].split(',')
-      property_checked_idx = []
-      for name in property_checked_values:
-        property_checked_idx.append(listnamesidx[name])
-      config[sectionName][property_checked + '-hide'] = ','.join(property_checked_idx)
-      self.page.setField(sectionName + '.' + property_checked + '-hide', ','.join(property_checked_idx))
-  
+      try:
+        property_checked_values = config[sectionName][self.property_name + "." + self.property_checked].split(',')
+      except KeyError:
+        property_checked_values = []
+          
     for i in range(len(listnames)):
       name = listnames[i]
-      if self.property_checked and rname in property_checked_values:
-        self.page.setField(sectionName + '.bool' + self.property_hided + str(i) + '-checked-hide', True)
-      self.page.setField(sectionName + '.' + self.property_hided + str(i) + '-name-hide', name)
-      if self.inputs:
+      if self.property_checked and name in property_checked_values:
+        self.page.setField(sectionName + '.bool' + self.property_name + str(i) + '-checked-hide', True)
+      self.page.setField(sectionName + '.' + self.property_name + str(i) + '-name-hide', name)
+      if self.jack_inputs:
         try:
-          self.page.setField(sectionName +'.' + self.property_hided + str(i) + '-inputs-hide', config[sectionName]['user.' + name + '.inputs'])
+          self.page.setField(sectionName +'.' + self.property_name + str(i) + '-jack_inputs-hide', config[sectionName]['user.' + name + '.jack_inputs'])
         except:
-          self.page.setField(sectionName + '.' + self.property_hided + str(i) + '-inputs-hide', '')
+          self.page.setField(sectionName + '.' + self.property_name + str(i) + '-jack_inputs-hide', '')
 
-      if self.outputs:
+      if self.jack_outputs:
         try:
-          self.page.setField(sectionName + '.' + self.property_hided + str(i) + '-outputs-hide', config[sectionName]['user.' + name + '.outputs'])
+          self.page.setField(sectionName + '.' + self.property_name + str(i) + '-jack_outputs-hide', config[sectionName]['user.' + name + '.jack_outputs'])
         except:
-          self.page.setField(sectionName + '.' + self.property_hided + str(i) + '-outputs-hide', '')
+          self.page.setField(sectionName + '.' + self.property_name + str(i) + '-jack_outputs-hide', '')
  
   def updateConf(self, config, datamodel_listid):
-    print('Updating ' + self.property_hided + '...')
+    print('Updating ' + self.property_name + '...')
     sectionName = self.page.sectionName
     datamodel = self.page.wizard().datamodel
-    datamodel.removeRegisteredKey(sectionName, self.property_hided + '.')
+    datamodel.removeRegisteredKey(sectionName, self.property_name + '.')
     listnames = self.listnames
-    property_checked_idx = ''
     self.datalist = []
-    if self.inputs:
+    if not ('alsa_devices' in datamodel.data):
+      datamodel.data['alsa_devices'] = []
+      
+    if self.jack_inputs:
       if not ('alsa_in_devices' in datamodel.data):
         datamodel.data['alsa_in_devices'] = []
   
-    if self.outputs:
+    if self.jack_outputs:
       if not ('alsa_out_devices' in datamodel.data):
         datamodel.data['alsa_out_devices'] = []
     
-    datamodel.data[datamodel_listid + ".alsa_in_devices"] = []
-    datamodel.data[datamodel_listid + ".alsa_out_devices"] = []
+    if datamodel_listid:
+      datamodel.data[datamodel_listid + ".alsa_in_devices"] = []
+      datamodel.data[datamodel_listid + ".alsa_out_devices"] = []
+    checkedlist=[]
     for i in range(len(listnames)):
       name = listnames[i]
       element = {}
       self.datalist.append(element)
       element['name'] = name
-      if self.property_checked and self.field(sectionName + '.' + property_hided + str(i) + '-checked-hide') == True:
-        property_checked_idx += str(i)
-      if self.inputs:
-        if config[sectionName][self.property_hided  + str(i) + '-inputs-hide'] != '':
-          value = self.page.field(sectionName + '.'+ self.property_hided  + str(i) + '-inputs-hide')
-          config[sectionName][self.property_hided  + '.' + name + '.inputs'] = value
-          datamodel.registerkey(sectionName, self.property_hided  + '.' + name + '.inputs')
+      if self.property_checked and self.page.field(sectionName + '.bool' + self.property_name + str(i) + '-checked-hide') == True:
+        checkedlist.append(name)
+        
+      if self.jack_inputs:
+        if config[sectionName][self.property_name  + str(i) + '-jack_inputs-hide'] != '':
+          value = self.page.field(sectionName + '.'+ self.property_name  + str(i) + '-jack_inputs-hide')
+          config[sectionName][self.property_name  + '.' + name + '.jack_inputs'] = value
+          datamodel.registerkey(sectionName, self.property_name  + '.' + name + '.jack_inputs')
           if not ('jack_connections' in element):
             element['jack_connections'] = {}
-          element['jack_connections']['left_inputs'] = datamodel.leftInputs(value) 
-          element['jack_connections']['right_inputs']= datamodel.rightInputs(value)
+          element['jack_connections']['left_jack_inputs'] = datamodel.leftJackInputs(value) 
+          element['jack_connections']['right_jack_inputs']= datamodel.rightJackInputs(value)
           for dev in datamodel.alsa_in_devices(value):
             if not (dev in datamodel.data[datamodel_listid + ".alsa_in_devices"]):
               datamodel.data[datamodel_listid + ".alsa_in_devices"].append(dev) 
             if not (dev in datamodel.data["alsa_in_devices"]):
               datamodel.data["alsa_in_devices"].append(dev) 
+            if not (dev in datamodel.data["alsa_devices"]):
+              datamodel.data["alsa_devices"].append(dev) 
       
-      if self.outputs:
-        if config[sectionName][self.property_hided + str(i) + '-outputs-hide'] != '':
-          value = self.page.field(sectionName + '.' + self.property_hided   + str(i) + '-outputs-hide')
-          config[sectionName][self.property_hided  + '.' + name + '.outputs'] = value
-          datamodel.registerkey(sectionName, self.property_hided  + '.' + name + '.outputs')
+      if self.jack_outputs:
+        if config[sectionName][self.property_name + str(i) + '-jack_outputs-hide'] != '':
+          value = self.page.field(sectionName + '.' + self.property_name   + str(i) + '-jack_outputs-hide')
+          config[sectionName][self.property_name  + '.' + name + '.jack_outputs'] = value
+          datamodel.registerkey(sectionName, self.property_name  + '.' + name + '.jack_outputs')
           if not ('jack_connections' in element):
             element['jack_connections'] = {}
-          element['jack_connections']['left_outputs'] = datamodel.leftOutputs(value)
-          element['jack_connections']['right_outputs'] = datamodel.rightOutputs(value)
+          element['jack_connections']['left_jack_outputs'] = datamodel.leftJackOutputs(value)
+          element['jack_connections']['right_jack_outputs'] = datamodel.rightJackOutputs(value)
           for dev in datamodel.alsa_out_devices(value):
             if not (dev in datamodel.data[datamodel_listid + ".alsa_out_devices"]):
               datamodel.data[datamodel_listid + ".alsa_out_devices"].append(dev) 
             if not (dev in datamodel.data["alsa_out_devices"]):
               datamodel.data["alsa_out_devices"].append(dev) 
+            if not (dev in datamodel.data["alsa_devices"]):
+              datamodel.data["alsa_devices"].append(dev) 
 
     if self.property_checked:
-      config[sectionName][self.property_checked] = property_checked_idx
-      
-    datamodel.data[datamodel_listid] = self.datalist
+      datamodel.registerkey(sectionName, self.property_name + "." + self.property_checked)
+      config[sectionName][self.property_name + "." + self.property_checked] = ",".join(checkedlist)
+      datamodel.data[sectionName + '.' + self.property_name + "." + self.property_checked + "list"] = checkedlist
     
+    if datamodel_listid and (self.jack_inputs or self.jack_outputs):
+      datamodel.data[datamodel_listid] = self.datalist
+    
+  def setFieldCheck(self, index, value):
+    self.page.setField(self.page.sectionName + '.bool' + self.property_name + str(index) + '-checked-hide', value)
+    
+  def setFieldName(self, index, value):
+    self.page.setField(self.page.sectionName + '.' + self.property_name   + str(index) + '-name-hide', value)
+
+  def setFieldJackInputs(self, index, value):
+    self.page.setField(self.page.sectionName + '.' + self.property_name   + str(index) + '-jack_inputs-hide', value)
+    
+  def setFieldJackOutputs(self, index, value):
+    self.page.setField(self.page.sectionName + '.' + self.property_name   + str(index) + '-jack_outputs-hide', value)

@@ -1,0 +1,7 @@
+#if 'jack_capture' in $data['wizard.sectionnamelist']
+#for $username in $data['jack_capture.user.jack_capture_connectedlist']
+#set $clientCount = $clientCount + 1
+#set $clientID = str($clientCount) + "_" + "captur"
+  <client id="$clientID" launched="1" label="RAY-PROXY jack_capture" executable="ray-proxy" icon="alt-config-session" name="Ray Proxy-jack_capture"/>
+#end for
+#end if

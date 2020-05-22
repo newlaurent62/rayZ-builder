@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='Obs_Icecast2_video' section-name='obs_icecast2_video'  use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Obs video streaming through icecast2 section</title>
+  <short-title>Obs Icecast2 video</short-title>
+  
+  <requires executable="obs" version="25.0.3"/> 
+  
+  <field id='server' type='QLineEdit'>
+    <label>Icecast2 server (hostname or IP address)</label>
+    <input type="None"/>
+    <default value="localhost"/>
+  </field>
+  <field id='port' type='QLineEdit'>
+    <label>Icecast2 port</label>
+    <input type="range" min="1" max="65535"/>
+    <default value="8000"/>
+  </field>
+  <field id='source' type='QLineEdit'>
+    <label>Source</label>
+    <input type="regexp"><regexp>^\w+$</regexp></input>
+    <default value="ts"/>
+  </field>
+  <field id='password' type='QLineEdit'>
+    <label>Password</label>
+    <input type="regexp"><regexp>^\w+$</regexp></input>
+    <default value="Jamulus0S"/>
+  </field>
+  <field id='mount' type='QLineEdit'>
+    <label>Mount point</label>
+    <input type="path"/>
+    <default value="/stream.ts"/>
+  </field>
+  <field id='user' type='UsersListEdit'>
+    <label>Set the jamulus client connected to obs</label>
+    <input list-id="global.userlist" max-count='5' min="1" max="1"/>
+    <output property-checked-name="obs_connected"/>
+    <default>
+      <item checked="True"/>
+      <item checked="False"/>
+      <item checked="False"/>
+    </default>
+  </field>
+  <set id="streaming_type" value="icecast2_video_ts"/>
+  <template-snippet ref-id="raysession_xml">
+#if 'obs_icecast2_video' in $data['wizard.sectionnamelist']  
+<xi:include href="obs_for_jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <template-snippet ref-id="raysession_sh">
+#if 'obs_icecast2_video' in $data['wizard.sectionnamelist']  
+<xi:include href="obs_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <template-snippet ref-id="patch_xml">
+#if 'obs_icecast2_video' in $data['wizard.sectionnamelist']  
+<xi:include href="obs_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <!-- TEMPLATE DEFINITION APART FROM patch_xml and raysession_sh -->
+  <template>
+    <!-- building default obs-studio configuration for icecast2_video_ts -->
+    <copy-tree src="default/obs-studio" dest="default/obs-studio-icecast2_video_ts"/>
+    <fill-template id="obs_scene_ts_json" type="conf"  dest="default/obs-studio-icecast2_video_ts/basic/scenes/icecast2_video_ts.json"/>
+    <fill-template id="obs_profile_basic_ini" type="conf" dest="default/obs-studio-icecast2_video_ts/basic/profiles/icecast2_video_ts/basic.ini"/>
+    <fill-template id="obs_global_ini" type="conf" dest="default/obs-studio-icecast2_video_ts/global.ini"/>
+  </template>  
+
+</page>

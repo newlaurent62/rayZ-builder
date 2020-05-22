@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='ObsFacebook' section-name='obs_facebook' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Obs streaming through facebook section</title>
+  <short-title>Obs Facebook</short-title>
+  
+  <requires executable="obs" version="25.0.3"/> 
+
+  <field id='facebookid' type='QLineEdit'>
+    <label>Input your facebook streaming ID</label>
+    <input type="None"/>
+    <default value=""/>
+  </field>
+  <field id='user' type='UsersListEdit'>
+    <label>Set the jamulus client connected to obs</label>
+    <input list-id="global.userlist" max-count='5' min="1" max="1"/>
+    <output property-checked-name="obs_connected"/>
+    <default>
+      <item checked="True"/>
+      <item checked="False"/>
+      <item checked="False"/>
+    </default>
+  </field>
+  <set id="streaming_type" value="facebook"/>
+  <template-snippet ref-id="raysession_xml">
+#if 'obs_facebook' in $data['wizard.sectionnamelist']
+<xi:include href="obs_for_jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <template-snippet ref-id="raysession_sh">
+#if 'obs_facebook' in $data['wizard.sectionnamelist']
+<xi:include href="obs_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <template-snippet ref-id="patch_xml">
+#if 'obs_facebook' in $data['wizard.sectionnamelist']
+<xi:include href="obs_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <template>
+    <!-- building default obs-studio configuration for facebook -->
+    <copy-tree src="default/obs-studio" dest="default/obs-studio-facebook"/>
+    <fill-template id="obs_scene_facebook_json" type="conf"  dest="default/obs-studio-facebook/basic/scenes/facebook.json"/>
+    <fill-template id="obs_profile_basic_ini" type="conf"  dest="default/obs-studio-facebook/basic/profiles/facebook/basic.ini"/>
+    <fill-template id="obs_global_ini" type="conf"  dest="default/obs-studio-facebook/global.ini"/>
+  </template>
+</page>

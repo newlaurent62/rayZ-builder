@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='Obs_youtube' section-name='obs_youtube' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Obs streaming through youtube section</title>
+  <short-title>Obs YouTube</short-title>
+  
+  <requires executable="obs" version="25.0.3"/> 
+    
+  <field id='youtubeid' type='QLineEdit'>
+    <label>Input your youtube streaming ID</label>
+    <input type="None"/>
+    <default value=""/>
+  </field>
+  <field id='user' type='UsersListEdit'>
+    <label>Set the jamulus client connected to obs</label>
+    <input list-id="global.userlist" max-count='5' min="1" max="1"/>
+    <output property-checked-name="obs_connected"/>
+    <default>
+      <item checked="True"/>
+      <item checked="False"/>
+      <item checked="False"/>
+    </default>
+  </field>
+  <set id="streaming_type" value="youtube"/>
+  <template-snippet ref-id="raysession_xml">
+#if 'obs_youtube' in $data['wizard.sectionnamelist']    
+<xi:include href="obs_for_jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <template-snippet ref-id="raysession_sh">
+#if 'obs_youtube' in $data['wizard.sectionnamelist']    
+<xi:include href="obs_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+  <template-snippet ref-id="patch_xml">
+#if 'obs_youtube' in $data['wizard.sectionnamelist']    
+<xi:include href="obs_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
+    <!-- TEMPLATE DEFINITION APART FROM patch_xml and raysession_sh -->
+  <template>
+    <!-- building default obs-studio configuration for youtube -->
+    <copy-tree src="default/obs-studio" dest="default/obs-studio-youtube"/>
+    <fill-template id="obs_scene_youtube_json" type="conf" dest="default/obs-studio-youtube/basic/scenes/youtube.json"/>
+    <fill-template id="obs_profile_basic_ini" type="conf"  dest="default/obs-studio-youtube/basic/profiles/youtube/basic.ini"/>
+    <fill-template id="obs_global_ini" type="conf" dest="default/obs-studio-youtube/global.ini"/>
+  </template>
+</page>

@@ -1,0 +1,39 @@
+<RAY-JACKPATCH>
+ <connection to="PulseAudio JACK Source:front-left" from="system:capture_1"/>
+ <connection to="PulseAudio JACK Source:front-right" from="system:capture_2"/>
+ <connection to="system:playback_1" from="PulseAudio JACK Sink:front-left"/>
+ <connection to="system:playback_2" from="PulseAudio JACK Sink:front-right"/>
+#for $user in $jamulus.users ## Iterate over jamulus users
+
+#for $to_jamulus in $user.jack_connection.to_jamulus_left
+ <connection to="Jamulus $user.name:input left" from="$to_jamulus"/>
+#end for
+#for $to_jamulus in $user.jack_connection.to_jamulus_right
+ <connection to="Jamulus $user.name:input right" from="$to_jamulus"/>
+#end for
+#for $from_jamulus in $user.jack_connection.from_jamulus_left
+ <connection to="$from_jamulus" from="Jamulus $user.name:output left"/>
+#end for
+#for $from_jamulus in $user.jack_connection.from_jamulus_right
+ <connection to="$from_jamulus" from="Jamulus $user.name:output right"/>
+#end for
+
+#if $user.name == $jamulus.obs_connected
+ <connection to="OBS Stream:in_1" from="Jamulus $user.name:output left"/>
+ <connection to="OBS Stream:in_2" from="Jamulus $user.name:output right"/>
+#end if
+
+#end for
+#for $user in $mumble.users
+ <connection to="Mumble_$user.name:input" from="$user.input"/>
+#end for
+
+#if $mumble.to_jamulus== 'L'
+ <connection to="Jamulus $jamulus.mumble_connected:input left" from="Mumble_to_jamulus:output_1"/>
+#else if $mumble.to_jamulus == 'R'
+ <connection to="Jamulus $jamulus.mumble_connected:input right" from="Mumble_to_jamulus:output_1"/>
+#else if $mumble.to_jamulus == 'LR'
+ <connection to="Jamulus $jamulus.mumble_connected:input left" from="Mumble_to_jamulus:output_1"/>
+ <connection to="Jamulus $jamulus.mumble_connected:input right" from="Mumble_to_jamulus:output_1"/>
+#end if
+</RAY-JACKPATCH>

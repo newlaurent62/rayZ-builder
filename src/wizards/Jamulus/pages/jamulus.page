@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='Jamulus' section-name='jamulus' use="required" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Jamulus section</title>
+  <short-title>Jamulus</short-title>
+  <requires executable="Jamulus" version="3.5.3"/>
+  <field id='server' type='QLineEdit'>
+    <label>Jamulus server (hostname or IP address)</label>
+    <input type="None"/>
+    <default value="localhost"/>
+  </field>
+  <field id='port' type='QLineEdit'>
+    <label>Jamulus port</label>
+    <input min="1" max="65535"/>
+    <default value="22124"/>
+  </field>
+  <field id='bool_start_server' type='QCheckBox'>
+    <label>Start Jamulus server on this machine</label>
+    <default value="False"/>
+  </field>
+  <field id='bool_multitrack_record' type='QCheckBox'>
+    <label>Activate server multitrack recording</label>
+    <default value="False"/>
+  </field>
+  <field id='user' type='UsersListEdit'>
+    <label>Set the input/output for each user</label>
+    <input list-id="global.userlist" max-count='5' jack-inputs="True" jack-outputs='True' min="0" max="1"/>
+    <output datamodel-id='jamulus.userinoutlist'/>
+    <default>
+      <item jack-inputs='1->L' jack-outputs='L->1 R->2'/>
+      <item jack-inputs='2->L'/>
+      <item jack-inputs='3->L'/>
+    </default>
+  </field>
+  <template-snippet ref-id="raysession_xml">
+    <xi:include href="jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
+  </template-snippet>
+  <template-snippet ref-id="raysession_sh">
+    <xi:include href="jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+  </template-snippet>
+  <template-snippet ref-id="patch_xml">
+    <xi:include href="jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+  </template-snippet>
+</page>

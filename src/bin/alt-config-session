@@ -13,41 +13,33 @@ function error() {
 
 function help() {
   echo "Usage: "
-  echo "  alt-config-session [ (-x|--xdg_config_home) path ] -- 'executable args'"
+  echo "  alt-config-session [ (-x|--xdg-config-home) RELATIVE_PATH ] [-n|nsm-client-id CLIENTID] -- EXECUTABLE_ARGS"
   echo ""
-  echo " Replace the string 'xxx-RAYSESSION_PATH-xxx' with its value given by ray_control."
+  echo " PWD = with --nsm-client-id RAY_SESSION_PATH/NSM_CLIENT_ID otherwise RAY_SESSION_PATH"
   echo " Example:"
   echo "  alt-config-session -x ~/.config2 -- 'mumble -m'"
 }
 
-PARAMS=""
-raysession_path="$(ray_control get_session_path)"
-if [ $? -ne 0 ]
+if [ "$RAY_SESSION_PATH" == "" ]
 then
-  echo "could not get ray_session_path ! Is there a raysession document opened ?"
-  error
+  RAY_SESSION_PATH="$(ray_control get_session_path)"
+  if [ $? -ne 0 ]
+  then
+    echo -e "\e[1m\e[31mcould not get ray_session_path ! Is there a raysession document opened ?\e[0m"
+    exit 1
+  fi
 fi
-
+NSM_CLIENT_ID="$NSM_CLIENT_ID"
 while (( "$#" )); do
   case "$1" in
-    -x|--xdg_config_home)
-      echo "arg xdg_config_home=$2"
-      export XDG_CONFIG_HOME="$(echo "$2" | perl -p -e "s|xxx-RAYSESSION_PATH-xxx|$raysession_path|g;")"
-      if [ $? -ne 0 ]
-      then
-        error
-      fi
+    -x|--xdg-config-home)
+      echo "arg xdg-config-home=$2"
+      export XDG_CONFIG_HOME="$2"
       shift 2
       ;;
-    -x|--localbin)
-      echo "arg localbin=$2"
-      # This path should not have space !
-      if [ -d ~/.local/share/raysession-templates/$2/bin ]
-      then
-        export PATH="/home/$USER/.local/share/raysession-templates/$2/bin:$PATH"
-      else
-        echo "localbin has not been found !"
-      fi
+    -n|--nsm-client-id)
+      echo "arg nsm-client-id=$2"
+      NSM_CLIENT_ID="$2"
       shift 2
       ;;
     -h|--help)
@@ -60,7 +52,7 @@ while (( "$#" )); do
       break
       ;;
     -*|--*=) # unsupported flags
-      echo "error: unrecognized parameter '$1'"
+      echo "error: unknown option '$1'"
       exit 1
       ;;
   esac
@@ -69,7 +61,7 @@ done
 argc=$#
 cmd=("$@")
 for (( j=0; j<argc; j++ )); do
-    cmd[$j]="$(echo "${cmd[$j]}" | perl -p -e "s|xxx-RAYSESSION_PATH-xxx|$raysession_path|g")" 
+    cmd[$j]="${cmd[$j]}" 
     if [ $? -ne 0 ]
     then
       error
@@ -78,11 +70,19 @@ done
 
 COMMAND="${cmd[0]}"
 
-cd "$raysession_path" || error
-echo "- pwd: $(pwd)"
+RAY_SESSION_NAME="$(basename "$RAY_SESSION_PATH")"
 echo "- PATH: $PATH"
 echo "- XDG_CONFIG_HOME resolved to: $XDG_CONFIG_HOME"
+echo "- NSM_CLIENT_ID: $NSM_CLIENT_ID"
+echo "- RAY_SESSION_NAME: $RAY_SESSION_NAME"
+cd "$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID" || error
+echo "- PWD: $(pwd)"
 echo "- Executing: '${cmd[@]}'"
 echo "- Command(which $COMMAND): '$(which "$COMMAND")'"
+if [ "$(which "$COMMAND")" == "" ]
+then
+  echo -e "\e[1m\e[31mCommand '$COMMAND' not found on this system !\e[0m"
+  exit 1
+fi
 echo "Starting command ..."
 exec "${cmd[@]}" || error

@@ -1,0 +1,82 @@
+{
+  "alsa_devices": [],
+  "alsa_in_devices": [],
+  "alsa_out_devices": [],
+  "global.raysession_name": "My jack capture session",
+  "global.requirelist": [
+    "raysession"
+  ],
+  "global.userlist": [
+    "user1_vocal",
+    "user2_guitar"
+  ],
+  "global.users": "user1_vocal,user2_guitar",
+  "jack_capture.audioformat": "oga",
+  "jack_capture.requirelist": [
+    "jack_capture"
+  ],
+  "jack_capture.user.jack_capture_connected": "user1_vocal",
+  "jack_capture.user.jack_capture_connectedlist": [
+    "user1_vocal"
+  ],
+  "jamulus.bool_multitrack_record": "True",
+  "jamulus.bool_start_server": "True",
+  "jamulus.port": "22124",
+  "jamulus.requirelist": [
+    "Jamulus"
+  ],
+  "jamulus.server": "localhost",
+  "jamulus.user.user1_vocal.jack_inputs": "1->L",
+  "jamulus.user.user1_vocal.jack_outputs": "L->1 R->2",
+  "jamulus.user.user2_guitar.jack_inputs": "2->L",
+  "jamulus.userinoutlist": [
+    {
+      "jack_connections": {
+        "left_jack_inputs": [
+          "system:capture_1"
+        ],
+        "left_jack_outputs": [
+          "system:playback_1"
+        ],
+        "right_jack_inputs": [],
+        "right_jack_outputs": [
+          "system:playback_2"
+        ]
+      },
+      "name": "user1_vocal"
+    },
+    {
+      "jack_connections": {
+        "left_jack_inputs": [
+          "system:capture_2"
+        ],
+        "right_jack_inputs": []
+      },
+      "name": "user2_guitar"
+    }
+  ],
+  "jamulus.userinoutlist.alsa_in_devices": [],
+  "jamulus.userinoutlist.alsa_out_devices": [],
+  "obs_icecast2_audio.mount": "/stream.mp3",
+  "obs_icecast2_audio.password": "Jamulus0S",
+  "obs_icecast2_audio.port": "8000",
+  "obs_icecast2_audio.requirelist": [
+    "obs"
+  ],
+  "obs_icecast2_audio.server": "localhost",
+  "obs_icecast2_audio.source": "mp3",
+  "obs_icecast2_audio.streaming_type": "icecast2_audio_mp3",
+  "obs_icecast2_audio.user.obs_connected": "user1_vocal",
+  "obs_icecast2_audio.user.obs_connectedlist": [
+    "user1_vocal"
+  ],
+  "wizard.id": "Jamulus",
+  "wizard.requirelist": [],
+  "wizard.sectionnamelist": [
+    "global",
+    "jamulus",
+    "jack_capture",
+    "obs_icecast2_audio"
+  ],
+  "wizard.sectionnames": "global,jamulus,jack_capture,obs_icecast2_audio"
+}

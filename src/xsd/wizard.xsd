@@ -1,142 +1,266 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude">
+  
+  <!-- SIMPLE TYPES DEFINITION -->
+  <xsd:simpleType name="id">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[a-zA-Z][a-zA-Z0-9_]+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
 
+  <xsd:simpleType name="dataid">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[a-zA-Z][.a-zA-Z0-9_]+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  
+  <xsd:simpleType name="short-title">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[a-zA-Z][ a-zA-Z0-9_]+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="boolean">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="True"/>
+      <xsd:enumeration value="False"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="use">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="required"/>
+      <xsd:enumeration value="optional"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- COMPLEX TYPES DEFINITION -->
+  <xsd:complexType name="set">
+    <xsd:attribute name="id" type="id" use="required"/>
+    <xsd:attribute name="value" use="required" type="xsd:string"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="template">
+    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="copy-file">
+        <xsd:complexType>
+          <xsd:attribute name="src" type="xsd:string" use="required"/>
+          <xsd:attribute name="dest" type="xsd:string" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="copy-tree">
+        <xsd:complexType>
+          <xsd:attribute name="src" type="xsd:string" use="required"/>
+          <xsd:attribute name="dest" type="xsd:string" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fill-template">
+        <xsd:complexType>
+          <xsd:attribute name="id" type="id" use="required"/>
+          <xsd:attribute name="type" use="required">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="conf"/>
+                <xsd:enumeration value="create-raysession"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="dest" use="required"/>
+          <xsd:attribute name="checkxml" use="optional" type="boolean"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:choice>
+  </xsd:complexType>
+  
+  <xsd:complexType name="page">
+    <xsd:sequence>
+      <xsd:element name="title"/>
+      <xsd:element name="short-title" type="short-title"/>
+      <xsd:element name="description" minOccurs="0"/>
+
+      <!-- PROGRAM DEPENDENCIES -->
+      <xsd:element name="requires" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="executable" type="xsd:string" use="required"/>
+          <xsd:attribute name="version" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- FIELD -->
+      <xsd:element name="field" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="label" type="xsd:string"/>
+            
+            <!-- INPUT CHECK TYPE -->                    
+            <xsd:element name="input" minOccurs="0">
+              <xsd:complexType>
+                <xsd:choice>
+                  <xsd:sequence>
+                    <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:complexType>
+                        <xsd:attribute name="id" type="id" use="required"/>
+                        <xsd:attribute name="label" type="xsd:string"/>
+                      </xsd:complexType>
+                    </xsd:element>
+                  </xsd:sequence>
+                  <xsd:sequence>
+                    <xsd:element name="regexp" type="xsd:string"/>
+                  </xsd:sequence>
+                </xsd:choice>
+                <xsd:attribute name="list-id" use="optional" type="dataid"/>
+                <xsd:attribute name="type" use="optional">
+                  <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                      <xsd:enumeration value="None"/>
+                      <xsd:enumeration value="range"/>
+                      <xsd:enumeration value="regexp"/>
+                      <xsd:enumeration value="path"/>
+                      <xsd:enumeration value="filename"/>
+                      <xsd:enumeration value="directory"/>
+                    </xsd:restriction>
+                  </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="value" type="xsd:string" use="optional"/>
+                <xsd:attribute name="min" use="optional" type="xsd:integer"/>
+                <xsd:attribute name="max" use="optional" type="xsd:integer"/>
+                <xsd:attribute name="max-count" use="optional" type="xsd:integer"/>
+                <xsd:attribute name="jack-inputs" use="optional" type="boolean"/>
+                <xsd:attribute name="jack-outputs" use="optional" type="boolean"/>
+              </xsd:complexType>
+            </xsd:element>
+            
+            <!-- OUTPUT TO JSON MODEL-->
+            
+            <xsd:element name="output" minOccurs="0">
+              <xsd:complexType>
+                <xsd:attribute name="split-seperator" type="xsd:string" use="optional"/>
+                <xsd:attribute name="datamodel-id" use="optional" type="dataid"/>
+                <xsd:attribute name="property-checked-name" use="optional" type="xsd:string"/>
+              </xsd:complexType>
+            </xsd:element>
+            
+            <!-- DEFAULT VALUES -->
+            
+            <xsd:element name="default">
+              <xsd:complexType>
+                <xsd:choice>
+                  <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:complexType>
+                      <xsd:attribute name="jack-inputs" type="xsd:string"/>
+                      <xsd:attribute name="jack-outputs" type="xsd:string"/>
+                      <xsd:attribute name="checked" type="boolean"/>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:choice>
+                <xsd:attribute name="value" use="optional" type="xsd:string"/>                      
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="id" type="id"/>
+          <xsd:attribute name="type">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="SessionNameCheckLineEdit"/>
+                <xsd:enumeration value="CheckLineEdit"/>
+                <xsd:enumeration value="QLineEdit"/>
+                <xsd:enumeration value="QCheckBox"/>
+                <xsd:enumeration value="QComboBox"/>
+                <xsd:enumeration value="QListWidget"/>
+                <xsd:enumeration value="UsersListEdit"/>
+                <xsd:enumeration value="PathLineEdit"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>                    
+        </xsd:complexType>
+      </xsd:element>
+      <!-- SET ADDITIONNAL VARIABLES AT PAGE LEVEL -->
+      <xsd:element name="set" type="set" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- TEMPLATE SNIPPET AT PAGE LEVEL -->
+      <xsd:element name="template-snippet" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="ref-id" type="xsd:IDREFS" use="required"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- APPLY TEMPLATE AT PAGE LEVEL -->
+      <xsd:element name="template" type="template" minOccurs="0"/>
+    
+    </xsd:sequence>
+    <xsd:attribute name="id" use="required" type="id"/>
+    <xsd:attribute name="section-name" type="xsd:string" use="required"/>
+    <xsd:attribute name="use" use="required" type="use"/>
+  </xsd:complexType>
+
+  
+  <!--
+  DOCUMENT STRUCTURE 
+  -->
+  
   <!-- WIZARD -->
   <xsd:element name="wizard">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element name="title" type="xsd:string"/>
-        <xsd:element name="description" type="xsd:string"/>
+        <xsd:element name="info">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="title" type="xsd:string"/>
+              <xsd:element name="category" type="xsd:string"/>
+              <xsd:element name="keywords">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="\w+(,\w+)*"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="version" type="xsd:string"/>
+              <xsd:element name="description" type="xsd:string"/>
+              <xsd:element name="author" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="email" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="creation-date" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="distribution" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="requires" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:complexType>
+                        <xsd:attribute name="executable" type="xsd:string" use="required"/>
+                        <xsd:attribute name="version" type="xsd:string" use="optional"/>
+                        <xsd:attribute name="download-url" type="xsd:string" use="optional"/>
+                        <xsd:attribute name="package-in" use="required">
+                          <xsd:simpleType>
+                            <xsd:restriction base="xsd:string">
+                              <xsd:enumeration value="github"/>
+                              <xsd:enumeration value="official-repo"/>
+                              <xsd:enumeration value="other-repo"/>
+                            </xsd:restriction>
+                          </xsd:simpleType>                    
+                        </xsd:attribute>
+                        <xsd:attribute name="repo-name" type="xsd:string" use="optional"/>
+                      </xsd:complexType>
+                    </xsd:element>
+                  </xsd:sequence>
+                  <xsd:attribute name="os-name" type="xsd:string"/>
+                  <xsd:attribute name="os-version" type="xsd:string"/>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
         <xsd:element name="width" type="xsd:integer"/>
         <xsd:element name="height" type="xsd:integer"/>
+        
         <!-- FIRST PAGE -->
         <xsd:element name="first-page">
           <xsd:complexType>
             <xsd:sequence>
               <xsd:element name="title"/>
               <xsd:element name="description"/>
-            </xsd:sequence>
-            <xsd:attribute name="id">
-              <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                  <xsd:pattern value="[a-zA-Z][a-zA-Z_0-9]+"/>
-                </xsd:restriction>
-              </xsd:simpleType>
-            </xsd:attribute>
-          </xsd:complexType>
-        </xsd:element>
-        <!-- PAGE INPUT-DATA -->
-        <xsd:element name="page" maxOccurs="unbounded">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element name="title"/>
-              <xsd:element name="description" minOccurs="0" maxOccurs="1"/>
-              <!-- FIELD -->
-              <xsd:element name="field" minOccurs="0" maxOccurs="unbounded">
-                <xsd:complexType>
-                  <xsd:sequence>
-                    <xsd:element name="label" type="xsd:string"/>
-                    
-                    <!-- INPUT CHECK TYPE -->
-                    
-                    <xsd:element name="input" minOccurs="0">
-                      <xsd:complexType>
-                        <xsd:choice>
-                          <xsd:sequence>
-                            <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
-                              <xsd:complexType>
-                                <xsd:attribute name="id" use="required" type="xsd:string"/>
-                                <xsd:attribute name="label" type="xsd:string"/>
-                              </xsd:complexType>
-                            </xsd:element>
-                          </xsd:sequence>
-                          <xsd:sequence>
-                            <xsd:element name="regexp" type="xsd:string"/>
-                          </xsd:sequence>
-                        </xsd:choice>
-                        <xsd:attribute name="list-id" use="optional" type="xsd:string"/>
-                        <xsd:attribute name="type" use="optional">
-                          <xsd:simpleType>
-                            <xsd:restriction base="xsd:string">
-                              <xsd:enumeration value="regexp"/>
-                              <xsd:enumeration value="filename"/>
-                              <xsd:enumeration value="directory"/>
-                            </xsd:restriction>
-                          </xsd:simpleType>
-                        </xsd:attribute>
-                        <xsd:attribute name="value" type="xsd:string" use="optional"/>
-                        <xsd:attribute name="min" use="optional" type="xsd:integer"/>
-                        <xsd:attribute name="max" use="optional" type="xsd:integer"/>
-                        <xsd:attribute name="max-count" use="optional" type="xsd:integer"/>
-                        <xsd:attribute name="inputs" use="optional">
-                          <xsd:simpleType>
-                            <xsd:restriction base="xsd:string">
-                              <xsd:enumeration value="True"/>
-                              <xsd:enumeration value="False"/>
-                            </xsd:restriction>
-                          </xsd:simpleType>
-                        </xsd:attribute>
-                        <xsd:attribute name="outputs" use="optional">
-                          <xsd:simpleType>
-                            <xsd:restriction base="xsd:string">
-                              <xsd:enumeration value="True"/>
-                              <xsd:enumeration value="False"/>
-                            </xsd:restriction>
-                          </xsd:simpleType>
-                        </xsd:attribute>
-                      </xsd:complexType>
-                    </xsd:element>
-                    
-                    <!-- OUTPUT TO JSON MODEL-->
-                    
-                    <xsd:element name="output" minOccurs="0">
-                      <xsd:complexType>
-                        <xsd:attribute name="split-seperator" type="xsd:string" use="optional"/>
-                        <xsd:attribute name="datamodel-id" use="required">
-                          <xsd:simpleType>
-                            <xsd:restriction base="xsd:string">
-                              <xsd:pattern value="[a-zA-Z][a-zA-Z0-9_]+"/>
-                            </xsd:restriction>
-                          </xsd:simpleType>
-                        </xsd:attribute>                      
-                      </xsd:complexType>
-                    </xsd:element>
-                    
-                    <!-- DEFAULT VALUES -->
-                    
-                    <xsd:element name="default">
-                      <xsd:complexType>
-                        <xsd:choice>
-                          <xsd:sequence>
-                            <xsd:element name="item" minOccurs="0" maxOccurs="unbounded"/>
-                          </xsd:sequence>
-                        </xsd:choice>
-                        <xsd:attribute name="value" use="optional" type="xsd:string"/>
-                      </xsd:complexType>
-                    </xsd:element>
-                  </xsd:sequence>
-                  <xsd:attribute name="id" use="required">
-                    <xsd:simpleType>
-                      <xsd:restriction base="xsd:string">
-                        <xsd:pattern value="[a-zA-Z][a-zA-Z_0-9]+"/>
-                      </xsd:restriction>
-                    </xsd:simpleType>
-                  </xsd:attribute>
-                  <xsd:attribute name="type">
-                    <xsd:simpleType>
-                      <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="SessionNameCheckLineEdit"/>
-                        <xsd:enumeration value="CheckLineEdit"/>
-                        <xsd:enumeration value="QLineEdit"/>
-                        <xsd:enumeration value="QCheckBox"/>
-                        <xsd:enumeration value="QComboBox"/>
-                        <xsd:enumeration value="UsersListEdit"/>
-                        <xsd:enumeration value="PathLineEdit"/>
-                      </xsd:restriction>
-                    </xsd:simpleType>
-                  </xsd:attribute>                    
-                </xsd:complexType>
-              </xsd:element>
             </xsd:sequence>
             <xsd:attribute name="id" use="required">
               <xsd:simpleType>
@@ -145,7 +269,21 @@
                 </xsd:restriction>
               </xsd:simpleType>
             </xsd:attribute>
-            <xsd:attribute name="section-name" type="xsd:string"/>
+          </xsd:complexType>
+        </xsd:element>
+        
+        <!-- PAGE -->
+        <xsd:element name="page" minOccurs="0" maxOccurs="unbounded" type="page"/>
+        
+        <!-- GROUPS OF EXCLUSIVE PAGES (ONE PAGE AT A TIME IN A WIZARD) -->
+        <xsd:element name="page-group" minOccurs="0" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="title" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="short-title" type="short-title"/>
+              <xsd:element name="description" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="page" type="page" maxOccurs="unbounded"/>
+            </xsd:sequence>
           </xsd:complexType>
         </xsd:element>
         <!-- LAST PAGE -->
@@ -155,23 +293,16 @@
               <xsd:element name="title"/>
               <xsd:element name="description"/>
             </xsd:sequence>
-            <xsd:attribute name="id" use="required">
-              <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                  <xsd:pattern value="[a-zA-Z][a-zA-Z_0-9]+"/>
-                </xsd:restriction>
-              </xsd:simpleType>
-            </xsd:attribute>
+            <xsd:attribute name="id" type="id"/>
           </xsd:complexType>
         </xsd:element>
+                
+        <!-- TEMPLATE -->
+        <xsd:element name="template" type="template"/>
+        
       </xsd:sequence>
-      <xsd:attribute name="id" use="required">
-        <xsd:simpleType>
-          <xsd:restriction base="xsd:string">
-            <xsd:pattern value="[a-zA-Z][a-zA-Z_0-9]+"/>
-          </xsd:restriction>
-        </xsd:simpleType>
-      </xsd:attribute>
+      <xsd:attribute name="id" type="id" use="required"/>
+
     </xsd:complexType>    
   </xsd:element>
 </xsd:schema>
