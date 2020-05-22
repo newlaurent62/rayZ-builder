@@ -200,7 +200,7 @@ class DataModel:
     return self.jackOutputs('R', content)
 
   def sessionNameAlreadyUsed(self):    
-    self.raysession_path = self.raysession_root + os.sep + self.field('<xsl:value-of select='//field[@id = "raysession_name"]/../@section-name'/>.raysession_name')
+    self.raysession_path = self.raysession_root + os.sep + self.wizard.field('<xsl:value-of select='//field[@id = "raysession_name"]/../@section-name'/>.raysession_name')
     if os.path.isdir(self.raysession_path):
       print('Directory "%s" already exist ! Choose another name or delete it first.' % self.raysession_path ) 
       return True
@@ -215,7 +215,7 @@ class DataModel:
       new_config[section]={}
       for ckey in self.config[section]:
         fieldkey = section + '.' + ckey
-        if (fieldkey  in allFieldNames() or (section in self.registeredkey and ckey in self.registeredkey[section])) and not ('-hide' in ckey):
+        if ((allFieldNames and fieldkey in allFieldNames) or (section in self.registeredkey and ckey in self.registeredkey[section])) and not ('-hide' in ckey):
           if self.config[section][ckey] != None and self.config[section][ckey] != '':
             new_config[section][ckey] = self.config[section][ckey]
       new_config._sections[section] = collections.OrderedDict(sorted(new_config._sections[section].items(), key=lambda t: t[0]))
@@ -236,7 +236,7 @@ class DataModel:
     return str_config
 
   def writeConf(self, allFieldNames):
-    cleanconfig = self.cleanConf()
+    cleanconfig = self.cleanConf(allFieldNames)
     
     with open(self.configfilename, 'w+') as fh:
       cleanconfig.write(fh)
@@ -245,9 +245,9 @@ class DataModel:
 
     return str_config
 
-  def createdata(self):
+  def createdata(self, allFieldNames):
     data = self.data
-    config = self.cleanConf()
+    config = self.cleanConf(allFieldNames)
     for section in config.sections():
       for key in config[section]:
         data[section + '.' + key] = config[section][key]
@@ -256,9 +256,9 @@ class DataModel:
     print (data)
     return data
     
-  def writeJSON(self, filename):    
+  def writeJSON(self, filename, allFieldNames):    
     print ('Write datamodel ...')
-    content = json.dumps(self.createdata(), sort_keys=True, indent=2)
+    content = json.dumps(self.createdata(allFieldNames), sort_keys=True, indent=2)
     with open(filename, 'w') as fh:
       fh.write(content)
     return content
@@ -355,14 +355,22 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
         self.currentPage().defaults()
         
     def allFieldNames(self):
-      return {s for page_id in self.pageIds() for s in self.page(page_id).field_names}
+      field_names = []
+      for page_id in self.pageIds():
+        for f in self.page(page_id).field_names:
+          if f not in field_names:
+            field_names.append(f)
+      return field_names
 
     def initFieldsOfSection(self):
       self.datamodel.initFieldsOfSection(self.currentPage())
       
     def cleanConfAsString(self):
-      return self.datamodel.cleanConfAsString(self.allFieldNames)
+      return self.datamodel.cleanConfAsString(self.allFieldNames())
 
+    def writeJSON(self, datamodelfile):
+      return self.datamodel.writeJSON(datamodelfile, self.allFieldNames())
+      
     def updateConfSections(self):
       sections=['wizard']
       if not('wizard' in self.datamodel.config.sections()):
@@ -377,7 +385,7 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
       print (self.datamodel.allowedSections)
       
     def writeConf(self):
-      self.datamodel.writeConf(self.allFieldNames)
+      self.datamodel.writeConf(self.allFieldNames())
       
     def sessionNameAlreadyUsed(self):
       self.datamodel.sessionNameAlreadyUsed()
@@ -823,7 +831,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
         else:
           datamodelfile = self.wizard().jsonfilename
         
-        print(self.wizard().datamodel.writeJSON(datamodelfile))
+        print(self.wizard().writeJSON(datamodelfile))
           
         templatedir = self.wizard().templatedir
 

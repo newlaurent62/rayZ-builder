@@ -33,8 +33,6 @@ build: install $(DEFAULT_PYTHON_FILES)
 	
 	xmllint --xinclude --schema src/xsd/wizard.xsd build/$(WIZARD_ID)/xml/$(WIZARD_ID).wizard > build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml
 	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/template-entry.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/tmpl_wizard.py"
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/wizard.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/wizard.py"
-	perl -pi -e "s|xxx-TEMPLATE_DIR-xxx|$(TEMPLATE_DIR)/$(WIZARD_ID)|g" "build/raysession-templates/$(WIZARD_ID)/tmpl_wizard.py" "build/raysession-templates/$(WIZARD_ID)/wizard.py"
 	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/install.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/install_dep_wizard.sh"
 	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/info-template.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/info_wizard.xml"
 	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/raysession_xml-gen_tmpl.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/raysession_xml.tmpl"
@@ -49,6 +47,9 @@ build: install $(DEFAULT_PYTHON_FILES)
 	cp -r src/gui/* src/wizards/$(WIZARD_ID)/default "build/raysession-templates/$(WIZARD_ID)/"
 	[ -d src/wizards/$(WIZARD_ID)/ray-scripts ] && cp -r src/wizards/$(WIZARD_ID)/ray-scripts "build/raysession-templates/$(WIZARD_ID)/"
 
+	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/wizard.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/wizard.py"
+	perl -pi -e "s|xxx-TEMPLATE_DIR-xxx|$(TEMPLATE_DIR)/$(WIZARD_ID)|g" "build/raysession-templates/$(WIZARD_ID)/tmpl_wizard.py" "build/raysession-templates/$(WIZARD_ID)/wizard.py"
+
 .PHONY: 
 
 exec:
@@ -60,7 +61,7 @@ test-template:
 fill-template:
 	$(PYTHON)  build/raysession-templates/$(DEFAULT_WIZARD)/tmpl_wizard.py --read-json-file=build/$(DEFAULT_WIZARD)/datamodel.json --start-gui
 
-install:
+install: all
 	mkdir -p ~/.local/bin
 	cp src/bin/alt-config-session ~/.local/bin/alt-config-session
 

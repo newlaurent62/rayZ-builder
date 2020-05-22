@@ -200,7 +200,7 @@ class DataModel:
     return self.jackOutputs('R', content)
 
   def sessionNameAlreadyUsed(self):    
-    self.raysession_path = self.raysession_root + os.sep + self.field('<xsl:value-of select='//field[@id = "raysession_name"]/../@section-name'/>.raysession_name')
+    self.raysession_path = self.raysession_root + os.sep + self.wizard.field('<xsl:value-of select='//field[@id = "raysession_name"]/../@section-name'/>.raysession_name')
     if os.path.isdir(self.raysession_path):
       print('Directory "%s" already exist ! Choose another name or delete it first.' % self.raysession_path ) 
       return True
