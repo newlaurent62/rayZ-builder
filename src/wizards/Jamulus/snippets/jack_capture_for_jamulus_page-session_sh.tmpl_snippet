@@ -12,9 +12,6 @@ create_clientID add_proxy "jack_capture"
 
 # create program subdir if needed
 create_dir_in_client "data"
-create_dir_in_client "bin"
-
-copy_to_client_dir "\$session_path/default/bin/jack_capture_multi.sh" "bin/jack_capture_multi.sh" || error
 
 # create proxy
 create_proxy --label "jack_capture" --arguments "-- jack_capture --jack-transport --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus -f $data['jack_capture.audioformat']" --save_signal 0 --stop_signal 2 --wait_window 0 --no_save_level 0
