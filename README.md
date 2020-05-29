@@ -1,7 +1,5 @@
 # rayZ-builder
 
-## Introduction
-
 This tool let you create simple or complex virtual studio setup.
 
 These virtual studio called session, let you save or close all audio applications in one click.
