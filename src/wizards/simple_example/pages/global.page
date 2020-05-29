@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page id='Global' section-name='global' use="required">
+  <title>Ray Session section</title>
+  <short-title>RaySession</short-title>
+  
+  <field id='session_name' type='SessionNameCheckLineEdit'>
+    <label>The Session filename</label>
+    <default value="My jack capture session"/>
+  </field> 
+</page>

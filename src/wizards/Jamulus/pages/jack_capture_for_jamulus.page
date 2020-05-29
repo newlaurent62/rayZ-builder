@@ -24,13 +24,10 @@
       <item checked="False"/>
     </default>
   </field>
-  <template-snippet ref-id="raysession_xml">
-    <xi:include href="jack_capture_for_jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
-  </template-snippet>  
-  <template-snippet ref-id="raysession_sh">
-    <xi:include href="jack_capture_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+  <template-snippet ref-id="session_sh">
+<xi:include href="jack_capture_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>
   </template-snippet>
   <template-snippet ref-id="patch_xml">
-    <xi:include href="jack_capture_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+<xi:include href="jack_capture_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
   </template-snippet>
 </page>

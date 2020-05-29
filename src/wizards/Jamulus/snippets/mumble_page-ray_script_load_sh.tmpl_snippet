@@ -1,0 +1,12 @@
+#if 'mumble' in $data['wizard.sectionnamelist']
+
+if [ \$CHECK_SERVER -eq 1 ]
+then
+  SERVER="$data['mumble.server']"
+
+  if [ "\$SERVER" == "localhost" -o "\$SERVER" == "\$(ip -4 a show lo | grep inet | awk '{print $2}' | cut -d"/" -f1)" ]
+  then
+    check_server_running mumble 
+  fi
+fi
+#end if

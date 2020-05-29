@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wizard id='simple_example' xmlns:xi="http://www.w3.org/2001/XInclude">
+  <info>
+    <title>Simple Jack capture wizard</title>
+    <category>Stereo recording</category>
+    <keywords>recording,audio,video,mp3,oga,wav</keywords>
+    <version>1</version>
+    <description>
+Input the jack_capture settings you need and record your virtual studio output in RaySession.
+    </description>
+    <author>Laurent Schwartz</author>
+    <email>newlaurent@gmail.com</email>
+  </info>
+  <width>800</width>
+  <height>600</height>
+  <!-- PAGES -->
+  <first-page id='First'>
+    <title>Simple example with jack_capture program</title>
+    <description>This wizard let you create a session with jack_capture.</description>
+  </first-page>
+  <!-- SINGLE PAGES -->
+  <xi:include href='global.page'/>
+  <xi:include href='jack_capture.page'/>
+  <last-page id='Last'>
+    <title>Validate</title>
+    <description>...</description>
+  </last-page>
+  <template>
+    <!-- session script -->
+    <fill-template id="ray_script_load_sh" type="conf" dest="ray-scripts/load.sh"/>    
+    <!--patch xml-->
+    <fill-template id="patch_xml" type="patch_xml" dest="default/patch.xml"/>
+    <!-- in session_ray_control_sh.tmpl -->
+    <fill-template id="session_sh" type="create-session" dest="default/session.sh"/>
+  </template>
+</wizard>

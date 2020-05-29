@@ -34,8 +34,24 @@
 # if for some reasons you want all clients to stop
 # set this variable true !
 close_all_clients=false
+USE_CATIA=1
+
+if [ -f "$RAY_SCRIPTS_DIR/.env" ]; then
+  source "$RAY_SCRIPTS_DIR/.env"
+fi
 
 
+if [ $USE_CATIA -eq 1 ]
+then
+  RAY_SESSION_NAME="$(basename "$RAY_SESSION_PATH")"
+  echo "RAY_SESSION_PATH: $RAY_SESSION_PATH"
+  echo "RAY_SESSION_NAME: $RAY_SESSION_NAME"  
+  if [ -d "/tmp/catia" ]
+  then
+    mv "/tmp/catia/${RAY_SESSION_NAME}.yml" "/tmp/catia/${RAY_SESSION_NAME}.yml.session_closed" || exit 1
+    touch "/tmp/catia/${RAY_SESSION_NAME}.yml.session_closed" || exit 1
+  fi
+fi
 
 if $close_all_clients;then
     # This command orders to ray-daemon to close the session closing all clients

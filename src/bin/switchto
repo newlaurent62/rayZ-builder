@@ -1,0 +1,113 @@
+#!/bin/bash
+
+echo "#<=== switchto"
+pid=0
+sessionname=""
+guitoload=""
+windowtitle=""
+sessionmanager="ray"
+windowid=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --pid)
+      pid=$2
+      echo "pid: $pid"
+      shift 2
+      ;;
+    --windowid)
+      windowid=$2
+      echo "windowid: $windowid"
+      shift 2
+      ;;
+    --windowtitle)
+      windowtitle=$2
+      echo "windowtitle: $windowtitle"
+      shift 2
+      ;;
+    --sessionname)
+      sessionname=$2
+      echo "sessionname: $sessionname"
+      shift 2
+      ;;
+    --guitoload)
+      guitoload=$2
+      echo "guitoload: $guitoload"
+      shift 2
+      ;;
+    --sessionmanager)
+      sessionmanager=$2
+      echo "sessionmanager: $sessionmanager"      
+      shift 2
+      ;;
+    --*)
+      echo "unknown option ! '$1'"
+      exit 1
+      ;;
+    *)
+      echo "ignoring arg: $1"
+      shift
+      ;;
+  esac
+done
+
+case "$sessionmanager" in
+  ray)
+    sessiontitle="RaySession - $sessionname"
+    ;;
+  nsm)
+    sessiontitle="Non Session Manager"
+    ;;
+  *)
+    echo "unknown session manager ! '$sessionmanager'"
+    exit 1
+    ;;
+esac
+
+if [ "$windowid" != "" ]; then
+
+  winid=$windowid
+
+elif [ $pid -gt 0 ]; then
+  
+  winid=$(getwindidbypid --single $pid "$windowtitle")
+
+elif [ "$windowtitle" != "" ]; then
+
+  winid=$(getwindidbyregexp --single "$windowtitle")
+
+fi
+
+if [ "$winid" != "" -a "$sessionname" != "" ]; then
+  echo "trying to switch to $winid or start sessionmanager ..."
+   
+  wmctrl -i -a $winid || wmctrl -a "$sessiontitle"
+
+elif [ "$winid" != "" -a "$guitoload" != "" ]; then
+
+    echo "trying to switch to $winid or load gui ..."
+    wmctrl -i -a $winid || ($guitoload &)
+
+elif [ "$winid" != "" ]; then
+
+    echo "switching to $winid ..."
+    wmctrl -i -a $winid
+
+elif [ "$winid" == "" -a "$sessionname" != "" ]; then
+
+  echo "switching to sessionmanager ..."
+  
+  wmctrl -a "$sessiontitle"
+
+elif [ "$winid" == "" -a "$guitoload" != "" ]; then
+
+  echo "load gui ..."
+  $guitoload &
+
+else
+  
+  echo "Nothing to do ..."
+  
+fi
+
+echo "#/>=== switchto"

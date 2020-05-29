@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# getwindidbyregexp
+# 
+# Get the ID of a window by regexp..
+# 
+# 
+# Usage:
+#   getwindidbypregexp --single|--many|--manytitles <TITLE-REGEXP>
+# 
+
+type="single"
+case "$1" in
+  --single)
+    type="--single"
+    shift
+    ;;
+  --many)
+    type="--many"
+    shift
+    ;;
+  --single-title)
+    type="--single-title"
+    shift
+    ;;
+  --many-titles)
+    type="--many-titles"
+    shift
+    ;;
+  *)
+    ;;
+esac
+
+WIN_ID=""
+WIN_IDS=""
+if [ "$1" == "" ]; then
+  WMCTRL="$(wmctrl -l)"
+else
+  WMCTRL="$(wmctrl -l | grep -E "$1")"
+fi
+
+if [ "$type" == "--many-titles" ]; then
+  echo "$WMCTRL"
+  exit 0
+fi
+
+if [ "$type" == "--single-title" ]; then
+  echo "$WMCTRL" | head -1
+  exit 0
+fi
+
+while read line; do
+  if [ "$WIN_IDS" == "" ]
+  then
+    WIN_ID="$(echo "$line" | awk '{print $1}')"
+  fi
+  WIN_IDS+="$(echo "$line" | awk '{print $1}') "
+done < <( echo "$WMCTRL" )
+
+case "$type" in
+  --single)
+    if [ "$WIN_ID" != "" ]; then
+      echo "$WIN_ID"
+    else
+      echo "None"
+    fi
+    ;;
+  --many)
+    if [ "$WIN_IDS" != "" ]; then
+      echo "$WIN_IDS"
+    else
+      echo "None"
+    fi
+    ;;
+esac

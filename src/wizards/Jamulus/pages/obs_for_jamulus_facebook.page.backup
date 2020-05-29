@@ -21,11 +21,6 @@
     </default>
   </field>
   <set id="streaming_type" value="facebook"/>
-  <template-snippet ref-id="raysession_xml">
-#if 'obs_facebook' in $data['wizard.sectionnamelist']
-<xi:include href="obs_for_jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
-#end if
-  </template-snippet>
   <template-snippet ref-id="raysession_sh">
 #if 'obs_facebook' in $data['wizard.sectionnamelist']
 <xi:include href="obs_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>

@@ -2,16 +2,16 @@
   "alsa_devices": [],
   "alsa_in_devices": [],
   "alsa_out_devices": [],
-  "global.raysession_name": "My jack capture session",
   "global.requirelist": [
-    "raysession"
+    "session"
   ],
+  "global.session_name": "My jack capture session",
   "global.userlist": [
     "user1_vocal",
     "user2_guitar"
   ],
   "global.users": "user1_vocal,user2_guitar",
-  "jack_capture.audioformat": "oga",
+  "jack_capture.audioformat": "wav",
   "jack_capture.requirelist": [
     "jack_capture"
   ],
@@ -57,26 +57,12 @@
   ],
   "jamulus.userinoutlist.alsa_in_devices": [],
   "jamulus.userinoutlist.alsa_out_devices": [],
-  "obs_icecast2_audio.mount": "/stream.mp3",
-  "obs_icecast2_audio.password": "Jamulus0S",
-  "obs_icecast2_audio.port": "8000",
-  "obs_icecast2_audio.requirelist": [
-    "obs"
-  ],
-  "obs_icecast2_audio.server": "localhost",
-  "obs_icecast2_audio.source": "mp3",
-  "obs_icecast2_audio.streaming_type": "icecast2_audio_mp3",
-  "obs_icecast2_audio.user.obs_connected": "user1_vocal",
-  "obs_icecast2_audio.user.obs_connectedlist": [
-    "user1_vocal"
-  ],
   "wizard.id": "Jamulus",
   "wizard.requirelist": [],
   "wizard.sectionnamelist": [
     "global",
     "jamulus",
-    "jack_capture",
-    "obs_icecast2_audio"
+    "jack_capture"
   ],
-  "wizard.sectionnames": "global,jamulus,jack_capture,obs_icecast2_audio"
+  "wizard.sectionnames": "global,jamulus,jack_capture"
 }

@@ -3,20 +3,21 @@
 # ---------------------- #
 # Created by newlaurent62
 #
-PREFIX  = /.local
-DESTDIR = /home/laurent
-TEMPLATE_DIR = build/raysession-templates
+PREFIX = /home/laurent/.local
+TEMPLATES_DIR = share/rayZ-builder/session-templates
 PYTHON := /usr/bin/python3
-DEFAULT_WIZARD := Jamulus
-DEFAULT_PYTHON_FILES := $(patsubst %, %.py, $(wildcard src/wizards/$(DEFAULT_WIZARD)))
-PYTHON_FILES := $(patsubst %, %.py, $(wildcard src/wizards/*))
-
+#WIZARD := simple_example
+WIZARD := Jamulus
+RAY_SESSION_ROOT := "/home/laurent/Ray Sessions"
+DEFAULT_FILES := $(patsubst %, %.py, $(wildcard src/wizards/$(WIZARD)))
+ALL_FILES := $(patsubst %, %.py, $(wildcard src/wizards/*))
+TMPL_ARGS :=
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
 
-all: install $(PYTHON_FILES)
+all: install-wrapper $(ALL_FILES)
 
-build: install $(DEFAULT_PYTHON_FILES)
+build: install-wrapper $(DEFAULT_FILES)
 
 %.py : WIZARD_ID=$(patsubst src/wizards/%,%, $<)
 %.py : %
@@ -25,56 +26,90 @@ build: install $(DEFAULT_PYTHON_FILES)
 	echo -e "-- WIZARD_ID: \e[1m$(WIZARD_ID)\e[0m from $<"
 	echo "--"
 	
-	mkdir -p build/$(WIZARD_ID)/xml build/$(WIZARD_ID)/raysession-template
-	cp src/wizards/$(WIZARD_ID)/*.wizard src/wizards/$(WIZARD_ID)/pages/*.page src/wizards/$(WIZARD_ID)/snippets/*.tmpl_snippet build/$(WIZARD_ID)/xml/
-	cheetah c -R --nobackup --idir src/wizards/$(WIZARD_ID)/tmpl --odir build/raysession-templates/$(WIZARD_ID)/
+	mkdir -p build/$(WIZARD_ID)/xml build/$(TEMPLATES_DIR)/$(WIZARD_ID)
+	#cp src/package-def/__init__.py build/$(TEMPLATES_DIR)/$(WIZARD_ID)/__init__.py
 
-	mkdir -p build/raysession-templates/$(WIZARD_ID)/
+	cp src/wizards/$(WIZARD_ID)/*.wizard src/wizards/$(WIZARD_ID)/pages/*.page build/$(WIZARD_ID)/xml/
+	test -d src/wizards/$(WIZARD_ID)/snippets && cp src/wizards/$(WIZARD_ID)/snippets/*.tmpl_snippet build/$(WIZARD_ID)/xml/ || exit 0
+	cheetah c -R --nobackup --idir src/wizards/$(WIZARD_ID)/tmpl --odir build/$(TEMPLATES_DIR)/$(WIZARD_ID)/
+
+	mkdir -p build/$(TEMPLATES_DIR)/$(WIZARD_ID)/
 	
-	xmllint --xinclude --schema src/xsd/wizard.xsd build/$(WIZARD_ID)/xml/$(WIZARD_ID).wizard > build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/template-entry.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/tmpl_wizard.py"
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/install.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/install_dep_wizard.sh"
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/info-template.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/info_wizard.xml"
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/raysession_xml-gen_tmpl.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/raysession_xml.tmpl"
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/raysession_sh-gen_tmpl.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/raysession_sh.tmpl"
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/patch_xml-gen_tmpl.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/patch_xml.tmpl"
-	
-	[ -f "src/wizards/$(WIZARD_ID)/xsl/ray_script_load_sh-gen_tmpl.xsl" ] && java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/ray_script_load_sh-gen_tmpl.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/ray_script_load_sh.tmpl" || exit 0
+	xmllint --xinclude --schema src/xsd/wizard.xsd build/$(WIZARD_ID)/xml/$(WIZARD_ID).wizard > build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/template-entry.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/tmpl_wizard.py"
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/install.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/install_dep_wizard.sh"
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/info-template.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/info_wizard.xml"
+	test -f "src/wizards/$(WIZARD_ID)/xsl/session_xml-gen_tmpl.xsl" && saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/session_xml-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_xml.tmpl" || exit 0
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/session_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_sh.tmpl"
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/patch_xml-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/patch_xml.tmpl"
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/patch_xml.tmpl -xsl:"src/xsl/nsm-patch.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/nsm_patch.tmpl"
+
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/ray_script_load_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray_script_load_sh.tmpl" || exit 0
 
 
-	cheetah c -R --nobackup --idir "build/raysession-templates/$(WIZARD_ID)" --odir "build//raysession-templates/$(WIZARD_ID)"
-	mkdir -p "build/raysession-templates/$(WIZARD_ID)/bin" "build/raysession-templates/$(WIZARD_ID)/default" "build/raysession-templates/$(WIZARD_ID)/share" "build/raysession-templates/$(WIZARD_ID)/data"
-	cp -r src/gui/* src/wizards/$(WIZARD_ID)/default "build/raysession-templates/$(WIZARD_ID)/"
-	[ -d src/wizards/$(WIZARD_ID)/ray-scripts ] && cp -r src/wizards/$(WIZARD_ID)/ray-scripts "build/raysession-templates/$(WIZARD_ID)/"
+	cheetah c -R --nobackup --idir "build/$(TEMPLATES_DIR)/$(WIZARD_ID)" --odir "build//$(TEMPLATES_DIR)/$(WIZARD_ID)"
+	mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/default" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/share" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/data"
+	cp -r src/gui/* "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/"
+	test -d src/wizards/$(WIZARD_ID)/default && cp -r src/wizards/$(WIZARD_ID)/default "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
+	test -d src/wizards/$(WIZARD_ID)/ray-scripts && cp -r src/wizards/$(WIZARD_ID)/ray-scripts "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
 
-	java -cp ./libjava/Saxon-HE-9.9.1-5.jar net.sf.saxon.Transform -s:build/raysession-templates/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/wizards/$(WIZARD_ID)/xsl/wizard.xsl" -o:"build/raysession-templates/$(WIZARD_ID)/wizard.py"
-	perl -pi -e "s|xxx-TEMPLATE_DIR-xxx|$(TEMPLATE_DIR)/$(WIZARD_ID)|g" "build/raysession-templates/$(WIZARD_ID)/tmpl_wizard.py" "build/raysession-templates/$(WIZARD_ID)/wizard.py"
-
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/wizard.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/wizard.py"
+		
 .PHONY: 
 
 exec:
-	$(PYTHON) build/raysession-templates/$(DEFAULT_WIZARD)/wizard.py --write-json-file=build/$(DEFAULT_WIZARD)/datamodel.json --start-gui-option
+	$(PYTHON) build/$(TEMPLATES_DIR)/$(WIZARD)/wizard.py --write-json-file=build/$(WIZARD)/datamodel.json --session-manager=nsm --start-gui-option 
 
-test-template:
-	$(PYTHON)  build/raysession-templates/$(DEFAULT_WIZARD)/tmpl_wizard.py --read-json-file=src/wizards/$(DEFAULT_WIZARD)/test-data/datamodel.json
-	
+test-ray-control-template:
+	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=src/wizards/$(WIZARD)/test-data/datamodel.json --session-manager=ray_control $(TMPL_ARGS)
+
+test-ray-xml-template:
+	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=src/wizards/$(WIZARD)/test-data/datamodel.json --session-manager=ray_xml $(TMPL_ARGS)
+
+test-nsm-template:
+	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=src/wizards/$(WIZARD)/test-data/datamodel.json --session-manager=nsm $(TMPL_ARGS)
+
 fill-template:
-	$(PYTHON)  build/raysession-templates/$(DEFAULT_WIZARD)/tmpl_wizard.py --read-json-file=build/$(DEFAULT_WIZARD)/datamodel.json --start-gui
+	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=build/$(WIZARD)/datamodel.json $(TMPL_ARGS)
 
-install: all
-	mkdir -p ~/.local/bin
-	cp src/bin/alt-config-session ~/.local/bin/alt-config-session
+rayZ_wizards.py:
+	cp src/rayZ_wizards.py build/rayZ_wizards.py
+	perl -pi -e "s|xxx-TEMPLATES_DIR-xxx|build/$(TEMPLATES_DIR)|g" build/rayZ_wizards.py
 
-uninstall:
-	rm -f ~/.local/bin/alt-config-session
+exec-main: rayZ_wizards.py
+	$(PYTHON) build/rayZ_wizards.py
 
-clean: uninstall
+install-wrapper:
+	mkdir -p $(PREFIX)/bin
+	install -m 755 src/bin/ray-config-session $(PREFIX)/bin/ray-config-session
+	install -m 755 src/bin/nsm-config-session $(PREFIX)/bin/nsm-config-session
+
+uninstall-wrapper:
+	rm -f $(PREFIX)/bin/ray-config-session
+	rm -f $(PREFIX)/bin/nsm-config-session
+
+install: install-wrapper
+	cp src/rayZ_wizards.py build/rayZ_wizards
+	perl -pi -e "s|xxx-TEMPLATES_DIR-xxx|$(PREFIX)/$(TEMPLATES_DIR)|g" build/rayZ_wizards
+	mkdir -p $(PREFIX)/$(TEMPLATES_DIR) $(PREFIX)/bin
+	install -m 755 build/rayZ_wizards $(PREFIX)/bin/rayZ_wizards
+	cp -r build/$(TEMPLATES_DIR)/Jamulus $(PREFIX)/$(TEMPLATES_DIR)
+	cp -r build/$(TEMPLATES_DIR)/simple_example $(PREFIX)/$(TEMPLATES_DIR)
+
+	
+uninstall: uninstall-wrapper
+	rm -f $(PREFIX)/bin/rayZ_wizards
+	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/Jamulus
+	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/simple_example
+	
+clean: uninstall-wrapper
 	rm -rf build
 	find -name "__pycache__" | xargs rm -rf 
 	
 prepare-ubuntu:
-	echo "-- Instructions on ubuntu 20.04"
-	sudo apt install python3-cheetah libxml2-utils yad python3-pyqt5
+	echo "-- development env on ubuntu 20.04"
+	sudo apt update
+	sudo apt install python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java
 	
 # -----------------------------------------------------------------------------------------------------------------------------------------
 

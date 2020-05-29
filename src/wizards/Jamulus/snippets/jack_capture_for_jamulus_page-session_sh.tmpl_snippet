@@ -1,0 +1,29 @@
+
+# add=add_proxy
+# set_properties=set_proxy_properties
+# add=add_executable
+# set_properties=set_properties
+
+#if 'jack_capture' in $data['wizard.sectionnamelist']
+#for $username in $data['jack_capture.user.jack_capture_connectedlist']
+
+# assign clientID variable
+create_clientID add_proxy "jack_capture"
+
+# create program subdir if needed
+create_dir_in_client "data"
+create_dir_in_client "bin"
+
+copy_to_client_dir "\$session_path/default/bin/jack_capture_multi.sh" "bin/jack_capture_multi.sh" || error
+
+# create proxy
+create_proxy --label "jack_capture" --arguments "-- jack_capture --jack-transport --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus -f $data['jack_capture.audioformat']" --save_signal 0 --stop_signal 2 --wait_window 0 --no_save_level 0
+
+# set client properties
+set_client_properties --launched 1 --description "jack_capture : Stereo recording of Jamulus $username" --icon "jack_capture" --label "jack_capture"  --name "jack_capture" 
+
+set_jackclient_properties --jackclientname "jack_capture"
+
+echo "-------- PROXY for jack_capture created"
+#end for
+#end if

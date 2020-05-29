@@ -41,14 +41,9 @@
     </default>
   </field>
   <set id="streaming_type" value="icecast2_video_ts"/>
-  <template-snippet ref-id="raysession_xml">
+  <template-snippet ref-id="session_sh">
 #if 'obs_icecast2_video' in $data['wizard.sectionnamelist']  
-<xi:include href="obs_for_jamulus_page-raysession_xml.tmpl_snippet" parse="text"/>
-#end if
-  </template-snippet>
-  <template-snippet ref-id="raysession_sh">
-#if 'obs_icecast2_video' in $data['wizard.sectionnamelist']  
-<xi:include href="obs_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+<xi:include href="obs_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>
 #end if
   </template-snippet>
   <template-snippet ref-id="patch_xml">
@@ -56,7 +51,7 @@
 <xi:include href="obs_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
 #end if
   </template-snippet>
-  <!-- TEMPLATE DEFINITION APART FROM patch_xml and raysession_sh -->
+  <!-- TEMPLATE DEFINITION APART FROM patch_xml and session_sh -->
   <template>
     <!-- building default obs-studio configuration for icecast2_video_ts -->
     <copy-tree src="default/obs-studio" dest="default/obs-studio-icecast2_video_ts"/>

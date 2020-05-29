@@ -11,14 +11,17 @@ class CheckLineEdit(QtWidgets.QWidget):
           self.labelMessage = QtWidgets.QLabel()
         self.lineEdit = QtWidgets.QLineEdit(self)
         self.lineEdit.textChanged.connect(self.check)
-        #self.lineEdit.textChanged.connect(self.valueChanged)
         self.labelCheck = QtWidgets.QLabel()
     
     def check(self):
       if self.hasAcceptableInput():
         self.labelCheck.setText('<span style="color:green">' + u'\u2713' + '</span>')
+        if self.message:
+          self.labelMessage.setText("")
       else:
-          self.labelCheck.setText('<span style="color:red">X</span>')
+        self.labelCheck.setText('<span style="color:red">X</span>')
+        if self.message:
+          self.labelMessage.setText("")
     
     def setEnabled(self, bool):
       self.lineEdit.setEnabled(bool)
@@ -65,22 +68,3 @@ class CheckLineEdit(QtWidgets.QWidget):
       if self.message:
         self.labelMessage.hide()
       self.labelCheck.hide()
-      
-class SessionNameCheckLineEdit(CheckLineEdit):
-
-  wizard = None
-
-  def __init__(self, parent=None):
-    super(SessionNameCheckLineEdit, self).__init__(parent)
-    
-  def hasAcceptableInput(self):
-    if self.wizard != None:
-      if self.lineEdit.hasAcceptableInput() and self.lineEdit.text() != '':
-        if self.wizard.sessionNameAlreadyUsed():
-          self.labelMessage.setText("<span style='color:red'>Session name already in use !</span>")
-        else:
-          self.labelMessage.setText("")  
-          return True      
-    else:
-      self.labelMessage.setText("")  
-      return self.lineEdit.hasAcceptableInput() and self.lineEdit.text() != ''     

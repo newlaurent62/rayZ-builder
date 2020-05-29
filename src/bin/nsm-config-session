@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# alt-config-session
+#
+# (c) 2020 Laurent Schwartz, license GPLv3
+#
+
+function error() {
+  echo -e "\e[1m\e[31man error occured !\e[0m"
+  exit 1
+}
+
+
+function help() {
+  echo "Usage: "
+  echo "  nsm-config-session [ (-x|--xdg-config-home) RELATIVE_PATH ] -- EXECUTABLE_ARGS"
+  echo ""
+  echo " Example:"
+  echo "  alt-config-session -x ~/.config2 -- 'mumble -m'"
+}
+
+NSM_CLIENT_ID="$NSM_CLIENT_ID"
+while (( "$#" )); do
+  case "$1" in
+    -x|--xdg-config-home)
+      echo "arg xdg-config-home=$2"
+      export XDG_CONFIG_HOME="$2"
+      shift 2
+      ;;
+    -h|--help)
+      echo 
+      help
+      exit 0
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*=) # unsupported flags
+      echo "error: unknown option '$1'"
+      exit 1
+      ;;
+  esac
+done
+
+argc=$#
+cmd=("$@")
+for (( j=0; j<argc; j++ )); do
+    cmd[$j]="${cmd[$j]}" 
+    if [ $? -ne 0 ]
+    then
+      error
+    fi
+done
+
+COMMAND="${cmd[0]}"
+
+echo "- PATH: $PATH"
+echo "- XDG_CONFIG_HOME resolved to: $XDG_CONFIG_HOME"
+echo "- NSM_CLIENT_ID: $NSM_CLIENT_ID"
+echo "- NSM_SESSION_NAME: $NSM_SESSION_NAME"
+echo "- PWD: $(pwd)"
+echo "- Executing: '${cmd[@]}'"
+echo "- Command(which $COMMAND): '$(which "$COMMAND")'"
+if [ "$(which "$COMMAND")" == "" ]
+then
+  echo -e "\e[1m\e[31mCommand '$COMMAND' not found on this system !\e[0m"
+  exit 1
+fi
+echo "Starting command ..."
+exec "${cmd[@]}" || error

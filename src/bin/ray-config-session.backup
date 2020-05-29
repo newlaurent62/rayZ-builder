@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# alt-config-session
+#
+# (c) 2020 Laurent Schwartz, license GPLv3
+#
+
+function stopclient() {
+  if [ "$NSM_CLIENT_ID" != "" ]
+  then
+    ray_control client $NSM_CLIENT_ID stop
+  fi
+}
+
+function error() {
+  echo -e "\e[1m\e[31man error occured !\e[0m"
+  stopclient
+  exit 1
+}
+
+
+function help() {
+  echo "Usage: "
+  echo "  ray-config-session [ (-x|--xdg-config-home) RELATIVE_PATH ] -- EXECUTABLE_ARGS"
+  echo ""
+  echo " Example:"
+  echo "  ray-config-session -x ~/.config2 -- mumble -m"
+}
+
+if [ "$RAY_SESSION_PATH" == "" ]
+then
+  RAY_SESSION_PATH="$(ray_control get_session_path)"
+  if [ $? -ne 0 ]
+  then
+    echo -e "\e[1m\e[31mcould not get ray_session_path ! Is there a raysession document opened ?\e[0m"
+    stopclient
+    exit 1
+  fi
+fi
+
+while (( "$#" )); do
+  case "$1" in
+    -x|--xdg-config-home)
+      echo "arg xdg-config-home=$2"
+      export XDG_CONFIG_HOME="$2"
+      shift 2
+      ;;
+    -h|--help)
+      echo 
+      help
+      exit 0
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*=) # unsupported flags
+      echo "error: unknown option '$1'"
+      exit 1
+      ;;
+  esac
+done
+
+argc=$#
+cmd=("$@")
+for (( j=0; j<argc; j++ )); do
+    cmd[$j]="${cmd[$j]}" 
+done
+
+COMMAND="${cmd[0]}"
+if [ "$NSM_CLIENT_ID" == "" ]
+then
+  echo -e "\e[1m\e[31mThe NSM_CLIENT_ID is not set ... Cannot run the program !\e[0m"
+  stopclient
+  error
+fi
+RAY_SESSION_NAME="$(basename "$RAY_SESSION_PATH")"
+echo "- PATH: $PATH"
+echo "- XDG_CONFIG_HOME resolved to: $XDG_CONFIG_HOME"
+echo "- NSM_CLIENT_ID: $NSM_CLIENT_ID"
+echo "- RAY_SESSION_NAME: $RAY_SESSION_NAME"
+cd "$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID" || error
+echo "- PWD: $(pwd)"
+echo "- Executing: '${cmd[@]}'"
+echo "- Command(which $COMMAND): '$(which "$COMMAND")'"
+if [ "$(which "$COMMAND")" == "" ]
+then
+  echo -e "\e[1m\e[31mCommand '$COMMAND' not found on this system !\e[0m"
+  stopclient
+  exit 1
+fi
+echo "Starting command ..."
+exec "${cmd[@]}" || error
+stopclient

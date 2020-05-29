@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="text" encoding="utf-8" indent="yes" />
 <xsl:template match="/wizard">#!/usr/bin/env python
 
@@ -19,6 +19,7 @@ import json
 import re
 import shutil
 import getopt
+import traceback
 
 # Project files
 from ui_userslistedit import UsersListEdit
@@ -30,7 +31,7 @@ serverQregexp = QtCore.QRegularExpression("^(((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4
 
 pathQregexp = QtCore.QRegularExpression("^(\\/(([ A-Za-z0-9-_+]|\\.)+\\/)*([A-Za-z0-9_-]|\\.)+)$")
 directoryQregexp = QtCore.QRegularExpression("^(\\/(([ A-Za-z0-9-_+]|\\.)+\\/)*([A-Za-z0-9_-]|\\.)+)$")
-filenameQregexp = QtCore.QRegularExpression("^([A-Za-z0-9_-]|\\.)+$")
+filenameQregexp = QtCore.QRegularExpression("^([A-Za-z0-9_\- ]|\\.)+$")
 sessionNameQregexp = QtCore.QRegularExpression("^((?!--)([ _A-Za-z0-9-]|\\.))+$")
 nameAndPasswordQregexp = QtCore.QRegularExpression("^((?!--)([_A-Za-z0-9-]|\\.))+$")
 usersQregexp = QtCore.QRegularExpression("^((?!--)([_A-Za-z0-9-]|\\.)+)(,((?!--)([_A-Za-z0-9-]|\\.)+))*$")
@@ -45,14 +46,14 @@ class DataModel:
 
   data = {}
   
-  def __init__(self, wizard):
+  def __init__(self, wizard, session_root):
     self.wizard = wizard
     self.config = None
     self.configfilename = '<xsl:value-of select='@id'/>.conf'
-    self.raysession_root = os.environ.get('RAY_SESSION_ROOT', '~/"Ray Sessions"')
-    self.raysession_path = None
+    self.session_path = None
     self.registeredkey = {}
     self.allowedSections = []
+    self.session_root = session_root
   
   def readConf(self):
     config = configparser.ConfigParser()
@@ -200,12 +201,12 @@ class DataModel:
     return self.jackOutputs('R', content)
 
   def sessionNameAlreadyUsed(self):    
-    self.raysession_path = self.raysession_root + os.sep + self.wizard.field('<xsl:value-of select='//field[@id = "raysession_name"]/../@section-name'/>.raysession_name')
-    if os.path.isdir(self.raysession_path):
-      print('Directory "%s" already exist ! Choose another name or delete it first.' % self.raysession_path ) 
+    self.session_path = self.session_root + os.sep + self.wizard.field('<xsl:value-of select='//field[@id = "session_name"]/../@section-name'/>.session_name')
+    if os.path.isdir(self.session_path):
+      print('Directory "%s" already exist ! Choose another name or delete it first.' % self.session_path ) 
       return True
     else:
-      print('Directory "%s" does not exist.' % self.raysession_path ) 
+      print('Directory "%s" does not exist.' % self.session_path ) 
       return False
 
   def cleanConf(self, allFieldNames):
@@ -215,7 +216,7 @@ class DataModel:
       new_config[section]={}
       for ckey in self.config[section]:
         fieldkey = section + '.' + ckey
-        if (fieldkey  in allFieldNames() or (section in self.registeredkey and ckey in self.registeredkey[section])) and not ('-hide' in ckey):
+        if ((allFieldNames and fieldkey in allFieldNames) or (section in self.registeredkey and ckey in self.registeredkey[section])) and not ('-hide' in ckey):
           if self.config[section][ckey] != None and self.config[section][ckey] != '':
             new_config[section][ckey] = self.config[section][ckey]
       new_config._sections[section] = collections.OrderedDict(sorted(new_config._sections[section].items(), key=lambda t: t[0]))
@@ -236,7 +237,7 @@ class DataModel:
     return str_config
 
   def writeConf(self, allFieldNames):
-    cleanconfig = self.cleanConf()
+    cleanconfig = self.cleanConf(allFieldNames)
     
     with open(self.configfilename, 'w+') as fh:
       cleanconfig.write(fh)
@@ -245,9 +246,9 @@ class DataModel:
 
     return str_config
 
-  def createdata(self):
+  def createdata(self, allFieldNames):
     data = self.data
-    config = self.cleanConf()
+    config = self.cleanConf(allFieldNames)
     for section in config.sections():
       for key in config[section]:
         data[section + '.' + key] = config[section][key]
@@ -256,33 +257,31 @@ class DataModel:
     print (data)
     return data
     
-  def writeJSON(self, filename):    
+  def writeJSON(self, filename, allFieldNames):    
     print ('Write datamodel ...')
-    content = json.dumps(self.createdata(), sort_keys=True, indent=2)
+    content = json.dumps(self.createdata(allFieldNames), sort_keys=True, indent=2)
     with open(filename, 'w') as fh:
       fh.write(content)
     return content
       
 class SessionNameCheckLineEdit(CheckLineEdit):
 
-  wizard = None
-
   def __init__(self, parent=None):
-    super(SessionNameCheckLineEdit, self).__init__(parent)
+    super(SessionNameCheckLineEdit, self).__init__(parent, message=True)
+    self.page = parent
     
   def hasAcceptableInput(self):
-    if self.wizard != None:
-      if self.lineEdit.hasAcceptableInput() and self.lineEdit.text() != '':
-        if self.wizard.sessionNameAlreadyUsed():
-          self.labelMessage.setText("<span style='color:red'>Session name already in use !</span>")
-        else:
-          self.labelMessage.setText("")  
-          return True      
+    if self.lineEdit.hasAcceptableInput() and self.lineEdit.text() != '':
+      if self.page != None and self.page.wizard().sessionNameAlreadyUsed():
+        self.labelMessage.setText('&lt;span style="color:red"&gt;Session name is already in use ! Please use another one&lt;/span&gt;')
+        return False
+      else:
+        self.labelMessage.setText("")  
+        return True
     else:
-      self.labelMessage.setText("")  
-      return self.lineEdit.hasAcceptableInput() and self.lineEdit.text() != ''     
+      return False
 
-class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidgets.QWizard):
+class SessionWizard(QtWidgets.QWizard):
 
   
     pageSteps = []
@@ -295,9 +294,13 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
     
     pagenameByIdx = {}
     
-    def __init__(self, parent=None, templatedir='.', jsonfilename=None, startguioption=False):
-        super(<xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard, self).__init__(parent)
+    def __init__(self, parent=None, jsonfilename=None, startguioption=False, session_manager="ray_control"):
+        super(SessionWizard, self).__init__(parent)
 
+        
+        self._id = '<xsl:value-of select='@id'/>'
+        self._title = '<xsl:value-of select='@title'/>'
+        
         self.startguioption = startguioption
         self.startgui = False
 
@@ -316,11 +319,32 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
         self.pagenameByIdx[self.Page_<xsl:value-of select="last-page/@id"/>] ='<xsl:value-of select="last-page/@id"/>'
 
         self.resize(<xsl:value-of select='width'/>,<xsl:value-of select='height'/>)
-        self.datamodel = DataModel(self)
+  
+        session_root = ''
+        if session_manager == 'nsm':
+          try:
+            session_root = os.environ['NSM_SESSION_ROOT'].replace('"','')
+          except:
+            pass
+          if session_root == '':
+            session_root = os.environ['HOME'] + os.sep + 'NSM Sessions'
+        else:
+          try:
+            session_root = os.environ['RAY_SESSION_ROOT'].replace('"','')
+          except:
+            pass
+          if session_root == '':
+            session_root = os.environ['HOME'] + os.sep + 'Ray Sessions'
+        
+        session_root = session_root.replace('"','')
+        
+        print ('session_root:"' + session_root + '"') 
+
+        self.datamodel = DataModel(self, session_root)
         self.datamodel.readConf()
         self.currentIdChanged.connect(self.enableButtons)
-        self.templatedir = templatedir
         self.jsonfilename = jsonfilename
+        self.session_manager = session_manager
         self.registeredPage = []
         self.stepindex = 0
         
@@ -331,6 +355,19 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
         self.pageSteps.append(self.Page_<xsl:value-of select="last-page/@id"/>)
         self.setStartId(self.Page_<xsl:value-of select="first-page/@id"/>)
         self.printPageSteps()
+
+        if self.session_manager == 'nsm':
+          self.session_type = 'NSM'
+        elif self.session_manager.startswith('ray'):
+          self.session_type = 'RAY'
+          
+        self.updateTitle(None)
+
+    def updateTitle(self,session_name):
+      if session_name:
+        self.setWindowTitle('Create ' + self.session_type + ' session ['+ session_name + ']')
+      else:
+        self.setWindowTitle('Create ' + self.session_type + ' session')
         
     def printPageSteps(self):
       id = self.currentId()
@@ -355,14 +392,22 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
         self.currentPage().defaults()
         
     def allFieldNames(self):
-      return {s for page_id in self.pageIds() for s in self.page(page_id).field_names}
+      field_names = []
+      for page_id in self.pageIds():
+        for f in self.page(page_id).field_names:
+          if f not in field_names:
+            field_names.append(f)
+      return field_names
 
     def initFieldsOfSection(self):
       self.datamodel.initFieldsOfSection(self.currentPage())
       
     def cleanConfAsString(self):
-      return self.datamodel.cleanConfAsString(self.allFieldNames)
+      return self.datamodel.cleanConfAsString(self.allFieldNames())
 
+    def writeJSON(self, datamodelfile):
+      return self.datamodel.writeJSON(datamodelfile, self.allFieldNames())
+      
     def updateConfSections(self):
       sections=['wizard']
       if not('wizard' in self.datamodel.config.sections()):
@@ -377,10 +422,10 @@ class <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(QtWidg
       print (self.datamodel.allowedSections)
       
     def writeConf(self):
-      self.datamodel.writeConf(self.allFieldNames)
+      self.datamodel.writeConf(self.allFieldNames())
       
     def sessionNameAlreadyUsed(self):
-      self.datamodel.sessionNameAlreadyUsed()
+      return self.datamodel.sessionNameAlreadyUsed()
       
     def nextId(self):
       id = self.currentId()
@@ -458,7 +503,7 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         self.setTitle('<xsl:value-of select='first-page/title'/>')
         self.labelDescription.setText('<xsl:value-of select='first-page/description'/>')
         if self.wizard().startguioption:
-          self.checkStartgui.setText('Check if you want to start RaySession GUI once the RaySession document has been created')
+          self.checkStartgui.setText('Check if you want to start GUI once the Session document has been created')
           self.checkStartgui.show()
         else:
           self.checkStartgui.hide()
@@ -529,6 +574,7 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
     def validatePage(self):
         if self.wizard().startguioption:
           self.wizard().startgui = self.checkStartgui.isChecked()
+          print ("startgui:" + str(self.wizard().startgui))
         
         self.wizard().pageSteps = []
         pageSteps = self.wizard().pageSteps
@@ -585,7 +631,7 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)            
             </xsl:when>
             <xsl:when test='input/@type = "regexp"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='input/@regexp'/>'), self)
+        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='input/regexp'/>'), self)
         self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)
             </xsl:when>
             <xsl:when test='input/@type = "range"'>
@@ -628,6 +674,16 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         </xsl:when>
         <xsl:when test='@type = "SessionNameCheckLineEdit"'>
         self._<xsl:value-of select='@id'/> = SessionNameCheckLineEdit(self)        
+          <xsl:choose>
+            <xsl:when test='input/@type = "regexp"'>
+        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='input/regexp'/>'), self)
+        self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)
+            </xsl:when>
+            <xsl:otherwise>
+        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(filenameQregexp, self)
+        self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)            
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:when test='@type = "QComboBox"'>
         self._<xsl:value-of select='@id'/> = QtWidgets.QComboBox(self)
@@ -719,6 +775,9 @@ class <xsl:value-of select='@id'/>Page(BasePage):
           data['<xsl:value-of select='output/@datamodel-id'/>'] = config['<xsl:value-of select='../@section-name'/>']['<xsl:value-of select='@id'/>']
                 </xsl:otherwise>
               </xsl:choose>
+            </xsl:if>
+            <xsl:if test='@type="SessionNameCheckLineEdit"'>
+          self.wizard().updateTitle(self.field(self.sectionName + '.<xsl:value-of select='@id'/>'))
             </xsl:if>
           </xsl:for-each>
           <xsl:for-each select='.//output[@split-seperator]'>
@@ -816,37 +875,38 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
         self.wizard().writeConf()
         
         tmpdir = tempfile.mkdtemp()      
-        outdir = datamodel.raysession_path
+        outdir = datamodel.session_path
         if self.wizard().jsonfilename == None:
           tmp = tempfile.NamedTemporaryFile()
           datamodelfile=tmp.name
         else:
           datamodelfile = self.wizard().jsonfilename
         
-        print(self.wizard().datamodel.writeJSON(datamodelfile))
+        print(self.wizard().writeJSON(datamodelfile))
           
-        templatedir = self.wizard().templatedir
-
-        if templatedir not in sys.path:
-          print ("adding %s to sys.path" % templatedir)
-          sys.path.append(templatedir)
-
+        templatedir = os.path.abspath(os.path.dirname(__file__))
         print ('sys.path' + str(sys.path))
-        print ('--' + str(datamodelfile) + '\n--' + str(templatedir) + '\n--' + str(tmpdir) + '\n')
-
+        print ('-- datamodel file:' + str(datamodelfile) + '\n-- rayZtemplatedir:' + str(templatedir) + '\n-- tmp dir:' + str(tmpdir) + '\n-- startgui:' + str(self.wizard().startgui) + "\n-- session_manager:" + self.wizard().session_manager)
         
-        #from tmpl_<xsl:value-of select='lower-case(@id)'/> import RaySessionTemplate        
-        from tmpl_wizard import RaySessionTemplate        
-        if RaySessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui) == 0:          
+        from tmpl_wizard import SessionTemplate
+        try:
+          SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager)
           QtWidgets.QMessageBox.information(self,
-                                            "RaySessionn creation ...",
-                                            "The RaySession has been successfully created.")
-        
-        return True
+                                            "Sessionn creation ...",
+                                            "The Session has been successfully created.")
+          return True
+        except Exception as exception:
+          traceback.print_exc()
+          print("Exception: {}".format(type(exception).__name__))
+          print("Exception message: {}".format(exception))          
+          QtWidgets.QMessageBox.critical(self,
+                                            "Sessionn creation ...",
+                                            "An error occured during the creation process (see logs for more details)")
+          return False
       else:
         QtWidgets.QMessageBox.critical(self,
-                                            "RaySessionn creation ...",
-                                            "The RaySession name is already in use ! Please set another one.")
+                                            "Sessionn creation ...",
+                                            "The Session already exists ! '" + self.wizard().datamodel.session_path + "'&lt;br/&gt;Please try another name.")
       return False
 
       
@@ -856,16 +916,19 @@ def usage():
   print ("   -h|--help              : print this help text")
   print ("   -d                     : debug information")
   print ("   -j|--write-json-file   : set the JSON file to write. It is used to fill the template and contains user inputs and wizard outputs variables.")
-  print ("   -t|--template-dir      : set the template directory that contains the template related to this wizard.")
-  print ("   -s|--start-gui-option  : The wizard will display an option for starting raysession software at the end of the document creation.")
+  print ("   -s|--start-gui-option  : the wizard will display an option for starting raysession software at the end of the document creation.")
+  print ("   -m|--session-manager   : set the session-manager of the resulting document")
+  print ("                             - ray_control : (default) create a raysession document. You will need raysession software for the processing,")
+  print ("                             - ray_xml     : create a raysession document. You wont need raysession for the document generation,")
+  print ("                             - nsm         : create a nsm session. You wont need non-session-manager for the document generation,")
   
 if __name__ == '__main__':
   jsonfilename = None
-  templatedir = 'xxx-TEMPLATE_DIR-xxx'
   startguioption = False
+  session_manager = 'ray_control'
   import sys
   try:                                
-    opts, args = getopt.getopt(sys.argv[1:], "hj:t:ds", ["help", "write-json-file=","template-dir=","debug","start-gui-option"])
+    opts, args = getopt.getopt(sys.argv[1:], "hj:ds", ["help", "write-json-file=","debug","start-gui-option","session-manager="])
     print ("args list: ")
     print(opts)
   except getopt.GetoptError:          
@@ -881,14 +944,16 @@ if __name__ == '__main__':
     elif opt in ("-j", "--write-json-file"):
       jsonfilename = arg
       print ("will write a json file '%s' when finishing the wizard steps." % jsonfilename)
-    elif opt in ("-t", "--template-dir"):
-      templatedir = arg
-      print ("Template dir is '%s'" % templatedir)
     elif opt in ("-s", "--start-gui-option"):
       startguioption=True
+    elif opt in ("-m", "--session-manager"):
+      session_manager=arg
+      if session_manager not in ['ray_control', 'ray_xml', 'nsm']:  
+        print ('--session-manager options : "ray_control|ray_xml|nsm"')
+        sys.exit(2)
   
   app = QtWidgets.QApplication(sys.argv)
-  wizard = <xsl:value-of select='replace(upper-case(@id),"WIZARD","")'/>Wizard(templatedir=templatedir, jsonfilename=jsonfilename, startguioption=startguioption)
+  wizard = SessionWizard(jsonfilename=jsonfilename, startguioption=startguioption, session_manager=session_manager)
   layout = [QtWidgets.QWizard.CustomButton1, QtWidgets.QWizard.CustomButton2, QtWidgets.QWizard.BackButton, QtWidgets.QWizard.CancelButton, QtWidgets.QWizard.NextButton, QtWidgets.QWizard.FinishButton]
   wizard.setButtonLayout(layout);    
   wizard.setButtonText(QtWidgets.QWizard.CustomButton1, "Defaults")

@@ -3,11 +3,8 @@
   <title>Ray Session section</title>
   <short-title>RaySession</short-title>
   
-  <requires executable="raysession" version="1.0"/> 
-
-  <field id='raysession_name' type='SessionNameCheckLineEdit'>
-    <label>The RaySession filename</label>
-    <input type="filename"/>
+  <field id='session_name' type='SessionNameCheckLineEdit'>
+    <label>The Session filename</label>
     <default value="My jack capture session"/>
   </field> 
   <field id='users' type='CheckLineEdit' >

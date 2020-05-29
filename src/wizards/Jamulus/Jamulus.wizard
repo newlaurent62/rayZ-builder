@@ -2,10 +2,16 @@
 <wizard id='Jamulus' xmlns:xi="http://www.w3.org/2001/XInclude">
   <info>
     <title>Jamulus and related applications</title>
-    <category>jamulus</category>
-    <keywords>jamulus,streaming,recording,audio,video</keywords>
+    <category>Jamulus</category>
+    <keywords>jamulus,streaming,recording,multitrack,audio,video,mp3,oga,wav,mp2ts,facebook,youtube,icecast2</keywords>
     <version>1</version>
-    <description>Select your applications and configure a simple or a complex virtual studio setup using RaySession.</description>
+    <description>
+Select your applications and create a simple or a complex virtual studio setup with Jamulus and other applications using RaySession.
+- Jamulus : online jam session for musicians (server has multitrack capability)
+- Obs : streaming capability (icecast2, facebook, youtube ...)
+- jack_capture : Stereo recording
+- mumble : vocal and written chat
+    </description>
     <author>Laurent Schwartz</author>
     <email>newlaurent@gmail.com</email>
   </info>
@@ -14,7 +20,7 @@
   <!-- PAGES -->
   <first-page id='First'>
     <title>Jamulus and related applications</title>
-    <description>This wizard let you create a raysession with Jamulus and other related applications.</description>
+    <description>This wizard let you create a session with Jamulus and other related applications.</description>
   </first-page>
   <!-- SINGLE PAGES -->
   <xi:include href='global_with_users.page'/>
@@ -35,14 +41,11 @@
     <description>...</description>
   </last-page>
   <template>
-    <copy-tree src="ray-scripts" dest="ray-scripts"/>
-    <!--raysession xml-->
-    <fill-template id="raysession_xml" type="conf" dest="default/raysession.xml.backup"/>
     <!-- session script -->
     <fill-template id="ray_script_load_sh" type="conf" dest="ray-scripts/load.sh"/>
     <!-- in patch_xml.tmpl -->
-    <fill-template id="patch_xml" type="conf" dest="default/patch.xml"/>
-    <!-- in raysession_ray_control_sh.tmpl -->
-    <fill-template id="raysession_sh" type="create-raysession" dest="default/raysession.sh"/>
+    <fill-template id="patch_xml" type="patch_xml" dest="default/patch.xml"/>
+    <!-- in session_ray_control_sh.tmpl -->
+    <fill-template id="session_sh" type="create-session" dest="default/session.sh"/>
   </template>
 </wizard>

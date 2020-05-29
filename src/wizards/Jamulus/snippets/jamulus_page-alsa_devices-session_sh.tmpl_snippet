@@ -1,0 +1,34 @@
+
+#if 'alsa_in_devices' in $data
+#for $device in $data['alsa_in_devices']
+
+# assign clientID variable
+create_clientID add_proxy "alsa_in"
+
+create_proxy --label "alsa_in" --arguments "-- -j in_$device -d h:$device"
+
+# set client properties
+set_client_properties --launched "1" --description "Capture device $device" --icon "alsa_in_x11" --label "alsa_in"  --name "alsa_in"
+
+set_jackclient_properties --jackclientname "in_$device"
+
+#end for
+#end if
+
+#if 'alsa_out_devices' in $data
+#for $device in $data['alsa_out_devices']
+
+# assign clientID variable
+create_clientID add_proxy "alsa_out"
+
+create_proxy --label "alsa_out" --arguments "-- -j out_$device -d h:$device"
+
+# set client properties
+set_client_properties --launched "1" --description "Playback device $device" --icon "alsa_out_x11" --label "alsa_out" --name "alsa_out"
+
+set_jackclient_properties --jackclientname "out_$device"
+
+#end for
+#end if
+
+echo "-------- DEVICES added "

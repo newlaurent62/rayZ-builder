@@ -62,7 +62,8 @@
             <xsd:simpleType>
               <xsd:restriction base="xsd:string">
                 <xsd:enumeration value="conf"/>
-                <xsd:enumeration value="create-raysession"/>
+                <xsd:enumeration value="create-session"/>
+                <xsd:enumeration value="patch_xml"/>
               </xsd:restriction>
             </xsd:simpleType>
           </xsd:attribute>
