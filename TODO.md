@@ -2,9 +2,7 @@
 
 ## Wizards
 
-### Jamulus
-
-adding application like:
+add application like:
   Mumble
   Audacity
   Reaper
@@ -13,16 +11,18 @@ Start Jamulus server with recording option
 
 Testing ...
 
-jack_capture does not start save quot between jack_capture_multi.sh and ray-config-session
+simple_example does not work:
+
+- jack_capture does not load ...
+
+- alsaplayer cannot be found Catia 
+    
+    simple_example doesn't work with Catia because the jackclientname cannot be set and the default is alsaplayer-ID 
+    and we don't know the ID  ... nor we know the pid of the jack client name from jack lib.
 
 ## Overall
 
 - Comment XSLs, XSDs, Pages, Wizards
-
-- check for program availabilities
-
-- Use client Proxy in raysession
-    => set the save level of each application in the ray-proxy xml files (created by raysession.sh snippets).
   
 - Schema creation :
   More contraint checks on dependencies and types
@@ -31,8 +31,6 @@ jack_capture does not start save quot between jack_capture_multi.sh and ray-conf
 - document the examples
 
 - handle QListWidget (with checkbox / radio) type and QTableWidget ?
-
-- check that all required programs are available on the system (check version ?) depending on the section declared in the conf file or datamodel.json. 
 
 - Check that variables are not using reserved variable names and that they are uniq in the xml file.
 

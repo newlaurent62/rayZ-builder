@@ -42,15 +42,15 @@ Ex: src/wizards/mywizard/test-data
 
 fill the $(WIZARD) template from test-data inputs to generate a ray session with ray_control.
 
-    make test-ray-control-template : 
+    make test-ray-control-template
 
 fill the $(WIZARD) template from test-data inputs to generate a ray session without ray_control.
     
-    make test-ray-xml-template : 
+    make test-ray-xml-template
 
 fill the $(WIZARD) template from test-data inputs to generate an nsm session.
 
-    make test-nsm-template : fill the DEFAULT_WIZARD template using test-data inputs
+    make test-nsm-template
 
 ## Install / Uninstall wrapper scripts
 
