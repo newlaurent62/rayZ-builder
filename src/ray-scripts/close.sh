@@ -53,15 +53,19 @@ then
   fi
 fi
 
-if $close_all_clients;then
-    # This command orders to ray-daemon to close the session closing all clients
-    # even if a session has to be opened just after.
-    ray_control run_step close_all
-else
-    # This command orders to ray-daemon to close the session
-    # If you don't run it, session will be closed after running the script
-    ray_control run_step
+close_all_if_needed=''
+
+if [[ "$RAY_FUTURE_SCRIPTS_DIR" != "$RAY_SCRIPTS_DIR" ]] &&\
+        ! [ -f "$RAY_FUTURE_SCRIPTS_DIR/.jack_config_script" ];then
+    close_all_if_needed=close_all
 fi
+
+ray_control run_step $close_all_if_needed
+
+if [ -n "$close_all_if_needed" ];then
+    ray-jack_config_script putback && ray_control hide_script_info
+fi
+
 
 
 

@@ -24,6 +24,7 @@ Select your applications and create a simple or a complex virtual studio setup w
   </first-page>
   <!-- SINGLE PAGES -->
   <xi:include href='global_with_users.page'/>
+  <xi:include href='jack.page'/>
   <xi:include href='jamulus.page'/>
   <xi:include href='jack_capture_for_jamulus.page'/>
   <!-- GROUPS OF EXCLUSIVE PAGES / CAN ONLY HAVE ONE AT A TIME IN WIZARD-->

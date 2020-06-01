@@ -82,6 +82,15 @@ function error() {
   exit 1
 }
 
+function init_catia_if_needed() {
+
+if [ -f "$RAY_SESSION_PATH/ray-scripts/.env" ]; then
+  source "$RAY_SESSION_PATH/ray-scripts/.env"
+  if [ $USE_CATIA -eq 1 ]; then
+    mkdir -p /tmp/catia/
+  fi
+fi
+}
 
 function help() {
   echo "Usage: "
@@ -106,7 +115,7 @@ while (( "$#" )); do
   case "$1" in
     -x|--xdg-config-home)
       echo "arg xdg-config-home=$2"
-      export XDG_CONFIG_HOME="$2"
+      CONFIG_HOME="$2"
       shift 2
       ;;
     -h|--help)
@@ -138,12 +147,19 @@ then
   error
 fi
 RAY_SESSION_NAME="$(basename "$RAY_SESSION_PATH")"
+
+export XDG_CONFIG_HOME="$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID/$CONFIG_HOME"
+
+USE_CATIA=0
+init_catia_if_needed
+
 echo "- PATH: $PATH"
 echo "- XDG_CONFIG_HOME resolved to: $XDG_CONFIG_HOME"
 echo "- NSM_CLIENT_ID: $NSM_CLIENT_ID"
 echo "- RAY_SESSION_NAME: $RAY_SESSION_NAME"
 cd "$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID" || error
 echo "- PWD: $(pwd)"
+echo "- USE_CATIA: $USE_CATIA"
 echo "- Executing: '${cmd[@]}'"
 echo "- Command(which $COMMAND): '$(which "$COMMAND")'"
 if [ "$(which "$COMMAND")" == "" ]
@@ -151,11 +167,15 @@ then
   echo -e "\e[1m\e[31mCommand '$COMMAND' not found on this system !\e[0m"
   error
 fi
-echo "0" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
+if [ $USE_CATIA -eq 1 ]; then
+  echo "0" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
+fi
 echo "Starting command ..."
 ${cmd[@]} &
 PID=$!
-echo "$PID" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
+if [ $USE_CATIA -eq 1 ]; then
+  echo "$PID" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
+fi
 sleep 2
 WINID="$(~/.local/bin/getwindidbypid $PID)"
 echo "window id: $WINID of PID: $PID"

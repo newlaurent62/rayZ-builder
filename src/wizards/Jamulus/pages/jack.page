@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='Jack' section-name='jack' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Jack settings section</title>
+  <short-title>Jack settings</short-title>
+  <requires executable="jack_control"/>
+  <field id='interface' type='QComboBox'>
+    <label>Select the interface</label>
+    <input type="command"><command call="getasoundlistinterface"/></input>
+    <default select-first="True"/>
+  </field>
+  <field id='period' type='QComboBox'>
+    <label>Frames / Periods</label>
+    <input>
+      <item label="64"/>
+      <item label="128"/>
+      <item label="256"/>
+      <item label="512"/>
+    </input>
+    <default select-first='True'/>
+  </field>
+  <field id='samplerate' type='QLineEdit'>
+    <label>Sample rate (Jamulus only supports 48000 Hz)</label>
+    <input type="regexp"><regexp>^48000$</regexp></input>
+    <default value="48000"/>
+  </field>
+  <template-snippet ref-id="session_sh">
+echo "USE_JACK=1" >> "\$session_path/ray-scripts/.env"
+echo "USE_JACK_SETTINGS=1" >> "\$session_path/ray-scripts/.env"
+  </template-snippet>
+  <!-- TEMPLATE DEFINITION APART FROM patch_xml and session_sh -->
+  <template>
+    <!-- building default obs-studio configuration for icecast2_video_ts -->
+    <fill-template id="jack_settings_env" type="conf" dest="default/jack_settings.env"/>
+  </template>  
+</page>

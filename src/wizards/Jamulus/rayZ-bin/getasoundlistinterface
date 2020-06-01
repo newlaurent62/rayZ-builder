@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#
+# Get the sound interfaces short name from alsa
+#
+
+perl -n -e 'print "$1\n" if /\s*[0-9]+\s+\[(.+?)\s*\].*$/' <(cat /proc/asound/cards)

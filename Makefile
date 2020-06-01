@@ -51,8 +51,11 @@ build: install-wrapper $(DEFAULT_FILES)
 	mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/default" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/share" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/data"
 	cp -r src/gui/* "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/"
 	test -d src/wizards/$(WIZARD_ID)/default && cp -r src/wizards/$(WIZARD_ID)/default "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
+	test -d src/ray-scripts && cp -r src/ray-scripts "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray-scripts" || exit 0
 	test -d src/wizards/$(WIZARD_ID)/ray-scripts && cp -r src/wizards/$(WIZARD_ID)/ray-scripts "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
-
+	test -d src/wizards/$(WIZARD_ID)/rayZ-bin/ && mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" || exit 0
+	test -d src/wizards/$(WIZARD_ID)/rayZ-bin/ && cp -r src/wizards/$(WIZARD_ID)/rayZ-bin/* "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin/" || exit 0
+	test -d src/wizards/$(WIZARD_ID)/rayZ-bin/ && find "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" -type f  | xargs chmod 755 || exit 0
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/wizard.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/wizard.py"
 		
 .PHONY: 

@@ -98,17 +98,20 @@
             <xsd:element name="input" minOccurs="0">
               <xsd:complexType>
                 <xsd:choice>
+                  <xsd:element name="command" minOccurs="0">
+                    <xsd:complexType>
+                      <xsd:attribute name="call" type="xsd:string" use="required"/>
+                    </xsd:complexType>
+                  </xsd:element>
                   <xsd:sequence>
                     <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
                       <xsd:complexType>
-                        <xsd:attribute name="id" type="id" use="required"/>
-                        <xsd:attribute name="label" type="xsd:string"/>
+                        <xsd:attribute name="id" type="id" use="optional"/>
+                        <xsd:attribute name="label" type="xsd:string" use="required"/>
                       </xsd:complexType>
                     </xsd:element>
                   </xsd:sequence>
-                  <xsd:sequence>
-                    <xsd:element name="regexp" type="xsd:string"/>
-                  </xsd:sequence>
+                  <xsd:element name="regexp" type="xsd:string"/>
                 </xsd:choice>
                 <xsd:attribute name="list-id" use="optional" type="dataid"/>
                 <xsd:attribute name="type" use="optional">
@@ -117,6 +120,7 @@
                       <xsd:enumeration value="None"/>
                       <xsd:enumeration value="range"/>
                       <xsd:enumeration value="regexp"/>
+                      <xsd:enumeration value="command"/>
                       <xsd:enumeration value="path"/>
                       <xsd:enumeration value="filename"/>
                       <xsd:enumeration value="directory"/>
@@ -155,7 +159,8 @@
                     </xsd:complexType>
                   </xsd:element>
                 </xsd:choice>
-                <xsd:attribute name="value" use="optional" type="xsd:string"/>                      
+                <xsd:attribute name="value" use="optional" type="xsd:string"/>
+                <xsd:attribute name="select-first" type="boolean" use="optional"/>
               </xsd:complexType>
             </xsd:element>
           </xsd:sequence>

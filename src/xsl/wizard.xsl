@@ -18,6 +18,7 @@ import collections
 import json
 import re
 import shutil
+import shlex
 import getopt
 import traceback
 
@@ -687,15 +688,40 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         </xsl:when>
         <xsl:when test='@type = "QComboBox"'>
         self._<xsl:value-of select='@id'/> = QtWidgets.QComboBox(self)
-        <xsl:for-each select='input/item'>
+          <xsl:choose>
+            <xsl:when test="input/item">
+              <xsl:for-each select='input/item'>
+              <xsl:if test='@id'>
         self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@id'/>","<xsl:value-of select='@label'/>")
-        </xsl:for-each>
+              </xsl:if>
+              <xsl:if test='not(@id)'>
+        self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@label'/>","<xsl:value-of select='@label'/>")              
+              </xsl:if>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="input/command">
+        try:
+          my_env = os.environ
+          my_env["PATH"] = os.path.abspath(os.path.dirname(__file__)) + os.sep + "bin:" + my_env["PATH"]
+          out = subprocess.check_output(shlex.split('<xsl:value-of select="input/command/@call"/>'), env=my_env, shell=True, text=True)        
+          list = out.splitlines()
+          self._<xsl:value-of select='@id'/>.addItems(list)
+        except Exception as e:
+          print (e)
+          print ('Could not initilize the <xsl:value-of select='@id'/> values.')
+            </xsl:when>
+          </xsl:choose>
         </xsl:when>
         <xsl:when test='@type = "QListWidget"'>
         self._<xsl:value-of select='@id'/> = QtWidgets.QListWidget(self)
-        <xsl:for-each select='input/item'>
+          <xsl:for-each select='input/item'>
+            <xsl:if test='@id'>
         self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@id'/>","<xsl:value-of select='@label'/>")
-        </xsl:for-each>
+            </xsl:if>
+            <xsl:if test='not(@id)'>            
+        self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@label'/>","<xsl:value-of select='@label'/>")
+            </xsl:if>
+          </xsl:for-each>
         </xsl:when>
         <xsl:when test='@type = "UsersListEdit"'>
         self._<xsl:value-of select='@id'/> = UsersListEdit(self, property_name='<xsl:value-of select='@id'/>'<xsl:if test="input/@max-count">, countmax=<xsl:value-of select='input/@max-count'/></xsl:if><xsl:if test="input/@min">, minchecked=<xsl:value-of select="input/@min"/></xsl:if><xsl:if test="input/@max">, maxchecked=<xsl:value-of select="input/@max"/></xsl:if><xsl:if test="output/@property-checked-name">, property_checked='<xsl:value-of select="output/@property-checked-name"/>'</xsl:if><xsl:if test="input/@jack-inputs">, jack_inputs=<xsl:value-of select='input/@jack-inputs'/></xsl:if><xsl:if test="not(input/@jack-inputs)">, jack_inputs=False</xsl:if><xsl:if test="input/@jack-outputs">,jack_outputs=<xsl:value-of select='input/@jack-outputs'/></xsl:if><xsl:if test="not(input/@jack-outputs)">,jack_outputs=False</xsl:if>)
@@ -760,7 +786,8 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         </xsl:for-each>
                               
     def validatePage(self):
-        if <xsl:for-each select='field[not(@type="QComboBox") and not(@type="QCheckBox")]'><xsl:if test='position() != 1'><xsl:text> and </xsl:text></xsl:if>self._<xsl:value-of select='@id'/>.hasAcceptableInput()</xsl:for-each>:
+        
+        if <xsl:if test='count(field[not(@type="QComboBox") and not(@type="QCheckBox")]) = 0'>True</xsl:if><xsl:for-each select='field[not(@type="QComboBox") and not(@type="QCheckBox")]'><xsl:if test='position() != 1'><xsl:text> and </xsl:text></xsl:if>self._<xsl:value-of select='@id'/>.hasAcceptableInput()</xsl:for-each>:
           self.updateFieldsOfSection()
           datamodel = self.wizard().datamodel
           data = datamodel.data
@@ -821,11 +848,16 @@ class <xsl:value-of select='@id'/>Page(BasePage):
             </xsl:if>
           </xsl:for-each>
         </xsl:when>
-        <xsl:when test='@type = "QCheckBox"'>
+        <xsl:when test='@type = "QCheckBox" and ./default/@value'>
       self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='./default/@value'/>' == True) 
         </xsl:when>
+        <xsl:when test='@type = "QComboBox" and ./default/@select-first'>
+      self._<xsl:value-of select='@id'/>.setCurrentIndex(0)         
+        </xsl:when>
         <xsl:otherwise>
+          <xsl:if test="./default/@value">
       self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='./default/@value'/>') 
+          </xsl:if>
         </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each>

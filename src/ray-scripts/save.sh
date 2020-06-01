@@ -20,8 +20,8 @@
 
 # script here some actions to run before saving the session
 
-# This command orders to ray-daemon to save the session
-# If you don't run it, session won't be saved
+ray-jack_config_script save
 ray_control run_step
+exit 0
 
 # script here some actions to run after saving the session

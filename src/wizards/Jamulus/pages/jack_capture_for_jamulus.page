@@ -22,6 +22,8 @@
       <item checked="True"/>
       <item checked="False"/>
       <item checked="False"/>
+      <item checked="False"/>
+      <item checked="False"/>
     </default>
   </field>
   <template-snippet ref-id="session_sh">

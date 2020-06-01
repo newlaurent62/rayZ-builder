@@ -35,7 +35,8 @@
 
 # [VARIABLES]
 CHECK_SERVER=1
-CHECK_JACK=1
+USE_JACK=1
+USE_JACK_SETTINGS=0
 CHECK_ADDITIONNAL_AUDIO_DEVICES=1
 CHECK_PROGRAMS=1
 USE_CATIA=1
@@ -54,9 +55,8 @@ function check_server_running() {
         echo "\$1 has been found in systemd."
         if [ "\$(systemctl status \$SERVICE | grep "active (running)")" == "" ]
         then
-          ray_control script_user_action "It seems that \$1 is not running in systemd. This RaySession use it. Please start it using 'sudo systemctl start \$SERVICE'. Do you want to stop loading the session ?"
-          if [ \$? -eq 0 ]
-          then
+          
+          if ray_control script_user_action "It seems that \$1 is not running in systemd. This RaySession use it. Please start it using 'sudo systemctl start \$SERVICE'. Do you want to stop loading the session ?"; then
             echo "The session load has been aborted by user."
             ray_control script_info "The session load has been aborted by user."
             exit 0
@@ -64,9 +64,7 @@ function check_server_running() {
         fi
     else
         echo "\$1 does not exist in systemd."
-        ray_control script_user_action "It seems that \$1 is not installed in systemd. This RaySession use it. Please install it. Do you want to stop loading the session ?"
-        if [ \$? -eq 0 ]
-        then
+        if ray_control script_user_action "It seems that \$1 is not installed in systemd. This RaySession use it. Please install it. Do you want to stop loading the session ?"; then
           echo "The session load has been aborted by user."
           ray_control script_info "The session load has been aborted by user."
           exit 0
@@ -75,18 +73,56 @@ function check_server_running() {
   fi
 }
 
-if [ \$CHECK_JACK -eq 1 ]
-then
-  jack_control status
-  if [ \$? -ne 0 ];then
-    ray_control script_user_action "The jack server is not started ! Please start it using qjackctl (or other software). Do you want to stop loading the session ?"
-    if [ \$? -eq 0 ]
-    then
-      echo "The session load has been aborted by user."
-      ray_control script_info "The session load has been aborted by user."
-      exit 0
-    fi
+function restart_server_with_session_settings() {  
+  if jack_control status; then
+    jack_control stop
   fi
+  jack_control  eps name default
+  jack_control  ds alsa 
+  jack_control  eps realtime true
+  jack_control  dps rate \$JACK_SAMPLERATE
+  jack_control  dps period \$JACK_PERIOD  
+  jack_control  dps device hw:\$JACK_INTERFACE
+  jack_control  dps playback hw:\$JACK_INTERFACE
+  jack_control  dps capture hw:\$JACK_INTERFACE
+
+  jack_control start
+}
+
+if [ \$USE_JACK -eq 1 ]
+then
+  ray-jack_config_script load || exit 0
+  ray_control hide_script_info
+
+<!--  if [ \$USE_JACK_SETTINGS -eq 1 -a -f "\$RAY_SESSION_PATH/default/jack_settings.env" ]; then
+    source "\$RAY_SESSION_PATH/default/jack_settings.env"
+    
+    if [ "\$JACK_INTERFACE" != "" -a "\$JACK_PERIOD" != "" -a "\$JACK_SAMPLERATE" != "" ]; then
+      if jack_control status; then
+        
+        if ray_control script_user_action "Jack is already running. If you choose ignore, the jack server will be restarted. Otherwise the session will stop loading."; then
+          echo "The session load has been aborted by user."
+          ray_control script_info "The session load has been aborted by user."
+          exit 0
+        else
+          restart_server_with_session_settings
+        fi
+      else
+        restart_server_with_session_settings
+      fi
+    else
+      echo "jack_settings.env is not complete so ignoring it !"
+    fi
+  else      
+    if jack_control status; then
+      
+      if ray_control script_user_action "The jack server is not started ! Please start it using qjackctl (or other software). Do you want to stop loading the session ?"; then
+        echo "The session load has been aborted by user."
+        ray_control script_info "The session load has been aborted by user."
+        exit 0
+      fi
+    fi
+  fi-->
 fi
 
 # CHECK FOR ADDITIONNAL AUDIO DEVICES DEFINED IN THE SETUP IF anyway
