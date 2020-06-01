@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page id='Global' section-name='global' use="required">
-  <title>Ray Session section</title>
-  <short-title>RaySession</short-title>
+  <title>Virtual studio setup section</title>
+  <short-title>Virtual studio</short-title>
   
   <field id='session_name' type='SessionNameCheckLineEdit'>
-    <label>The Session filename</label>
+    <label>The session name</label>
     <default value="My jack capture session"/>
   </field> 
   <field id='users' type='CheckLineEdit' >
