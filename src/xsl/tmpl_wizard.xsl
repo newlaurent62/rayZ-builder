@@ -148,7 +148,7 @@ if __name__ == '__main__':
       destfilepath = outdir + os.sep + '<xsl:value-of select='@dest'/>'
       os.makedirs(os.path.dirname(destfilepath),exist_ok=True)    
       print ('---- Copy file to %s' % destfilepath)
-      shutil.copy(rayZtemplatedir + os.sep + '<xsl:value-of select="@src"/>', destfilepath)x
+      shutil.copy(rayZtemplatedir + os.sep + '<xsl:value-of select="@src"/>', destfilepath)
     
 </xsl:template>
 

@@ -36,7 +36,7 @@ build: install-wrapper $(DEFAULT_FILES)
 	mkdir -p build/$(TEMPLATES_DIR)/$(WIZARD_ID)/
 	
 	xmllint --xinclude --schema src/xsd/wizard.xsd build/$(WIZARD_ID)/xml/$(WIZARD_ID).wizard > build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml
-	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/template-entry.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/tmpl_wizard.py"
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/tmpl_wizard.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/tmpl_wizard.py"
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/install.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/install_dep_wizard.sh"
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/info-template.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/info_wizard.xml"
 	test -f "src/wizards/$(WIZARD_ID)/xsl/session_xml-gen_tmpl.xsl" && saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/session_xml-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_xml.tmpl" || exit 0
