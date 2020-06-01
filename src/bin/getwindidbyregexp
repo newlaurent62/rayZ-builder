@@ -52,6 +52,10 @@ while read line; do
   if [ "$WIN_IDS" == "" ]
   then
     WIN_ID="$(echo "$line" | awk '{print $1}')"
+    if [ "$type" == "--single" ]
+    then
+      break
+    fi
   fi
   WIN_IDS+="$(echo "$line" | awk '{print $1}') "
 done < <( echo "$WMCTRL" )
