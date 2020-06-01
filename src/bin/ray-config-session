@@ -68,10 +68,6 @@ function stopclient() {
       echo "0" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid"
     fi
   fi
-#   if [ "$NSM_CLIENT_ID" != "" ]
-#   then
-#     ray_control client $NSM_CLIENT_ID stop
-#   fi
 }
 
 function error() {
@@ -111,12 +107,18 @@ then
   fi
 fi
 
+EXEC=0
 while (( "$#" )); do
   case "$1" in
     -x|--xdg-config-home)
       echo "arg xdg-config-home=$2"
       CONFIG_HOME="$2"
       shift 2
+      ;;
+    -e|--exec)
+      echo "arg exec"
+      EXEC=1
+      shift
       ;;
     -h|--help)
       echo 
@@ -135,6 +137,7 @@ while (( "$#" )); do
 done
 
 argc=$#
+
 cmd=("$@")
 for (( j=0; j<argc; j++ )); do
     cmd[$j]="${cmd[$j]}" 
@@ -160,6 +163,7 @@ echo "- RAY_SESSION_NAME: $RAY_SESSION_NAME"
 cd "$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID" || error
 echo "- PWD: $(pwd)"
 echo "- USE_CATIA: $USE_CATIA"
+echo "- EXEC: $EXEC"
 echo "- Executing: '${cmd[@]}'"
 echo "- Command(which $COMMAND): '$(which "$COMMAND")'"
 if [ "$(which "$COMMAND")" == "" ]
@@ -171,7 +175,13 @@ if [ $USE_CATIA -eq 1 ]; then
   echo "0" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
 fi
 echo "Starting command ..."
-${cmd[@]} &
+
+if [ $EXEC -eq 0 ]; then
+  ${cmd[@]} &
+else
+  exec ${cmd[@]}
+fi
+
 PID=$!
 if [ $USE_CATIA -eq 1 ]; then
   echo "$PID" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
