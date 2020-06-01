@@ -1,0 +1,26 @@
+#import socket
+#set hostname=socket.gethostname()
+hostname:laurent-W94-95-97JU
+jack_started:1
+/engine/driver:alsa
+/engine/name:default
+/engine/realtime:1
+/engine/realtime-priority:10
+/engine/verbose:0
+/engine/port-max:2048
+/engine/sync:0
+/driver/device:hw:$data['jack.interface']
+/driver/capture:hw:$data['jack.interface']
+/driver/playback:hw:$data['jack.interface']
+/driver/rate:$data['jack.samplerate']
+/driver/period:$data['jack.period']
+/driver/nperiods:2
+/driver/hwmeter:0
+/driver/duplex:1
+/driver/softmode:0
+/driver/monitor:0
+/driver/dither:n
+/driver/shorts:0
+/driver/midi-driver:seq
+pulseaudio_sinks:2
+pulseaudio_sources:2

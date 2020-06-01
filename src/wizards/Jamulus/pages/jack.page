@@ -30,6 +30,6 @@ echo "USE_JACK_SETTINGS=1" >> "\$session_path/ray-scripts/.env"
   <!-- TEMPLATE DEFINITION APART FROM patch_xml and session_sh -->
   <template>
     <!-- building default obs-studio configuration for icecast2_video_ts -->
-    <fill-template id="jack_settings_env" type="conf" dest="default/jack_settings.env"/>
+    <fill-template id="jack_parameters" type="conf" dest="default/jack_parameters"/>
   </template>  
 </page>
