@@ -16,9 +16,9 @@ simple_example does not work:
 - jack_capture does not load ...
 
 - alsaplayer cannot be found Catia 
-    
-    simple_example doesn't work with Catia because the jackclientname cannot be set and the default is alsaplayer-ID 
-    and we don't know the ID  ... nor we know the pid of the jack client name from jack lib.
+.
+When the jackclientname is set and jackclient name-PID. allow to variables like PID in regexp (windowtitle) xxx-PID-xxx
+generate a short unique id for use with jackclient names xxx-uniqID-xxx
 
 ## Overall
 
@@ -34,3 +34,4 @@ simple_example does not work:
 
 - Check that variables are not using reserved variable names and that they are uniq in the xml file.
 
+- remplacer session.sh par un fichier XML pour éviter d'avoir à changer le code à chaque fois que les apis changent ...
