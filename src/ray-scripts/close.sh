@@ -48,6 +48,7 @@ then
   echo "RAY_SESSION_NAME: $RAY_SESSION_NAME"  
   if [ -d "/tmp/catia" ]
   then
+    rm -f "/tmp/catia/${RAY_SESSION_NAME}.*.pid"
     mv "/tmp/catia/${RAY_SESSION_NAME}.yml" "/tmp/catia/${RAY_SESSION_NAME}.yml.session_closed" || exit 1
     touch "/tmp/catia/${RAY_SESSION_NAME}.yml.session_closed" || exit 1
   fi
@@ -55,17 +56,20 @@ fi
 
 close_all_if_needed=''
 
-if [[ "$RAY_FUTURE_SCRIPTS_DIR" != "$RAY_SCRIPTS_DIR" ]] &&\
-        ! [ -f "$RAY_FUTURE_SCRIPTS_DIR/.jack_config_script" ];then
-    close_all_if_needed=close_all
+if [ $USE_SETTINGS -eq 1 ]; then
+  if [[ "$RAY_FUTURE_SCRIPTS_DIR" != "$RAY_SCRIPTS_DIR" ]] &&\
+          ! [ -f "$RAY_FUTURE_SCRIPTS_DIR/.jack_config_script" ];then
+      close_all_if_needed=close_all
+  fi
 fi
 
 ray_control run_step $close_all_if_needed
 
-if [ -n "$close_all_if_needed" ];then
-    ray-jack_config_script putback && ray_control hide_script_info
+if [ $USE_JACK_SETTINGS -eq 1 ]; then
+  if [ -n "$close_all_if_needed" ];then
+      ray-jack_config_script putback && ray_control hide_script_info
+  fi
 fi
-
 
 
 

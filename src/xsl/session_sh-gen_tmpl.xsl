@@ -157,7 +157,7 @@ function create_proxy() {
             no_save_level:"\$no_save_level" \
             arguments:"\$arguments" \
             save_signal:"\$save_signal" \
-            executable:"\$executable" _
+            executable:"\$executable" \
             stop_signal:"\$stop_signal" 
       
       proxy_dir="\$session_name.\$clientID"
@@ -513,14 +513,14 @@ function ray_patch() {
       echo "-------- Install patch.xml to '\$filename'"
       cp "\$filltemplate_dir/default/patch.xml" "\$filename" || error
       cp "\$filltemplate_dir/default/patch.xml" "\$session_path/default/\$session_name.\$patchLabel-\$patchID.xml" || error
-      test -f "\$filltemplate_dir/default/jack_parameters" &amp;&amp; cp "\$filltemplate_dir/default/jack_parameters" "\$session_path/jack_parameters" || error
+      test -f "\$filltemplate_dir/default/jack_parameters" &amp;&amp; cp "\$filltemplate_dir/default/jack_parameters" "\$session_path/jack_parameters"
       ;;
     ray_control)
       filename="\$session_path/\$session_name.\$patchID.xml"
       echo "-------- Install patch.xml to '\$filename'"
       cp "\$filltemplate_dir/default/patch.xml" "\$filename" || error
       cp "\$filltemplate_dir/default/patch.xml" "\$session_path/default/\$session_name.\$patchID.xml" || error
-      test -f "\$filltemplate_dir/default/jack_parameters" &amp;&amp; cp "\$filltemplate_dir/default/jack_parameters" "\$session_path/jack_parameters" || error
+      test -f "\$filltemplate_dir/default/jack_parameters" &amp;&amp; cp "\$filltemplate_dir/default/jack_parameters" "\$session_path/jack_parameters" 
       ;;
   esac
 }

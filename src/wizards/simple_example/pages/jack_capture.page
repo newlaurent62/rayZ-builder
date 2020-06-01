@@ -9,51 +9,71 @@
   <field id='audioformat' type='QComboBox'>
     <label>The output audio format</label>
     <input>
-      <item id='mp3' label='MP3 format file'/>
+      <item id='flac' label='FLAC audio format file'/>
       <item id='oga' label='OGG audio format file'/>
-      <item id='wav' label='WAV format file'/>
+      <item id='mp3' label='MP3 audio format file'/>
+      <item id='wav' label='WAV audio format file'/>
     </input>
     <default value="wav"/>
   </field>
-  <field id='filenameprefix' type='QLineEdit'>
+  <field id='filenameprefix' type='CheckLineEdit'>
     <label>The filename prefix of the recorded files</label>
-    <input type="regexp"><regexp>^[a-zA-Z0-9][a-zA-Z0-9-_ ]+$</regexp></input>
+    <input type="regexp"><regexp>^[a-zA-Z0-9][a-zA-Z0-9-_]+$</regexp></input>
     <default value="My session"/>
   </field>
   <template-snippet ref-id="session_sh">
 <![CDATA[
 #if 'jack_capture' in $data['wizard.sectionnamelist']
 
-#=== BEGIN Audio player to connect to jack_capture
+#=== BEGIN Audio player to connect to alsaplayer
 create_clientID add_proxy "alsaplayer"
 
-create_proxy --label "alsaplayer"  --arguments " -- alsaplayer -o jack"
+alsaplayerID="\$clientID"
+
+create_proxy --label "alsaplayer"  \
+            --arguments " -- alsaplayer --session-name "alsaplayer-\$alsaplayerID" --output jack --fragsize $data['jack.period'] --frequency 48000 --realtime"
 
 # set client properties
-set_client_properties --launched 1 --description "alsaplayer: audio player" --icon "alsaplayer" --label "alsaplayer" --name "Proxy-alsaplayer" --save_signal 0 --stop_signal 15 --wait_window 0 --no_save_level 0
 
-set_jackclient_properties --jackclientname "alsaplayer" --windowtitle "AlsaPlayer" 
+set_client_properties --launched 1 \
+                      --description "alsaplayer: audio player" \
+                      --icon "alsaplayer" \
+                      --label "alsaplayer" \
+                      --name "Proxy-alsaplayer" \
+                      --save_signal 0 \
+                      --stop_signal 15 \
+                      --wait_window 0 \
+                      --no_save_level 0
+
+set_jackclient_properties --jackclientname "alsaplayer-\$alsaplayerID" --windowtitle "AlsaPlayer" 
 
 #=== END Audio player
 
 #=== BEGIN jack_capture
-
 # assign clientID variable
 create_clientID add_proxy "jack_capture"
 
-# create program subdir if needed
-create_dir_in_client data
-
 # create proxy
-create_proxy --label "jack_capture"  --arguments " -- jack_capture --jack-transport --port alsaplayer* -b 24 --filename-prefix \\\"data/\$(date +%Y%m%d)-$data['jack_capture.filenameprefix']\\\" -f $data['jack_capture.audioformat']" --save_signal 0 --stop_signal 2 --wait_window 0 --no_save_level 0
+create_proxy --label "jack_capture" \
+            --arguments "--exec -- jack_capture --jack-transport -f $data['jack_capture.audioformat'] --port alsaplayer-\$alsaplayerID:out*  --filename-prefix data/\$(date +%Y%m%d)-$data['jack_capture.filenameprefix']" \
+            --save_signal 0 \
+            --stop_signal 2 \
+            --wait_window 0 \
+            --no_save_level 0
 
 # set client properties
-set_client_properties --launched 1 --description "jack_capture : recording of alsaplayer" --icon "jack_capture" --label "jack_capture" --name "Proxy-jack_capture" 
+set_client_properties --launched 0 \
+                      --description "jack_capture will record the alsaplayer output. To start the recording, choose an audio file in alsaplayer, start the jack_capture client and press the start button on jack transport panel. (Go to qjackctl ...). Once done unarm the play button. This will stop the recording and stop jack_capture." \
+                      --icon "jack_capture" \
+                      --label "jack_capture" \
+                      --name "Proxy-jack_capture" 
 
-set_jackclient_properties --jackclientname "jack_capture"
+                      
+create_dir_in_client data
 
 #end if
 #=== END jack_capture
+
 ]]>
   </template-snippet>
 </page>

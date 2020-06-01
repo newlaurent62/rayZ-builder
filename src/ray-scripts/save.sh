@@ -20,7 +20,9 @@
 
 # script here some actions to run before saving the session
 
-ray-jack_config_script save
+if [ $USE_JACK_SETTINGS -eq 1 ]; then
+  ray-jack_config_script save
+fi
 ray_control run_step
 exit 0
 
