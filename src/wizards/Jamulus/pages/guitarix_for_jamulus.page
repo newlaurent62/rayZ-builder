@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='Guitarix_for_jamulus' section-name='guitarix' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Virtual guitar amplifier section (Guitarix)</title>
+  <short-title>Virtual guitar amplifier</short-title>
+  <requires executable="guitarix" version="0.9.73"/> 
+  <group id="users" display="ListCheckableH" list-id="global.userslist">
+    <label>Check the jamulus users that need a virtual guitar amplifier and effects and input the jack input(s) of the amplifier for each user checked &lt;br/&gt;Example for &lt;b&gt;inputs: 1-&gt;L&lt;/b&gt; = system:capture_1 to Guitarix input (mono)&lt;br/&gt; You can also add another device to the jack setup by using: (ALSA short name):(input or output number). Example: U22:1-&gt;L (input), ...</label>
+    <field id="jack_inputs">
+      <label>Jack input(s)</label>
+      <line-edit default-value=""><regexp-validator type="jackinputmono"/><model-jack io-type="input" channel-type="mono"/></line-edit>
+    </field>
+  </group>
+  <template-snippet ref-id="session_sh">
+<xi:include href="guitarix_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>
+  </template-snippet>
+  <template-snippet ref-id="patch_xml">
+<xi:include href="guitarix_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+  </template-snippet>
+</page>

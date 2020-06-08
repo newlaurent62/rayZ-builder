@@ -1,25 +1,23 @@
 
-# add=add_proxy
-# set_properties=set_proxy_properties
-# add=add_executable
-# set_properties=set_properties
-
 #if 'jack_capture' in $data['wizard.sectionnamelist']
-#for $username in $data['jack_capture.user.jack_capture_connectedlist']
+#for $username in $data['jack_capture.userslist']
 
 # assign clientID variable
 create_clientID add_proxy "jack_capture"
 
 # create program subdir if needed
 # create proxy
-create_proxy --label "jack_capture" --arguments "-- jack_capture --jack-transport --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus -f $data['jack_capture.audioformat']" --save_signal 0 --stop_signal 2 --wait_window 0 --no_save_level 0
+create_proxy --label "jack_capture" --arguments "--exec -- bin/jack_capture --jack-transport -f $data['jack_capture.audioformat'] --jack-name \"jack_capture-$username\" --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus" --save_signal 0 --stop_signal 2 --wait_window 0 --no_save_level 0
 
 # set client properties
-set_client_properties --launched 1 --description "jack_capture : Stereo recording of Jamulus $username" --icon "jack_capture" --label "jack_capture"  --name "jack_capture" 
-
+set_client_properties --launched 1 --description "Stereo recording of Jamulus $username. To start the recording, press the play button on the jack transport panel (for example in qjackctl). To stop recording unarm the play button. jack_capture will created a file in \$session_path/\$proxy_dir/data with an incremented number." --icon "jack_capture" --name "jack_capture" 
+ 
 set_jackclient_properties --jackclientname "jack_capture"
 
 create_dir_in_client "data"
+create_dir_in_client "bin"
+
+ln -rs "\$session_path/default/bin/jack_capture" "\$session_path/\$proxy_dir/bin/jack_capture" || error
 
 echo "-------- PROXY for jack_capture created"
 #end for

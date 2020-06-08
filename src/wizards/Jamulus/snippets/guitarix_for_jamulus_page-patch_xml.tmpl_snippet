@@ -1,0 +1,14 @@
+#if 'guitarix' in $data['wizard.sectionnamelist']
+#for $username in $data['guitarix.userslist']
+ <connection to="Jamulus $username:input left" from="guitarix-${username}_fx:out_0"/>
+ <connection to="Jamulus $username:input right" from="guitarix-${username}_fx:out_1"/>
+#end for
+#for $username in $data['guitarix.userslist']
+#set key = 'guitarix.users.' + $username +'.jack_inputs.inlist'
+#if $key in $data
+#for $input in $data[$key]
+ <connection to="guitarix-${username}_amp:in_0" from="$input"/>
+#end for
+#end if
+#end for
+#end if

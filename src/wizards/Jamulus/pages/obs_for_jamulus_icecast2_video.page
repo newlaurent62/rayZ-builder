@@ -5,41 +5,30 @@
   
   <requires executable="obs" version="25.0.3"/> 
   
-  <field id='server' type='QLineEdit'>
+  <field id='server'>
     <label>Icecast2 server (hostname or IP address)</label>
-    <input type="None"/>
-    <default value="localhost"/>
+    <line-edit default-value="localhost"><regexp-validator type="hostnameOrIP"/></line-edit>
   </field>
-  <field id='port' type='QLineEdit'>
+  <field id='port'>
     <label>Icecast2 port</label>
-    <input type="range" min="1" max="65535"/>
-    <default value="8000"/>
+    <line-edit default-value="8000"><int-validator min="1" max="65535"/></line-edit>
   </field>
-  <field id='source' type='QLineEdit'>
+  <field id='source'>
     <label>Source</label>
-    <input type="regexp"><regexp>^\w+$</regexp></input>
-    <default value="ts"/>
+    <line-edit default-value="ts"><regexp-validator type="custom" regexp="^\w+$"/></line-edit>
   </field>
-  <field id='password' type='QLineEdit'>
+  <field id='password'>
     <label>Password</label>
-    <input type="regexp"><regexp>^\w+$</regexp></input>
-    <default value="Jamulus0S"/>
+    <line-edit default-value="Jamulus0S"><regexp-validator type="custom" regexp="^\w+$"/></line-edit>
   </field>
-  <field id='mount' type='QLineEdit'>
+  <field id='mount'>
     <label>Mount point</label>
-    <input type="path"/>
-    <default value="/stream.ts"/>
+    <line-edit default-value="/stream.ts"><regexp-validator type="path"/></line-edit>
   </field>
-  <field id='user' type='UsersListEdit'>
-    <label>Set the jamulus client connected to obs</label>
-    <input list-id="global.userlist" max-count='5' min="1" max="1"/>
-    <output property-checked-name="obs_connected"/>
-    <default>
-      <item checked="True"/>
-      <item checked="False"/>
-      <item checked="False"/>
-    </default>
-  </field>
+  <group id="obs_connected" display="ListCheckableH" list-id="global.userslist" min="0" max="1">
+    <label>Select the Jamulus user to stream</label>
+  </group>
+  
   <set id="streaming_type" value="icecast2_video_ts"/>
   <template-snippet ref-id="session_sh">
 #if 'obs_icecast2_video' in $data['wizard.sectionnamelist']  

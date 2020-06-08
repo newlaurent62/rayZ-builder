@@ -1,26 +1,28 @@
 #if 'jamulus'  in $data['wizard.sectionnamelist']
-#for $user in $data['jamulus.userinoutlist']
-#if 'jack_connections' in $user
-#if 'left_jack_inputs' in $user['jack_connections']
-#for $input in $user['jack_connections']['left_jack_inputs']
- <connection to="Jamulus $user.name:input left" from="$input"/>
+#for $username in $data['global.userslist']
+#set key = 'jamulus.users.' + $username +'.jack_inputs.inLlist'
+#if $key in $data
+#for $input in $data[$key]
+ <connection to="Jamulus $username:input left" from="$input"/>
 #end for
 #end if
-#if 'right_jack_inputs' in $user['jack_connections']
-#for $input in $user['jack_connections']['right_jack_inputs']
- <connection to="Jamulus $user.name:input right" from="$input"/>
+#set key = 'jamulus.users.' + $username +'.jack_inputs.inRlist'
+#if $key in $data
+#for $input in $data[$key]
+ <connection to="Jamulus $username:input right" from="$input"/>
 #end for
 #end if
-#if 'left_jack_outputs' in $user['jack_connections']
-#for $output in $user['jack_connections']['left_jack_outputs']
- <connection to="$output" from="Jamulus $user.name:output left"/>
+#set key = 'jamulus.users.' + $username +'.jack_outputs.outLlist'
+#if $key in $data
+#for $output in $data[$key]
+ <connection to="$output" from="Jamulus $username:output left"/>
 #end for
 #end if
-#if 'right_jack_outputs' in $user['jack_connections']
-#for $output in $user['jack_connections']['right_jack_outputs']
- <connection to="$output" from="Jamulus $user.name:output right"/>
+#set key = 'jamulus.users.' + $username +'.jack_outputs.outRlist'
+#if $key in $data
+#for $output in $data[$key]
+ <connection to="$output" from="Jamulus $username:output right"/>
 #end for
-#end if
 #end if
 #end for
 #end if

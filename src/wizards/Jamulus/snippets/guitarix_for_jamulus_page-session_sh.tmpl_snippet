@@ -1,0 +1,21 @@
+
+#if 'guitarix' in $data['wizard.sectionnamelist']
+
+#if 'guitarix.userslist' in $data
+#for $username in $data['guitarix.userslist']
+
+# assign clientID variable
+create_clientID add_proxy "guitarix"
+
+# create proxy
+create_proxy --label "Guitar amp and FX for $username" --arguments "-- guitarix --name guitarix-$username --rcset=Gold" --save_signal 0 --stop_signal 2 --wait_window 1 --no_save_level 0
+
+# set client properties
+set_client_properties --launched 1 --description "Virtual guitar amplifier and effects : mono input and Stereo output to Jamulus for $username." --icon "guitarix"  --name "Guitarix" 
+
+set_jackclient_properties --jackclientname "guitarix-$username"
+
+echo "-------- PROXY for jack_capture created"
+#end for
+#end if
+#end if

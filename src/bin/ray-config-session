@@ -160,6 +160,7 @@ echo "- PATH: $PATH"
 echo "- XDG_CONFIG_HOME resolved to: $XDG_CONFIG_HOME"
 echo "- NSM_CLIENT_ID: $NSM_CLIENT_ID"
 echo "- RAY_SESSION_NAME: $RAY_SESSION_NAME"
+echo "- RAY_CONTROL_PORT: $RAY_CONTROL_PORT"
 cd "$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID" || error
 echo "- PWD: $(pwd)"
 echo "- USE_CATIA: $USE_CATIA"
@@ -179,7 +180,7 @@ echo "Starting command ..."
 if [ $EXEC -eq 0 ]; then
   ${cmd[@]} &
 else
-  exec ${cmd[@]}
+  exec "${cmd[@]}"
 fi
 
 PID=$!

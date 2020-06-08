@@ -129,15 +129,18 @@ then
   echo "Check that program are available on the system ..."
   MISSING_PROGRAMS=""
   COUNT=0
-
+  
+  previous_path="\$PATH"
   <xsl:for-each select="//requires">
+  export PATH="\$RAY_SESSION_PATH/default/bin:\$PATH"
   if [ "\$(which "<xsl:value-of select="@executable"/>")" == "" ]
   then
       MISSING_PROGRAMS="\$MISSING_PROGRAMS <xsl:value-of select="@executable"/>"
       COUNT=\$(( COUNT + 1 ))
   fi
   </xsl:for-each>
-
+  export PATH="\$previous_path"
+  
   if [ "\$MISSING_PROGRAMS" != "" ]
   then
       if [ \$COUNT -gt 1 ]

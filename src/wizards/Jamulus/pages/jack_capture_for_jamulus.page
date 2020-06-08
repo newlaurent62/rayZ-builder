@@ -2,30 +2,20 @@
 <page id='Jack_capture_for_jamulus' section-name='jack_capture' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Jack_capture section (stereo recording)</title>
   <short-title>Jack capture</short-title>
-  
   <requires executable="jack_capture" version="0.9.73"/> 
-
-  <field id='audioformat' type='QComboBox'>
+  <field id='audioformat'>
     <label>The output audio format</label>
-    <input>
-      <item id='mp3' label='MP3 format file'/>
-      <item id='oga' label='OGG audio format file'/>
-      <item id='wav' label='WAV format file'/>
-    </input>
-    <default value="wav"/>
+    <combobox default-value="WAV format file">
+      <role-items>
+        <item id='mp3' label='MP3 format file'/>
+        <item id='oga' label='OGG audio format file'/>
+        <item id='wav' label='WAV format file'/>
+      </role-items>
+    </combobox>
   </field>
-  <field id='user' type='UsersListEdit'>
-    <label>Set the user connected to jack_capture</label>
-    <input list-id="global.userlist" max-count='5' min="1" max="2"/>
-    <output property-checked-name="jack_capture_connected"/>
-    <default>
-      <item checked="True"/>
-      <item checked="False"/>
-      <item checked="False"/>
-      <item checked="False"/>
-      <item checked="False"/>
-    </default>
-  </field>
+  <group id="users" list-id="global.userslist" display="ListCheckableV">
+    <label>Select the Jamulus user to be recorded</label>
+  </group>
   <template-snippet ref-id="session_sh">
 <xi:include href="jack_capture_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>
   </template-snippet>

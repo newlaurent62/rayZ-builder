@@ -1,7 +1,6 @@
 #if 'jack_capture' in $data['wizard.sectionnamelist']
-#if len($data['jack_capture.user.jack_capture_connectedlist']) > 0
-#set $username=$data['jack_capture.user.jack_capture_connectedlist'][0]
- <connection to="jack_capture:input1" from="Jamulus $username:output left"/>
- <connection to="jack_capture:input2" from="Jamulus $username:output right"/>
-#end if
+#for $username in $data['jack_capture.userslist']
+ <connection to="jack_capture-$username:input1" from="Jamulus $username:output left"/>
+ <connection to="jack_capture-$username:input2" from="Jamulus $username:output right"/>
+#end for
 #end if

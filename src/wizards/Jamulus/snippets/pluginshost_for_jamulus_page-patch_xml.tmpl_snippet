@@ -1,0 +1,14 @@
+#if 'audio-plugins' in $data['wizard.sectionnamelist']
+#for $username in $data['audio-plugins.userslist']
+ <connection to="Jamulus $username:input left" from="calf_${username}_fx:Analyzer Out #1"/>
+ <connection to="Jamulus $username:input right" from="calf_${username}_fx:Analyzer Out #2"/>
+#end for
+#for $username in $data['audio-plugins.userslist']
+#set key = 'audio-plugins.users.' + $username +'.jack_inputs.inlist'
+#if $key in $data
+#for $input in $data[$key]
+ <connection to="calf_${username}_fx:Mono Input In #1" from="$input"/>
+#end for
+#end if
+#end for
+#end if

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo ""
+calfjackhost --list | tr ' ' '\n' | sort | grep -v -E "mono|analyzer|xover"

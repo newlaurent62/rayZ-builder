@@ -36,6 +36,7 @@ function create_clientID() {
 
   ACTION="\$1"
   PROGRAM="\$2"
+  label=""
   
   if [ "\$clientCount" == "" ]; then
     echo "clientCount must not be empty !"
@@ -136,6 +137,13 @@ function create_proxy() {
   
   while [ \$# -gt 0 ]; do  
     case "\$1" in
+    --label)
+      v="\${1#??}"
+      declare -g \$v="\$2"
+      # echo "\$1='\$2'"
+      shift 2
+      ;;
+    
     --*)
       v="\${1#??}"
       declare \$v="\$2"
@@ -148,7 +156,12 @@ function create_proxy() {
       ;;
     esac
   done
-    
+
+  if [ "\$label" == "" ]; then
+    echo -e "\e[1m\e[31mThe label must set ! clientID: '\$clientID'\e[0m"
+    exit 1
+  fi
+
   case "\$SESSION_MANAGER" in
     ray_control)      
       mkdir -p "\$session_path/\$session_name.\$clientID"
@@ -173,7 +186,6 @@ function create_proxy() {
       arguments="\${arguments//\'/\&amp;apos;}"
       arguments="\${arguments//&lt;/\&amp;lt;}"
       arguments="\${arguments//&gt;/\&amp;gt;}"
-      label="\${label:-Ray Proxy}"
       proxy_dir="\$session_name.\$label-\$clientID"
       mkdir -p "\$session_path/\$session_name.\$label-\$clientID"
       cat&lt;&lt;EOF_rayproxy_xml_2 &gt; "\$session_path/\$session_name.\$label-\$clientID/ray-proxy.xml" || exit 1
@@ -330,7 +342,7 @@ function set_client_properties() {
   launched=0
   description=""
   icon=""
-  label=""
+    
   if [ "\$ACTION" == "add_proxy" ];then
     if [ "\$SESSION_MANAGER" == "nsm" ];then
       name="\${name:-NSM PROXY \$PROGRAM}"
@@ -344,9 +356,11 @@ function set_client_properties() {
     executable="\$PROGRAM"
   fi
 
-  if [ "\$clientID" == "" ]
-  then
-    echo -e "\e[1m\e[31mThe clientID must be set !\e[0m"
+  if [ "\$label" == "" ]; then
+    echo -e "\e[1m\e[31mThe label must set ! clientID: '\$clientID'\e[0m"
+    exit 1
+  elif [ "\$clientID" == "" ]; then
+    echo -e "\e[1m\e[31mThe clientID must set ! (please call create_clientID)\e[0m"
     exit 1
   fi
 
@@ -365,6 +379,11 @@ function set_client_properties() {
     esac
   done
 
+  if [ "\$label" == "" ]; then
+    echo "The label must set ! clientID: '\$clientID'"
+    exit 1
+  fi
+
   case "\$SESSION_MANAGER" in
     ray_control)
       ray_control client \$clientID set_properties launched:"\$launched" \
@@ -372,8 +391,8 @@ function set_client_properties() {
           label:"\$label" \
           executable:"\$executable" \
           icon:"\$icon" \
-          name:"\$name" 
-          
+          name:"\$name" \
+
       if [ \$? -ne 0 ]
       then
         echo -e "\e[1m\e[31mCould not set properties !\e[0m"
@@ -445,6 +464,12 @@ function set_jackclient_properties() {
 }
 
 function init_session() {
+  USE_JACK=1
+  USE_JACK_SETTINGS=1
+  USE_CATIA=1
+  CHECK_ADDITIONNAL_AUDIO_DEVICES=1
+  CHECK_SERVER=1
+  CHECK_PROGRAMS=1
 
   case "\$SESSION_MANAGER" in
     ray_control)
@@ -497,13 +522,8 @@ EOF_raysession_init
 
   mkdir -p "\$session_path/ray-scripts" || error
   echo -n > "\$session_path/ray-scripts/.env" || error
-
-  echo "USE_JACK=1" >> "\$session_path/ray-scripts/.env" || error
-  echo "USE_CATIA=1" >> "\$session_path/ray-scripts/.env" || error
-  echo "CHECK_ADDITIONNAL_AUDIO_DEVICES=1" >> "\$session_path/ray-scripts/.env" || error
-  echo "CHECK_SERVER=1" >> "\$session_path/ray-scripts/.env" || error
-  echo "CHECK_PROGRAMS=1" >> "\$session_path/ray-scripts/.env" || error  
-
+  
+  
 }
 
 function ray_patch() {
@@ -588,6 +608,13 @@ EOF_raysession_end
       exit 1
       ;;
   esac
+  
+  echo "USE_JACK=\$USE_JACK" > "\$session_path/ray-scripts/.env" || error
+  echo "USE_JACK_SETTINGS=\$USE_JACK_SETTINGS" > "\$session_path/ray-scripts/.env" || error
+  echo "USE_CATIA=\$USE_CATIA" >> "\$session_path/ray-scripts/.env" || error
+  echo "CHECK_ADDITIONNAL_AUDIO_DEVICES=\$CHECK_ADDITIONNAL_AUDIO_DEVICES" >> "\$session_path/ray-scripts/.env" || error
+  echo "CHECK_SERVER=\$CHECK_SERVER" >> "\$session_path/ray-scripts/.env" || error
+  echo "CHECK_PROGRAMS=\$CHECK_PROGRAMS" >> "\$session_path/ray-scripts/.env" || error    
 }
 
 function gui_session() {

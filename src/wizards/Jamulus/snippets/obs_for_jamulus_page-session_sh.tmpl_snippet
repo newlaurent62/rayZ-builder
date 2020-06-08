@@ -21,19 +21,19 @@
 #set $obs_description = 'Obs mp2ts video streaming to icecast2 (to read the stream open the URL in vlc or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' )' 
 #end if
 
-#if len($data[$obssection + '.user.obs_connectedlist']) == 1
+#if len($data[$obssection + '.userslist']) == 1
 # assign clientID variable
 create_clientID add_proxy "obs"
 
-create_dir_in_client ".config" || error
-
 # create proxy
-create_proxy --label "obs" --arguments "--xdg-config-home .config -- obs --profile $streamingtype --scene $streamingtype $startrecording" --wait_window 0 --no_save_level 2 --stop_signal 15
+create_proxy --label "obs" --arguments "--xdg-config-home .config -- obs --profile $streamingtype --scene $streamingtype $startrecording" --save_signal 0 --wait_window 1 --no_save_level 2 --stop_signal 15
 
 # set client properties
 set_client_properties --launched "1" --description "$obs_description" --icon "obs" --label "obs studio" --name "Obs"
 
 set_jackclient_properties --jackclientname "OBS Stream" --windowtitle "OBS.*?$streamingtype"
+
+create_dir_in_client ".config" || error
 
 copy_to_client_dir "\$session_path/default/obs-studio-$streamingtype" ".config/obs-studio" || error
 

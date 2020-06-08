@@ -7,7 +7,7 @@
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtProperty
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets
 import platform    
 import subprocess
 import configparser
@@ -21,26 +21,35 @@ import shutil
 import shlex
 import getopt
 import traceback
+import pprint
 
 # Project files
-from ui_userslistedit import UsersListEdit
-from ui_checklineedit import CheckLineEdit
-from ui_pathlineedit import PathLineEdit
-from ui_radiobuttondelegate import RadioButtonDelegate
+from rayZ_ui import *
 
-serverQregexp = QtCore.QRegularExpression("^(((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])))$")
+hostnameOrIPre = "^(((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])))$"
+hostnameOrIPQregexp = QtCore.QRegularExpression(hostnameOrIPre)
 
-pathQregexp = QtCore.QRegularExpression("^(\\/(([ A-Za-z0-9-_+]|\\.)+\\/)*([A-Za-z0-9_-]|\\.)+)$")
-directoryQregexp = QtCore.QRegularExpression("^(\\/(([ A-Za-z0-9-_+]|\\.)+\\/)*([A-Za-z0-9_-]|\\.)+)$")
-filenameQregexp = QtCore.QRegularExpression("^([A-Za-z0-9_\- ]|\\.)+$")
-sessionNameQregexp = QtCore.QRegularExpression("^((?!--)([ _A-Za-z0-9-]|\\.))+$")
-nameAndPasswordQregexp = QtCore.QRegularExpression("^((?!--)([_A-Za-z0-9-]|\\.))+$")
-usersQregexp = QtCore.QRegularExpression("^((?!--)([_A-Za-z0-9-]|\\.)+)(,((?!--)([_A-Za-z0-9-]|\\.)+))*$")
+pathre = "^(\\/(([ A-Za-z0-9-_+]|\\.)+\\/)*([A-Za-z0-9_-]|\\.)+)$"
+pathQregexp = QtCore.QRegularExpression(pathre)
+directoryre = "^(\\/(([ A-Za-z0-9-_+]|\\.)+\\/)*([A-Za-z0-9_-]|\\.)+)$"
+directoryQregexp = QtCore.QRegularExpression(directoryre)
+filenamere = "^([A-Za-z0-9_\- ]|\\.)+$"
+filenameQregexp = QtCore.QRegularExpression(filenamere)
+sessionnamere = "^((?!--)([ _A-Za-z0-9-]|\\.))+$"
+sessionNameQregexp = QtCore.QRegularExpression(sessionnamere)
+nameAndPasswordre = "^((?!--)([_A-Za-z0-9-]|\\.))+$"
+nameAndPasswordQregexp = QtCore.QRegularExpression(nameAndPasswordre)
+usersre = "^((?!--)([_A-Za-z0-9-]|\\.)+)(,((?!--)([_A-Za-z0-9-]|\\.)+))*$"
+usersQregexp = QtCore.QRegularExpression(usersre)
 
-inputsregexp = "((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*->(LR|L|R|)\s*"
-inputsre = re.compile(inputsregexp)
-outputsregexp = "(LR|L|R)->(([a-zA-Z]\w*):)?([0-9]+)(,(([a-zA-Z]\w*):)?([0-9]+))*\s*"
-outputsre = re.compile(outputsregexp)
+jackinputmonore = "^(((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*-&gt;(L)\s*)+$"
+jackinputstereore = "^(((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*-&gt;(LR|L|R|)\s*)+$"
+jackoutputmonore = "^((L)-&gt;(([a-zA-Z]\w*):)?([0-9]+)(,(([a-zA-Z]\w*):)?([0-9]+))*\s*)+$"
+jackoutputstereore = "^((LR|L|R)-&gt;(([a-zA-Z]\w*):)?([0-9]+)(,(([a-zA-Z]\w*):)?([0-9]+))*\s*)+$"
+jackinputmonoQregexp = QtCore.QRegularExpression(jackinputmonore)
+jackinputstereoQregexp = QtCore.QRegularExpression(jackinputstereore)
+jackoutputmonoQregexp = QtCore.QRegularExpression(jackoutputmonore)
+jackoutputstereoQregexp = QtCore.QRegularExpression(jackoutputstereore)
 
 class DataModel:
 
@@ -55,6 +64,7 @@ class DataModel:
     self.registeredkey = {}
     self.allowedSections = []
     self.session_root = session_root
+    self.session_name = None
   
   def readConf(self):
     config = configparser.ConfigParser()
@@ -65,165 +75,62 @@ class DataModel:
     self.config = config
    
   def registerkey(self, sectionName, key):
+    key = key.lower()
     if not (sectionName in self.registeredkey):
-      self.registeredkey[sectionName] = set([])
-    self.registeredkey[sectionName].add(key)
+      self.registeredkey[sectionName] = []
+    if key not in self.registeredkey[sectionName]:
+      self.registeredkey[sectionName].append(key)
+    print ('++key %s registered in section %s' % (key,sectionName))
       
-  def removeRegisteredKey(self, section, property_hided):
+  def removeRegiteredKey(self, section, property_hided):
     r = []
     if section in self.registeredkey:
       for key in self.registeredkey[section]:
         if key.startswith(property_hided):
           r.append(key)
           
-    for i in r:
-      self.registeredkey[section].remove(i)
-      
-  def initFieldsOfSection(self,page):
-    sectionname = page.sectionName
-    if sectionname != None and sectionname in self.config.sections():
-      print ('Loading [' + sectionname + '] values ...')
-      for key in self.config[sectionname]:
-        if not (key in self.config.defaults()):
-          field_name = sectionname + '.' + key
-          if field_name in page.field_names:
-            try:
-              value = self.config[sectionname][key]
-              if key.startswith('bool'):
-                page.setField(sectionname+ '.' + key, value == 'True')
-              else:
-                page.setField(sectionname+ '.' + key, value)
-              print ('--' + sectionname + '.' + key + ':' + value)
-            except KeyError:
-              print ("--KeyError: loading value for %s.%s" % sectionname, key)
-              self.config[sectionname][key] = self.field(sectionname+ '.' + key)
-    else:
-      page.defaults()
-
-  def updateConf(self,page):
-    sectionname = page.sectionName
-    if sectionname != None:
-      self.config[sectionname] = {}
-      print ('Updating [' + sectionname + '] values in memory ...')
-      for key in page.field_names:
-        if key.startswith(sectionname):
-          ckey = key[(len(sectionname)+1):]
-          value = page.field(key)
-          print ('--' + ckey  + ':' + str(value))
-          self.config[sectionname][ckey] = str(value)
-      
-
-  def alsa_in_devices(self,ins):
-    devices=[]
-    for m in inputsre.finditer(ins):
-      for i in range(len (m.groups())+1):
-        match = m.group(i)
-        if match != None:             
-          if len(match) > 0 and not (':' in match) and not (',' in match) and not ('->' in match) and not match.isdigit() and not (match in ['L','R','LR']):
-            device = match
-            if not (device in devices):
-              devices.append(device)
-    return devices
-  
-  def alsa_out_devices(self, outs):
-    devices=[]
-    for m in outputsre.finditer(outs):
-      for i in range(len (m.groups())+1):
-        match = m.group(i)
-        if match != None:             
-          if len(match) > 0 and not (':' in match) and not (',' in match) and not ('->' in match) and not match.isdigit() and not (match in ['L','R','LR']):
-            device = match
-            if not (device in devices):
-              devices.append(device)
-
-    return devices
-
-  def jackInputs(self,inputtype,content):
-    result=[]
-    devices=[]
-    for m in inputsre.finditer(content):
-      device = 'system'
-      temp=[]
-      #print(m.groups())
-      for i in range(len (m.groups())+1):
-        match = m.group(i)
-        if match != None:             
-          if match in [inputtype,'LR']:
-            result.extend(temp)
-            temp = []
-          elif match != inputtype and match in ['L', 'R', 'LR']:
-            temp = []            
-          elif len(match) > 0 and not (':' in match) and not (',' in match) and match.isdigit():
-            if device != 'system':
-              jack_input = 'in_' + device + ':capture_' + match
-            else:
-              jack_input = device + ':capture_' + match            
-            if not (jack_input in result) and not (jack_input in temp):
-              temp.append(jack_input)
-          elif len(match) > 0 and not (':' in match) and not (',' in match) and not ('->' in match):
-            device = match
-            if not (device in devices):
-              devices.append(device)
-              
-    return result
-
-  def jackOutputs(self,inputtype,content):
-    result=[]
-    for m in outputsre.finditer(content):
-      currenttype = None
-      device = 'system'
-      #print(m.groups())    
-      for i in range(len (m.groups())+1):
-        match = m.group(i)
-        if match != None:
-          if match in ['L', 'R', 'LR']:
-            currenttype = match
-          elif len(match) > 0 and not (':' in match) and not (',' in match) and match.isdigit():
-            if device != 'system':
-              jack_output = 'out_' + device + ':playback_' + match
-            else:
-              jack_output = device + ':playback_' + match
-            if currenttype in [inputtype,'LR'] and not (jack_output in result):
-              result.append(jack_output)
-          elif len(match) > 0 and not (':' in match) and not (',' in match) and not ('->' in match):
-            device = match
-    return result
-
-  def leftJackInputs(self, content):
-    return self.jackInputs('L', content)
-
-  def rightJackInputs(self, content):
-    return self.jackInputs('R', content)
-    
-  def leftJackOutputs(self, content):
-    return self.jackOutputs('L', content)
-  
-  def rightJackOutputs(self, content):
-    return self.jackOutputs('R', content)
-
-  def sessionNameAlreadyUsed(self):    
-    self.session_path = self.session_root + os.sep + self.wizard.field('<xsl:value-of select='//field[@id = "session_name"]/../@section-name'/>.session_name')
-    if os.path.isdir(self.session_path):
-      print('Directory "%s" already exist ! Choose another name or delete it first.' % self.session_path ) 
-      return True
-    else:
-      print('Directory "%s" does not exist.' % self.session_path ) 
-      return False
+    for key in r:
+      self.registeredkey[section].remove(key)
+      datakey = section + '.' + key
+      if datakey in self.data:
+        del self.data[datakey]
+      datakey = section + '.' + key + 'list'
+      if datakey in self.data:
+        del self.data[datakey]
 
   def cleanConf(self, allFieldNames):
     sections = self.allowedSections
+    
+    print ('[==== CleanConf')
+    print ('allowedSections:')
+    print (sections)
+    print ('---')
+    print ('registered keys:')
+    print (self.registeredkey)
+    print ('---')
+  
     new_config = configparser.ConfigParser({}, collections.OrderedDict)
     for section in sections:
       new_config[section]={}
       for ckey in self.config[section]:
         fieldkey = section + '.' + ckey
-        if ((allFieldNames and fieldkey in allFieldNames) or (section in self.registeredkey and ckey in self.registeredkey[section])) and not ('-hide' in ckey):
-          if self.config[section][ckey] != None and self.config[section][ckey] != '':
+        if ((allFieldNames and fieldkey in allFieldNames) or (section in self.registeredkey and ckey in self.registeredkey[section])) and not ckey.endswith('-hide'):
+          if self.config[section][ckey] != None and self.config[section][ckey].strip() != '':
             new_config[section][ckey] = self.config[section][ckey]
       new_config._sections[section] = collections.OrderedDict(sorted(new_config._sections[section].items(), key=lambda t: t[0]))
     
+    self.printConf()
+    print (']==== CleanConf')
     return new_config
 
+  def printConf(self):
+    ff = tempfile.TemporaryFile(mode = 'w+')      
+    self.config.write(ff)
+    ff.seek(0)      
+    str_config = ff.read()
+    ff.close()    
+    print (str_config)
+    
   def cleanConfAsString(self, allFieldNames):
 
     cleanconfig = self.cleanConf(allFieldNames)
@@ -264,24 +171,19 @@ class DataModel:
     with open(filename, 'w') as fh:
       fh.write(content)
     return content
-      
-class SessionNameCheckLineEdit(CheckLineEdit):
 
-  def __init__(self, parent=None):
-    super(SessionNameCheckLineEdit, self).__init__(parent, message=True)
-    self.page = parent
-    
-  def hasAcceptableInput(self):
-    if self.lineEdit.hasAcceptableInput() and self.lineEdit.text() != '':
-      if self.page != None and self.page.wizard().sessionNameAlreadyUsed():
-        self.labelMessage.setText('&lt;span style="color:red"&gt;Session name is already in use ! Please use another one&lt;/span&gt;')
-        return False
-      else:
-        self.labelMessage.setText("")  
-        return True
+  def isSessionNameAlreadyUsed(self, session_name):    
+    self.session_path = self.session_root + os.sep + session_name
+    if os.path.isdir(self.session_path):
+      print('Directory "%s" already exist ! Choose another name or delete it first.' % self.session_path ) 
+      return True
     else:
+      self.session_name = session_name
       return False
 
+  def sessionNameAlreadyUsed(self):
+    return self.isSessionNameAlreadyUsed(self.session_name)
+    
 class SessionWizard(QtWidgets.QWizard):
 
   
@@ -302,25 +204,8 @@ class SessionWizard(QtWidgets.QWizard):
         self._id = '<xsl:value-of select='@id'/>'
         self._title = '<xsl:value-of select='@title'/>'
         
-        self.startguioption = startguioption
-        self.startgui = False
-
-        self._<xsl:value-of select='first-page/@id'/>Page = <xsl:value-of select='first-page/@id'/>Page(self)
-        self.setPage(self.Page_<xsl:value-of select='first-page/@id'/>, self._<xsl:value-of select='first-page/@id'/>Page)
-        self.pagenameByIdx[self.Page_<xsl:value-of select="first-page/@id"/>] = '<xsl:value-of select="first-page/@id"/>'
         
-        <xsl:for-each select='//page'>
-        self._<xsl:value-of select='@id'/>Page = <xsl:value-of select='@id'/>Page(self)
-        self.setPage(self.Page_<xsl:value-of select='@id'/>, self._<xsl:value-of select='@id'/>Page)
-        self.pagenameByIdx[self.Page_<xsl:value-of select="@id"/>] = '<xsl:value-of select="@id"/>'
-        </xsl:for-each>
-        
-        self._<xsl:value-of select='last-page/@id'/>Page = <xsl:value-of select='last-page/@id'/>Page(self)
-        self.setPage(self.Page_<xsl:value-of select='last-page/@id'/>, self._<xsl:value-of select='last-page/@id'/>Page)
-        self.pagenameByIdx[self.Page_<xsl:value-of select="last-page/@id"/>] ='<xsl:value-of select="last-page/@id"/>'
-
-        self.resize(<xsl:value-of select='width'/>,<xsl:value-of select='height'/>)
-  
+        # Initialize DataModel
         session_root = ''
         if session_manager == 'nsm':
           try:
@@ -343,6 +228,28 @@ class SessionWizard(QtWidgets.QWizard):
 
         self.datamodel = DataModel(self, session_root)
         self.datamodel.readConf()
+
+        self.startguioption = startguioption
+        self.startgui = False
+        
+        # Create Wizard Pages
+
+        self._<xsl:value-of select='first-page/@id'/>Page = <xsl:value-of select='first-page/@id'/>Page(self)
+        self.setPage(self.Page_<xsl:value-of select='first-page/@id'/>, self._<xsl:value-of select='first-page/@id'/>Page)
+        self.pagenameByIdx[self.Page_<xsl:value-of select="first-page/@id"/>] = '<xsl:value-of select="first-page/@id"/>'
+        
+        <xsl:for-each select='//page'>
+        self._<xsl:value-of select='@id'/>Page = <xsl:value-of select='@id'/>Page(self)
+        self.setPage(self.Page_<xsl:value-of select='@id'/>, self._<xsl:value-of select='@id'/>Page)
+        self.pagenameByIdx[self.Page_<xsl:value-of select="@id"/>] = '<xsl:value-of select="@id"/>'
+        </xsl:for-each>
+        
+        self._<xsl:value-of select='last-page/@id'/>Page = <xsl:value-of select='last-page/@id'/>Page(self)
+        self.setPage(self.Page_<xsl:value-of select='last-page/@id'/>, self._<xsl:value-of select='last-page/@id'/>Page)
+        self.pagenameByIdx[self.Page_<xsl:value-of select="last-page/@id"/>] ='<xsl:value-of select="last-page/@id"/>'
+
+        self.resize(<xsl:value-of select='width'/>,<xsl:value-of select='height'/>)
+  
         self.currentIdChanged.connect(self.enableButtons)
         self.jsonfilename = jsonfilename
         self.session_manager = session_manager
@@ -391,7 +298,11 @@ class SessionWizard(QtWidgets.QWizard):
     def defaults(self):
       if self.currentPage() != None:
         self.currentPage().defaults()
-        
+
+    def readData(self):
+      if self.currentPage() != None:
+        self.currentPage().readData(self.datamodel.config, self.datamodel)
+
     def allFieldNames(self):
       field_names = []
       for page_id in self.pageIds():
@@ -399,9 +310,6 @@ class SessionWizard(QtWidgets.QWizard):
           if f not in field_names:
             field_names.append(f)
       return field_names
-
-    def initFieldsOfSection(self):
-      self.datamodel.initFieldsOfSection(self.currentPage())
       
     def cleanConfAsString(self):
       return self.datamodel.cleanConfAsString(self.allFieldNames())
@@ -412,7 +320,7 @@ class SessionWizard(QtWidgets.QWizard):
     def updateConfSections(self):
       sections=['wizard']
       if not('wizard' in self.datamodel.config.sections()):
-        self.datamodel.config['wizard'] = {}
+        self.datamodel.config.add_section('wizard')
       for pageid in self.pageSteps:
         sectionname = self.page(pageid).sectionName
         if sectionname:
@@ -478,6 +386,9 @@ class BasePage(QtWidgets.QWizardPage):
       
     def requires(self):
       return []      
+      
+    def readData(self, config, datamodel):
+      pass
     
 class <xsl:value-of select='first-page/@id'/>Page(BasePage):
     def __init__(self, parent=None):
@@ -490,7 +401,7 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         self.labelMessage = QtWidgets.QLabel()
         layout.addWidget(self.labelMessage)
         self.treeApplications = QtWidgets.QTreeWidget()
-        self.treeApplications.setItemDelegate(RadioButtonDelegate())
+        self.treeApplications.setItemDelegate(CRadioButtonDelegate())
         self.treeApplications.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
         layout.addWidget(self.treeApplications)
         self.setLayout(layout)
@@ -610,125 +521,18 @@ class <xsl:value-of select='@id'/>Page(BasePage):
     def __init__(self, parent=None):
         super(<xsl:value-of select='@id'/>Page, self).__init__(parent)
         self.sectionName = '<xsl:value-of select='@section-name'/>'
+        datamodel = None
+        headers = []
+        fields = []
+        <xsl:apply-templates mode="__init__create_instance"/>
         
-        <xsl:for-each select='field'>
-        self._label_<xsl:value-of select='@id'/> = QtWidgets.QLabel()
-        <xsl:choose>
-        <xsl:when test='@type = "QLineEdit"'>
-        self._<xsl:value-of select='@id'/> = QtWidgets.QLineEdit(self)
-          <xsl:choose>
-            <xsl:when test='input/@type = "None"'>
-            </xsl:when>
-            <xsl:when test='input/@type = "filename"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(filenameQregexp, self)
-        self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)                        
-            </xsl:when>
-            <xsl:when test='input/@type = "directory"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(directoryQregexp, self)
-        self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)            
-            </xsl:when>
-            <xsl:when test='input/@type = "path"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(pathQregexp, self)
-        self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)            
-            </xsl:when>
-            <xsl:when test='input/@type = "regexp"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='input/regexp'/>'), self)
-        self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)
-            </xsl:when>
-            <xsl:when test='input/@type = "range"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QIntValidator(<xsl:value-of select='input/@min'/>,<xsl:value-of select='input/@max'/>, self)            
-        self._<xsl:value-of select='@id'/>.setValidator(_validator_<xsl:value-of select='@id'/>)
-            </xsl:when>
-            <xsl:otherwise>
-            # GENERATION ERROR: unhandled input/@type "<xsl:value-of select='input/@type'/>" for <xsl:value-of select='@type'/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test='@type = "QCheckBox"'>
-        self._<xsl:value-of select='@id'/> = QtWidgets.QCheckBox(self)
-        </xsl:when>
-        <xsl:when test='@type = "PathLineEdit"'>
-          <xsl:choose>
-            <xsl:when test='input/@type = "filename"'>        
-        self._<xsl:value-of select='@id'/> = PathLineEdit(self, filedialogtype=PathLineEdit.Type_File)
-            </xsl:when>
-            <xsl:when test='input/@type = "directory"'>
-        self._<xsl:value-of select='@id'/> = PathLineEdit(self, filedialogtype=PathLineEdit.Type_Dir)
-            </xsl:when>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test='@type = "CheckLineEdit"'>
-        self._<xsl:value-of select='@id'/> = CheckLineEdit(self)        
-          <xsl:choose>
-            <xsl:when test='input/@type = "regexp"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='input/regexp'/>'), self)
-        self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)
-            </xsl:when>
-            <xsl:when test='input/@type = "range"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QIntValidator(<xsl:value-of select='input/@min'/>,<xsl:value-of select='input/@max'/>, self)            
-        self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)
-            </xsl:when>
-            <xsl:otherwise>
-            # GENERATION ERROR: unhandled input/@type "<xsl:value-of select='input/@type'/>" for <xsl:value-of select='@type'/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test='@type = "SessionNameCheckLineEdit"'>
-        self._<xsl:value-of select='@id'/> = SessionNameCheckLineEdit(self)        
-          <xsl:choose>
-            <xsl:when test='input/@type = "regexp"'>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression('<xsl:value-of select='input/regexp'/>'), self)
-        self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)
-            </xsl:when>
-            <xsl:otherwise>
-        _validator_<xsl:value-of select='@id'/> = QtGui.QRegularExpressionValidator(filenameQregexp, self)
-        self._<xsl:value-of select='@id'/>.lineEdit.setValidator(_validator_<xsl:value-of select='@id'/>)            
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test='@type = "QComboBox"'>
-        self._<xsl:value-of select='@id'/> = QtWidgets.QComboBox(self)
-          <xsl:choose>
-            <xsl:when test="input/item">
-              <xsl:for-each select='input/item'>
-              <xsl:if test='@id'>
-        self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@id'/>","<xsl:value-of select='@label'/>")
-              </xsl:if>
-              <xsl:if test='not(@id)'>
-        self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@label'/>","<xsl:value-of select='@label'/>")              
-              </xsl:if>
-              </xsl:for-each>
-            </xsl:when>
-            <xsl:when test="input/command">
-        try:
-          my_env = os.environ
-          my_env["PATH"] = os.path.abspath(os.path.dirname(__file__)) + os.sep + "bin:" + my_env["PATH"]
-          out = subprocess.check_output(shlex.split('<xsl:value-of select="input/command/@call"/>'), env=my_env, shell=True, text=True)        
-          list = out.splitlines()
-          self._<xsl:value-of select='@id'/>.addItems(list)
-        except Exception as e:
-          print (e)
-          print ('Could not initilize the <xsl:value-of select='@id'/> values.')
-            </xsl:when>
-          </xsl:choose>
-        </xsl:when>
-        <xsl:when test='@type = "QListWidget"'>
-        self._<xsl:value-of select='@id'/> = QtWidgets.QListWidget(self)
-          <xsl:for-each select='input/item'>
-            <xsl:if test='@id'>
-        self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@id'/>","<xsl:value-of select='@label'/>")
-            </xsl:if>
-            <xsl:if test='not(@id)'>            
-        self._<xsl:value-of select='../../@id'/>.addItem("<xsl:value-of select='@label'/>","<xsl:value-of select='@label'/>")
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:when test='@type = "UsersListEdit"'>
-        self._<xsl:value-of select='@id'/> = UsersListEdit(self, property_name='<xsl:value-of select='@id'/>'<xsl:if test="input/@max-count">, countmax=<xsl:value-of select='input/@max-count'/></xsl:if><xsl:if test="input/@min">, minchecked=<xsl:value-of select="input/@min"/></xsl:if><xsl:if test="input/@max">, maxchecked=<xsl:value-of select="input/@max"/></xsl:if><xsl:if test="output/@property-checked-name">, property_checked='<xsl:value-of select="output/@property-checked-name"/>'</xsl:if><xsl:if test="input/@jack-inputs">, jack_inputs=<xsl:value-of select='input/@jack-inputs'/></xsl:if><xsl:if test="not(input/@jack-inputs)">, jack_inputs=False</xsl:if><xsl:if test="input/@jack-outputs">,jack_outputs=<xsl:value-of select='input/@jack-outputs'/></xsl:if><xsl:if test="not(input/@jack-outputs)">,jack_outputs=False</xsl:if>)
-        </xsl:when>
-        </xsl:choose>
-        </xsl:for-each>
-        layout = QtWidgets.QVBoxLayout()
+        # we free widgets
+        fields = []
+        headers = []
+        layout = QtWidgets.QVBoxLayout(self)
+        <xsl:apply-templates mode="__init__add_to_layout"/>
+
+<!--        layout = QtWidgets.QVBoxLayout()
         <xsl:for-each select='field'>
         layout.addWidget(self._label_<xsl:value-of select='@id'/>)
         <xsl:choose>
@@ -743,6 +547,9 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         </xsl:when>
         <xsl:when test='@type = "UsersListEdit"'>
         self._<xsl:value-of select='@id'/>.addToLayout(layout)
+        </xsl:when>
+        <xsl:when test='@type = "TableWidgetWithComboBox"'>
+        layout.addWidget(self._<xsl:value-of select='@id'/>)
         </xsl:when>
         <xsl:otherwise>
         layout.addWidget(self._<xsl:value-of select='@id'/>)
@@ -768,113 +575,74 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         </xsl:otherwise>
         </xsl:choose>
         </xsl:for-each>
-      
+-->      
+
+    def readData(self, config, datamodel):
+          print('[====== readData')
+          <xsl:apply-templates mode="initializePage_readdata"/>    
+          print(']====== readData')
+        
     def initializePage(self):
+        print ("[==== initializePage " + self.sectionName)
+
         datamodel = self.wizard().datamodel
         data = datamodel.data
         config = datamodel.config
-        self.initFieldsOfSection()
-        <xsl:for-each select='field'>
-        <xsl:if test='@type = "UsersListEdit"'>
-        self._<xsl:value-of select='@id'/>.initialize(data['<xsl:value-of select='input/@list-id'/>'])
-        self._<xsl:value-of select='@id'/>.readConf(config)
-        </xsl:if>
-        </xsl:for-each>
+        
+        <xsl:apply-templates mode="initializePage_initialize"/>
+        if self.sectionName in config.sections():
+          self.readData(config, datamodel)
+        else:
+          self.defaults()
+
         self.setTitle('<xsl:value-of select='title'/>')
         <xsl:for-each select='field'>
         self._label_<xsl:value-of select='@id'/>.setText('<xsl:value-of select='label'/>')
         </xsl:for-each>
-                              
+        <xsl:for-each select='group'>
+        self._label_<xsl:value-of select='@id'/>.setText('<xsl:value-of select='label'/>')
+        </xsl:for-each>
+        print ("]==== initializePage " + self.sectionName)
+
     def validatePage(self):
+        print ("[==== validatePage " + self.sectionName)
         
-        if <xsl:if test='count(field[not(@type="QComboBox") and not(@type="QCheckBox")]) = 0'>True</xsl:if><xsl:for-each select='field[not(@type="QComboBox") and not(@type="QCheckBox")]'><xsl:if test='position() != 1'><xsl:text> and </xsl:text></xsl:if>self._<xsl:value-of select='@id'/>.hasAcceptableInput()</xsl:for-each>:
-          self.updateFieldsOfSection()
-          datamodel = self.wizard().datamodel
-          data = datamodel.data
-          config = datamodel.config
-          <xsl:for-each select='field'>
-            <xsl:if test="output/@datamodel-id or output/@property-checked-name">
-              <xsl:choose>
-                <xsl:when test='@type = "UsersListEdit"'>
-          self._<xsl:value-of select='@id'/>.updateConf(config,<xsl:if test="output/@datamodel-id">'<xsl:value-of select='output/@datamodel-id'/>'</xsl:if><xsl:if test="not(output/@datamodel-id)">None</xsl:if>)
-                </xsl:when>
-                <xsl:otherwise>
-          data['<xsl:value-of select='output/@datamodel-id'/>'] = config['<xsl:value-of select='../@section-name'/>']['<xsl:value-of select='@id'/>']
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:if>
-            <xsl:if test='@type="SessionNameCheckLineEdit"'>
-          self.wizard().updateTitle(self.field(self.sectionName + '.<xsl:value-of select='@id'/>'))
-            </xsl:if>
-          </xsl:for-each>
-          <xsl:for-each select='.//output[@split-seperator]'>
-            <xsl:if test='../@type = "CheckLineEdit" or ../@type = "QLineEdit"'>
-          data['<xsl:value-of select='@datamodel-id'/>'] = config['<xsl:value-of select='../../@section-name'/>']['<xsl:value-of select='../@id'/>'].split('<xsl:value-of select='@split-seperator'/>')
-            </xsl:if>
-          </xsl:for-each>
-          print (data)
+        config = self.wizard().datamodel.config
+        datamodel = self.wizard().datamodel
+        
+        if <xsl:for-each select="field"><xsl:if test="line-edit"> self._<xsl:value-of select='@id'/>.hasAcceptableInput() and</xsl:if></xsl:for-each><xsl:for-each select="group"> self._<xsl:value-of select='@id'/>.hasAcceptableInput() and</xsl:for-each> True:
+        
+          <xsl:apply-templates mode="validatePage"/>
+          
+          datamodel.printConf()
+          pprint.pprint(datamodel.data)
           return True
-        return False
-    
+        else:
+          return False
+        print ("]==== validatePage " + self.sectionName)
+        
     def defaults(self):
-      print ("Apply defaults")
-      <xsl:for-each select='field'>
-        <xsl:choose>
-          <xsl:when test='@type = "UsersListEdit"'>
-      for i in range(<xsl:value-of select='input/@max-count'/>):
-        self._<xsl:value-of select='@id'/>.setFieldName(i, '') 
-              <xsl:if test='@checked and ../../output/@property-checked-name'>
-        self._<xsl:value-of select='@id'/>.setFieldCheck(<xsl:value-of select='(position() - 1)'/>, False) 
-              </xsl:if>
-              <xsl:if test='@jack-inputs'>
-        self._<xsl:value-of select='@id'/>.setFieldJackInputs(i, '') 
-              </xsl:if>
-              <xsl:if test='@jack-outputs'>
-        self._<xsl:value-of select='@id'/>.setFieldJackOutputs(i, '') 
-              </xsl:if>
-      
-      listlabel = self.wizard().datamodel.data['<xsl:value-of select='input/@list-id'/>']
-      for i in range(len(listlabel)):
-        self.setField(self.sectionName + '.<xsl:value-of select='@id'/>' + str(i) + '-name-hide', listlabel[i] )
-          <xsl:for-each select='./default/item'>
-            <xsl:if test='@checked and ../../output/@property-checked-name'>
-      self._<xsl:value-of select='../../@id'/>.setFieldCheck(<xsl:value-of select='(position() - 1)'/>, <xsl:value-of select='@checked'/>) 
-            </xsl:if>
-            <xsl:if test='@jack-inputs'>
-      self._<xsl:value-of select='../../@id'/>.setFieldJackInputs(<xsl:value-of select='(position() - 1)'/>, '<xsl:value-of select='@jack-inputs'/>') 
-            </xsl:if>
-            <xsl:if test='@jack-outputs'>
-      self._<xsl:value-of select='../../@id'/>.setFieldJackOutputs(<xsl:value-of select='(position() - 1)'/>, '<xsl:value-of select='@jack-outputs'/>') 
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:when>
-        <xsl:when test='@type = "QCheckBox" and ./default/@value'>
-      self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='./default/@value'/>' == True) 
-        </xsl:when>
-        <xsl:when test='@type = "QComboBox" and ./default/@select-first'>
-      self._<xsl:value-of select='@id'/>.setCurrentIndex(0)         
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="./default/@value">
-      self.setField(self.sectionName + '.<xsl:value-of select='@id'/>', '<xsl:value-of select='./default/@value'/>') 
-          </xsl:if>
-        </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
-      
+        print ("Apply defaults")
+        
+        config = self.wizard().datamodel.config
+        if self.sectionName not in config.sections():
+          config.add_section(self.sectionName)
+          
+        <xsl:apply-templates mode="defaults"/>
+        
     def requires(self):
-      programs = []
-      <xsl:for-each select="requires">
-      programs.append('<xsl:value-of select="@executable"/>')
-      </xsl:for-each>
-      self.wizard().datamodel.data['<xsl:value-of select="@section-name"/>.requirelist'] = programs
-      return programs
+        programs = []
+        <xsl:for-each select="requires">
+        programs.append('<xsl:value-of select="@executable"/>')
+        </xsl:for-each>
+        self.wizard().datamodel.data['<xsl:value-of select="@section-name"/>.requirelist'] = programs
+        return programs
     
     def setVariables(self):
-      <xsl:for-each select="set">
-      self.wizard().datamodel.data['<xsl:value-of select='../@section-name'/>.<xsl:value-of select="@id"/>'] = '<xsl:value-of select='@value'/>'
-      </xsl:for-each>
-      pass
+        <xsl:for-each select="set">
+        self.wizard().datamodel.data['<xsl:value-of select='../@section-name'/>.<xsl:value-of select="@id"/>'] = '<xsl:value-of select='@value'/>'
+        </xsl:for-each>
+        pass
     
 </xsl:for-each>
       
@@ -894,8 +662,6 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
       self.setTitle('<xsl:value-of select='last-page/title'/>')
       self.labelDescription.setText('<xsl:value-of select='last-page/description'/>')
       
-      print ("Allowed Sections:")
-      print (self.wizard().datamodel.allowedSections)
       str_conf = self.wizard().cleanConfAsString()  
       self.textEdit.setPlainText(str_conf)
       self.textEdit.setReadOnly(True)
@@ -992,10 +758,250 @@ if __name__ == '__main__':
   wizard.setButtonText(QtWidgets.QWizard.CustomButton2, "Read wizard.conf")
   wizard.show()
   wizard.button(QtWidgets.QWizard.CustomButton1).clicked.connect(wizard.defaults)
-  wizard.button(QtWidgets.QWizard.CustomButton2).clicked.connect(wizard.initFieldsOfSection)
+  wizard.button(QtWidgets.QWizard.CustomButton2).clicked.connect(wizard.readData)
   
   sys.exit(app.exec_())
 
 </xsl:template>
 
+<!-- 
+
+defaults RULES
+
+-->
+<!-- Ignore those tags -->
+<xsl:template match='title|short-title|requires|template-snippet|template' mode="defaults"/>
+
+<xsl:template match="group" mode="defaults">
+        self._<xsl:value-of select='@id'/>.defaults()
+</xsl:template>
+
+<xsl:template match="field" mode="defaults">
+        self._<xsl:value-of select='@id'/>.defaults()
+</xsl:template>
+
+
+<!-- 
+
+validatePage RULES
+
+-->
+
+<!-- Ignore those tags -->
+<xsl:template match='title|short-title|requires|template-snippet|template' mode="validatePage"/>
+
+<xsl:template match="field" mode="validatePage">
+  <xsl:choose>
+    <xsl:when test="line-edit">
+          self._<xsl:value-of select='@id'/>.updateData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="checkbox">
+          self._<xsl:value-of select='@id'/>.updateData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="combobox">
+          self._<xsl:value-of select='@id'/>.updateData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="listbox">
+          self._<xsl:value-of select='@id'/>.updateData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="list-of-combobox">
+          self._<xsl:value-of select='@id'/>.updateData(config, datamodel)
+    </xsl:when>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="group" mode="validatePage">
+          self._<xsl:value-of select='@id'/>.updateData(config, datamodel)
+</xsl:template>
+
+<!-- 
+
+initializePage RULES
+
+-->
+
+<!-- Ignore those tags -->
+<xsl:template match='title|short-title|requires|template-snippet|template' mode="initializePage_readdata"/>
+
+<xsl:template match="field" mode="initializePage_readdata">
+  <xsl:choose>
+    <xsl:when test="line-edit">
+          self._<xsl:value-of select='@id'/>.readData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="checkbox">
+          self._<xsl:value-of select='@id'/>.readData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="combobox">
+          self._<xsl:value-of select='@id'/>.readData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="listbox">
+          self._<xsl:value-of select='@id'/>.readData(config, datamodel)
+    </xsl:when>
+    <xsl:when test="list-of-combobox">
+          self._<xsl:value-of select='@id'/>.readData(config, datamodel)
+    </xsl:when>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="group" mode="initializePage_readdata">
+          self._<xsl:value-of select='@id'/>.readData(config, datamodel)
+</xsl:template>
+
+<xsl:template match='title|short-title|requires|template-snippet|template' mode="initializePage_initialize"/>
+
+<xsl:template match="field" mode="initializePage_initialize">
+        <xsl:if test="line-edit">
+        self._<xsl:value-of select='@id'/>.setDatamodel(datamodel)
+        </xsl:if>
+        <!-- self._<xsl:value-of select='@id'/>.initialize() -->
+</xsl:template>
+
+<xsl:template match="group" mode="initializePage_initialize">
+        self._<xsl:value-of select='@id'/>.initialize(datamodel.data['<xsl:value-of select='@list-id'/>'])
+</xsl:template>
+
+
+<!-- 
+
+__init_add_to_layout RULES
+
+-->
+
+<!-- Ignore those tags -->
+<xsl:template match='title|short-title|requires|template-snippet|template' mode="__init__add_to_layout"/>
+
+<xsl:template match="field" mode="__init__add_to_layout">
+        layout.addWidget(self._label_<xsl:value-of select='@id'/>)
+        layout.addWidget(self._<xsl:value-of select='@id'/>)
+</xsl:template>
+
+<xsl:template match="group" mode="__init__add_to_layout">
+        layout.addWidget(self._label_<xsl:value-of select='@id'/>)
+        layout.addWidget(self._<xsl:value-of select='@id'/>)
+</xsl:template>
+
+
+
+<!-- 
+
+__init_create_instance RULES
+
+-->
+<!-- Ignore those tags -->
+<xsl:template match='title|short-title|requires|template-snippet|template' mode="__init__create_instance"/>
+
+<xsl:template match="group" mode="__init__create_instance">
+        fields=[]
+        headers=[]
+        self._label_<xsl:value-of select='@id'/> = CLabel('<xsl:value-of select='label'/>')
+        <xsl:apply-templates select="field" mode="__init__create_instance"/>
+        self._<xsl:value-of select='@id'/> = CGroupOfComponentWidget(None, fields,sectionName=self.sectionName, headerlist=headers,key='<xsl:value-of select='@id'/>', display='<xsl:value-of select='@display'/>')
+</xsl:template>
+
+<xsl:template match="field" mode="__init__create_instance">
+        self._label_<xsl:value-of select='@id'/> = CLabel('<xsl:value-of select='label'/>')
+        headers.append(self._label_<xsl:value-of select='@id'/>)
+        modelAction = None        
+  <xsl:choose>
+    <xsl:when test="line-edit">
+        validator = None
+        <xsl:apply-templates select="line-edit/*"/>
+        self._<xsl:value-of select='@id'/> = CLineEdit(sectionName=self.sectionName, key='<xsl:value-of select='@id'/>', message=False<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/>.setValidator(validator)
+        self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        fields.append(self._<xsl:value-of select='@id'/>)
+    </xsl:when>
+    <xsl:when test="checkbox">
+        self._<xsl:value-of select='@id'/> = CCheckBox('<xsl:value-of select='label'/>', defaultvalue=<xsl:value-of select='checkbox/@default-value'/>, sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        fields.append(self._<xsl:value-of select='@id'/>)
+    </xsl:when>
+    <xsl:when test="combobox">
+        roleitemlist = None
+        itemlist = None
+        <xsl:apply-templates select="combobox/*"/>
+        self._<xsl:value-of select='@id'/> = CComboBox(itemlist=itemlist, roleitemlist=roleitemlist, defaultvalue='<xsl:value-of select='checkbox/@default-value'/>', sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        fields.append(self._<xsl:value-of select='@id'/>)
+    </xsl:when>
+    <xsl:when test="listbox">
+        roleitemlist = None
+        itemlist = None
+        selectedlist = []
+        <xsl:apply-templates select="listbox/*"/>
+        self._<xsl:value-of select='@id'/> = CListWidget(itemlist=itemlist, roleitemlist=roleitemlist, selectedlist=selectedlist, selectionMode=<xsl:value-of select='listbox/@selection-mode'/>, sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        fields.append(self._<xsl:value-of select='@id'/>)
+    </xsl:when>
+    <xsl:when test="list-of-combobox">
+        roleitemlist = None
+        itemlist = None
+        <xsl:apply-templates select="list-of-combobox/*"/>
+        self._<xsl:value-of select='@id'/> = CListOfComboBox(itemlist=itemlist, roleitemlist=roleitemlist, defaultvalue='<xsl:value-of select='list-of-combobox/@default-value'/>', sectionName=self.sectionName, key='<xsl:value-of select='@id'/>', display='<xsl:value-of select='list-of-combobox/@display'/>', seperator='<xsl:value-of select='list-of-combobox/@join'/>', count=<xsl:value-of select='list-of-combobox/@count'/>,ignoreblank=<xsl:value-of select='list-of-combobox/@ignore-blank'/><xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        fields.append(self._<xsl:value-of select='@id'/>)
+    </xsl:when>
+  </xsl:choose>
+</xsl:template>
+
+
+<xsl:template match="int-validator">
+        validator = CIntValidator(<xsl:value-of select='@min'/>,<xsl:value-of select='@max'/>, parent=self)            
+</xsl:template>
+
+<xsl:template match="regexp-validator">
+  <xsl:choose>
+    <xsl:when test='@type = "custom"'>
+        validator = CRegExpValidator('<xsl:value-of select='@regexp'/>')
+    </xsl:when>
+    <xsl:otherwise>
+        validator = CRegExpValidator(<xsl:value-of select='@type'/>re)
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="session-name-validator">
+        validator = CSessionNameValidator(datamodel, self)
+</xsl:template>
+
+<xsl:template match="model-split">
+        modelAction = CSplitModelAction('<xsl:value-of select='@seperator'/>')
+</xsl:template>
+
+<xsl:template match="model-jack">
+        modelAction = CJackModelAction('<xsl:value-of select='@io-type'/>', '<xsl:value-of select='@channel-type'/>')
+</xsl:template>
+
+<xsl:template match="command">
+        try:
+          my_env = os.environ
+          my_env["PATH"] = os.path.abspath(os.path.dirname(__file__)) + os.sep + "bin:" + my_env["PATH"]
+          out = subprocess.check_output(shlex.split('<xsl:value-of select="@call"/>'), env=my_env, shell=True, text=True)        
+          itemlist = out.splitlines()
+          selectedlist= []
+          <xsl:if test="@selection-startswith">
+          for i in range(len(itemlist)):
+            if itemlist[i].startswith('<xsl:value-of select="@selection-startswith"/>'):
+              itemlist[i] = itemlist[i][len('<xsl:value-of select="@selection-startswith"/>'):]
+              selectedlist.append(i)
+          </xsl:if>
+        except Exception as e:
+          print (e)
+          print ('Could not initialize the field values for "<xsl:value-of select='@id'/>".')
+    
+</xsl:template>
+
+<xsl:template match="items">
+        itemlist = []
+  <xsl:for-each select="item">
+        itemlist.append('<xsl:value-of select='@label'/>')
+  </xsl:for-each>
+</xsl:template>
+
+<xsl:template match="role-items">
+        roleitemlist = []
+  <xsl:for-each select="item">
+        roleitemlist.append(('<xsl:value-of select='@id'/>', '<xsl:value-of select='@label'/>'))
+  </xsl:for-each>
+</xsl:template>
 </xsl:stylesheet>

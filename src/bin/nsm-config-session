@@ -20,6 +20,7 @@ function help() {
 }
 
 NSM_CLIENT_ID="$NSM_CLIENT_ID"
+EXEC=1
 while (( "$#" )); do
   case "$1" in
     -x|--xdg-config-home)
@@ -27,6 +28,12 @@ while (( "$#" )); do
       export XDG_CONFIG_HOME="$2"
       shift 2
       ;;
+    -e|--exec)
+      # for compatibility with ray-config-session command line options but nsm-config-session always exec command.
+      echo "arg exec"
+      EXEC=1
+      shift
+      ;;      
     -h|--help)
       echo 
       help

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page id='Pluginhost_for_jamulus' section-name='audio-plugins' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Calf audio plugins host section</title>
+  <short-title>Audio plugins host</short-title>
+  <requires executable="calfjackhost" version="0.90.3"/>
+  <group id="users" list-id="global.userslist" display="TabCheckableV">
+    <label>Check the users that will have audio plugins and fill there initial configuration</label>
+    <field id="jack_inputs">
+      <label>Jack input(s)</label>
+      <line-edit default-value=""><regexp-validator type="jackinputmono"/><model-jack io-type="input" channel-type="mono"/></line-edit>
+    </field>
+    <field id="plugins">
+      <label>Select the rack effects you want to apply to your instrument or voice (pipeline from left to right)</label>
+      <list-of-combobox count="5" display="H" join=" ! " ignore-blank="True" default-value="eq5 ! compressor ! eq5 ! reverb ! vintagedelay"><command call="getcalfpluginsnames"/></list-of-combobox>
+    </field>
+  </group>
+  <template-snippet ref-id="session_sh">
+    <xi:include href="pluginshost_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>
+  </template-snippet>
+  <template-snippet ref-id="patch_xml">
+    <xi:include href="pluginshost_for_jamulus_page-patch_xml.tmpl_snippet" parse="text"/>
+  </template-snippet>
+</page>
