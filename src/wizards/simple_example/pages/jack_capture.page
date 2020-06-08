@@ -6,20 +6,20 @@
   <requires executable="jack_capture" version="0.9.73"/> 
   <requires executable="alsaplayer" version="0.99.81"/> 
 
-  <field id='audioformat' type='QComboBox'>
+  <field id='audioformat'>
     <label>The output audio format</label>
-    <input>
-      <item id='flac' label='FLAC audio format file'/>
-      <item id='oga' label='OGG audio format file'/>
-      <item id='mp3' label='MP3 audio format file'/>
-      <item id='wav' label='WAV audio format file'/>
-    </input>
-    <default value="wav"/>
+    <combobox default-value="WAV audio format file">
+      <role-items>
+        <item id='flac' label='FLAC audio format file'/>
+        <item id='oga' label='OGG audio format file'/>
+        <item id='mp3' label='MP3 audio format file'/>
+        <item id='wav' label='WAV audio format file'/>
+      </role-items>
+    </combobox>
   </field>
-  <field id='filenameprefix' type='CheckLineEdit'>
+  <field id='filenameprefix'>
     <label>The filename prefix of the recorded files</label>
-    <input type="regexp"><regexp>^[a-zA-Z0-9][a-zA-Z0-9-_]+$</regexp></input>
-    <default value="My session"/>
+    <line-edit default-value="My session"><regexp-validator type="custom" regexp="^[a-zA-Z0-9][a-zA-Z0-9-_]+$"/></line-edit>
   </field>
   <template-snippet ref-id="session_sh">
 <![CDATA[
@@ -38,7 +38,6 @@ create_proxy --label "alsaplayer"  \
 set_client_properties --launched 1 \
                       --description "alsaplayer: audio player" \
                       --icon "alsaplayer" \
-                      --label "alsaplayer" \
                       --name "Proxy-alsaplayer" \
                       --save_signal 0 \
                       --stop_signal 15 \
@@ -65,7 +64,6 @@ create_proxy --label "jack_capture" \
 set_client_properties --launched 0 \
                       --description "jack_capture will record the alsaplayer output. To start the recording, choose an audio file in alsaplayer, start the jack_capture client and press the start button on jack transport panel. (Go to qjackctl ...). Once done unarm the play button. This will stop the recording and stop jack_capture." \
                       --icon "jack_capture" \
-                      --label "jack_capture" \
                       --name "Proxy-jack_capture" 
 
                       

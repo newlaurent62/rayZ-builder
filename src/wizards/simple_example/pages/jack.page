@@ -3,28 +3,27 @@
   <title>Jack settings section</title>
   <short-title>Jack settings</short-title>
   <requires executable="jack_control"/>
-  <field id='interface' type='QComboBox'>
+  <field id='interface'>
     <label>Select the interface</label>
-    <input type="command"><command call="getasoundlistinterface"/></input>
-    <default select-first="True"/>
+    <combobox default-value=""><command call="getasoundlistinterface"/></combobox>
   </field>
-  <field id='period' type='QComboBox'>
+  <field id='period'>
     <label>Frames / Periods</label>
-    <input>
-      <item label="64"/>
-      <item label="128"/>
-      <item label="256"/>
-      <item label="512"/>
-      <item label="1024"/>
-      <item label="2048"/>
-      <item label="4096"/>
-    </input>
-    <default select-first='True'/>
+    <combobox default-value="128">
+      <items>
+        <item label="64"/>
+        <item label="128"/>
+        <item label="256"/>
+        <item label="512"/>
+        <item label="1024"/>
+        <item label="2048"/>
+        <item label="4096"/>
+      </items>
+    </combobox>
   </field>
-  <field id='samplerate' type='QLineEdit'>
+  <field id='samplerate'>
     <label>Sample rate (Jamulus only supports 48000 Hz)</label>
-    <input type="regexp"><regexp>^48000$</regexp></input>
-    <default value="48000"/>
+    <line-edit default-value="48000"><regexp-validator type="custom" regexp="^48000$"/></line-edit>
   </field>
   <template-snippet ref-id="session_sh">
     <!-- don't use jack_config_script from raysession to save and restore jack setup : It doesn't work -->

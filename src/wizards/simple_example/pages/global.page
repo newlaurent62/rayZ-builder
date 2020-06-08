@@ -3,8 +3,8 @@
   <title>Virtual studio setup</title>
   <short-title>Virtual studio session</short-title>
   
-  <field id='session_name' type='SessionNameCheckLineEdit'>
+  <field id='session_name'>
     <label>The session name</label>
-    <default value="My jack capture session"/>
+    <line-edit default-value=""><session-name-validator/></line-edit>
   </field> 
 </page>
