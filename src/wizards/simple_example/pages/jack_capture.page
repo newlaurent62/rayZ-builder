@@ -37,7 +37,7 @@ create_proxy --label "alsaplayer"  \
 
 set_client_properties --launched 1 \
                       --description "alsaplayer: audio player" \
-                      --icon "alsaplayer" \
+                      --icon "multimedia-audio-player" \
                       --name "Proxy-alsaplayer" \
                       --save_signal 0 \
                       --stop_signal 15 \
@@ -63,7 +63,7 @@ create_proxy --label "jack_capture" \
 # set client properties
 set_client_properties --launched 0 \
                       --description "jack_capture will record the alsaplayer output. To start the recording, choose an audio file in alsaplayer, start the jack_capture client and press the start button on jack transport panel. (Go to qjackctl ...). Once done unarm the play button. This will stop the recording and stop jack_capture." \
-                      --icon "jack_capture" \
+                      --icon "audio-recorder" \
                       --name "Proxy-jack_capture" 
 
                       
