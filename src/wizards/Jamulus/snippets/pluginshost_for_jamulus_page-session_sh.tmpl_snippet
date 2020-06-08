@@ -11,7 +11,7 @@ create_clientID add_proxy "calfjackhost"
 create_proxy --label "Calf FX for $username" --arguments "-- bin/CalfHost calf_${username}_fx .config/calf_${username}.state mono ! $data['audio-plugins.users.' + $username + '.plugins'] ! analyzer " --save_signal 0 --stop_signal 2 --wait_window 1 --no_save_level 0
 
 # set client properties
-set_client_properties --launched 1 --description "Rack of audio plugins effects : mono input and Stereo output to Jamulus for $username. Save you preset to the proxy dir in PROXY_DIR/.config/calf_${username}.state to load it next time you start this client rather than the default rack you selected in the wizard." --icon "calfjackhost" --name "calfjackhost" 
+set_client_properties --launched 1 --description "Rack of audio plugins effects : mono input and Stereo output to Jamulus for $username. Save you preset to the proxy dir in PROXY_DIR/.config/calf_${username}.state to load it next time you start this client rather than the default rack you selected in the wizard." --icon "calf" --name "calfjackhost" 
 
 set_jackclient_properties --jackclientname "calf_${username}_fx"
 
