@@ -94,7 +94,7 @@ fi
 #if 'alsa_devices' in $data and len($data['alsa_devices']) > 0
 if [ \$CHECK_ADDITIONNAL_AUDIO_DEVICES -eq 1 ]
 then
-  echo "Check that additionnal devices are available ..."
+  echo "Check that additionnal device(s) are available ..."
   COUNT=0
   MISSING_DEVICES=""
 #for $device in $data['alsa_devices']
@@ -126,7 +126,7 @@ fi
 # CHECK THE PROGRAM USED BY THIS SESSION
 if [ \$CHECK_PROGRAMS -eq 1 ]
 then
-  echo "Check that program are available on the system ..."
+  echo "Check that program(s) are available on the system ..."
   MISSING_PROGRAMS=""
   COUNT=0
   
@@ -164,7 +164,7 @@ then
   RAY_SESSION_NAME="\$(basename "\$RAY_SESSION_PATH")"
   echo "RAY_SESSION_PATH: \$RAY_SESSION_PATH"
   echo "RAY_SESSION_NAME: \$RAY_SESSION_NAME"
-  cp "\$RAY_SESSION_PATH/default/metadata-jackclients.yml" "/tmp/catia/\${RAY_SESSION_NAME}.yml" || exit 1
+  perl -p -e "s/xxx-PORT-xxx/\$RAY_CONTROL_PORT/g" &lt; "\$RAY_SESSION_PATH/default/metadatas.yml" &gt; "/tmp/catia/\${RAY_SESSION_NAME}.yml" || exit 0
 fi
 
 
