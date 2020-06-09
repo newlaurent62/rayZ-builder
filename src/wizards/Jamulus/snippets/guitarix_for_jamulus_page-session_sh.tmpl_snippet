@@ -16,7 +16,8 @@
   <description>Virtual guitar amplifier and effects : mono input and Stereo output to Jamulus for $username.</description>
   <command>guitarix</command>
   <arguments>--name guitarix-$username --rcset=Gold</arguments>
-  <jack-name>guitarix-$username</jack-name>
+  <jack-name>guitarix-${username}_amp</jack-name>
+  <jack-name>guitarix-${username}_fx</jack-name>
 </client>
 #end for
 #end if
