@@ -8,9 +8,9 @@
       &lt;category&gt;<xsl:value-of select="info/category"/>&lt;/category&gt;
       &lt;keywords&gt;<xsl:value-of select="info/keywords"/>&lt;/keywords&gt;
       &lt;version&gt;v<xsl:value-of select="info/version"/>&lt;/version&gt;
-      &lt;description&gt;<xsl:value-of select="info/author"/>&lt;/description&gt;
+      &lt;description&gt;<xsl:value-of select="info/description"/>&lt;/description&gt;
       &lt;author&gt;<xsl:value-of select="info/author"/>&lt;/author&gt;
-      &lt;email&gt;<xsl:value-of select="info/author"/>&lt;/email&gt;
+      &lt;email&gt;<xsl:value-of select="info/email"/>&lt;/email&gt;
     &lt;/info&gt;
     <xsl:for-each select="//page">
       <xsl:if test=".//template-snippet[@ref-id='session_sh']">

@@ -30,14 +30,12 @@ print (shlex.split('\$1')[0])
 EOF_python_cmd
 }
 
-
-
 function create_clientID() {
 
 
   ACTION="\$1"
   PROGRAM="\$2"
-  label=""
+  label="\$3"
   
   if [ "\$clientCount" == "" ]; then
     echo "clientCount must not be empty !"
@@ -68,16 +66,19 @@ function create_clientID() {
         echo -e "\e[1m\e[31mUnknown action '\$ACTION' !\e[0m"
         exit 1
       fi
+      shortclientID="\$(generate_nsm_clientID)"
     ;;
     ray_xml)
       echo "set clientID with rayZ generation"
-      clientID="\$(generate_nsm_clientID)"
+      shortclientID="\$(generate_nsm_clientID)"
       clientCount=\$(( clientCount + 1 ))
+      clientID="\${label}-\${shortclientID}"
     ;;
     nsm)
       echo "set clientID with rayZ generation"
       clientCount=\$(( clientCount + 1 ))
       clientID="\$(generate_nsm_clientID)"
+      shortclientID="\$clientID"
     ;;
     *)
       echo "Unknown session manager '\$SESSION_MANAGER' !"
@@ -95,7 +96,7 @@ function create_proxy() {
   config_file=""
   no_save_level=2
   arguments=""
-  executable="alt-config-session"
+  executable=""
   stop_signal=15
   save_signal=0
   
@@ -117,14 +118,14 @@ function create_proxy() {
     exit 1
   fi
 
-  case "\$SESSION_MANAGER" in  
+<!--  case "\$SESSION_MANAGER" in  
   ray_control)
     echo "- ray_control proxy"
-    executable="ray-config-session"
+    executable="ray-proxy"
     ;;
   ray_xml)
     echo "- ray_xml proxy"
-    executable="ray-config-session"
+    executable="ray-proxy"
     ;;
   nsm)
     echo "- nsm proxy"
@@ -134,7 +135,7 @@ function create_proxy() {
       echo "Unknown session manager '\$SESSION_MANAGER' !"
       exit 1
     ;;
-  esac
+  esac-->
   
   while [ \$# -gt 0 ]; do  
     case "\$1" in
@@ -187,9 +188,9 @@ function create_proxy() {
       arguments="\${arguments//\'/\&amp;apos;}"
       arguments="\${arguments//&lt;/\&amp;lt;}"
       arguments="\${arguments//&gt;/\&amp;gt;}"
-      proxy_dir="\$session_name.\$label-\$clientID"
-      mkdir -p "\$session_path/\$session_name.\$label-\$clientID"
-      cat&lt;&lt;EOF_rayproxy_xml_2 &gt; "\$session_path/\$session_name.\$label-\$clientID/ray-proxy.xml" || exit 1
+      proxy_dir="\$session_name.\$clientID"
+      mkdir -p "\$session_path/\$session_name.\$clientID"
+      cat&lt;&lt;EOF_rayproxy_xml_2 &gt; "\$session_path/\$session_name.\$clientID/ray-proxy.xml" || exit 1
 <![CDATA[<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE RAY-PROXY>
 <RAY-PROXY wait_window="\$wait_window" config_file="\$config_file" no_save_level="\$no_save_level" arguments="\$arguments" VERSION="0.9.0" save_signal="\$save_signal" executable="\$executable" stop_signal="\$stop_signal"/>
@@ -403,7 +404,7 @@ function set_client_properties() {
       ;;
     ray_xml)
       cat &lt;&lt; EOF_raysession_xml &gt;&gt; "\$session_path/raysession.xml"
-&lt;client id="\$label-\$clientID" description="\$description" launched="\$launched" label="\$label" icon="\$icon" description="\$description"  executable="\$executable" name="\$name"/&gt;
+&lt;client id="\$clientID" description="\$description" launched="\$launched" label="\$label" icon="\$icon" description="\$description"  executable="\$executable" name="\$name"/&gt;
 EOF_raysession_xml
       ;;
     nsm)
@@ -454,13 +455,18 @@ function set_jackclient_properties() {
 
   echo "__ set_jackclient_properties __ ( \$jackclientname ) : windowtitle: \$windowtitle, layer: \$layer"
   
-  echo "    - name:          \$jackclientname" &gt;&gt; "\$session_path/default/metadata-jackclients.yml"
-  echo "      windowtitle:   \$windowtitle" &gt;&gt; "\$session_path/default/metadata-jackclients.yml"
-  echo "      layer:         \$layer" &gt;&gt; "\$session_path/default/metadata-jackclients.yml"
-  echo "      guitoload:     \$guitoload" &gt;&gt; "\$session_path/default/metadata-jackclients.yml"
-  echo "      clientid:      \$clientID" &gt;&gt; "\$session_path/default/metadata-jackclients.yml"
+  echo "    - name:          \$jackclientname" &gt;&gt; "\$session_path/default/metadatas.yml"
+  echo "      windowtitle:   \$windowtitle" &gt;&gt; "\$session_path/default/metadatas.yml"
+  echo "      layer:         \$layer" &gt;&gt; "\$session_path/default/metadatas.yml"
+  echo "      guitoload:     \$guitoload" &gt;&gt; "\$session_path/default/metadatas.yml"
+  if [ "\$layer" == "" ]; then
+    echo "      clientid:" &gt;&gt; "\$session_path/default/metadatas.yml"
+  else
+    echo "      clientid:      \$clientID" &gt;&gt; "\$session_path/default/metadatas.yml"  
+  fi
+  echo "      clienttype:    \${ACTION#????}" &gt;&gt; "\$session_path/default/metadatas.yml"
   
-  echo "" &gt;&gt; "\$session_path/default/metadata-jackclients.yml"
+  echo "" &gt;&gt; "\$session_path/default/metadatas.yml"
 
 }
 
@@ -518,8 +524,9 @@ EOF_raysession_init
   cp -r "\$filltemplate_dir/default" "\$session_path/" || error
   echo "-------- default dir copied"
   
-  echo  "sessionname:  \$session_name" &gt; "\$session_path/default/metadata-jackclients.yml"
-  echo  "jackclients:" &gt;&gt; "\$session_path/default/metadata-jackclients.yml"
+  echo  "sessionname:  \$session_name" &gt; "\$session_path/default/metadatas.yml"
+  echo  "port:         xxx-PORT-xxx" &gt;&gt; "\$session_path/default/metadatas.yml"
+  echo  "jackclients:" &gt;&gt; "\$session_path/default/metadatas.yml"
 
   mkdir -p "\$session_path/ray-scripts" || error
   echo -n > "\$session_path/ray-scripts/.env" || error
@@ -692,7 +699,7 @@ cat&lt;&lt;EOF_Notes &gt; "\$session_path/\$note_file"
 <xsl:value-of select="info/title"/>
 
 author:        <xsl:value-of select="info/author"/>
-version:       v<xsl:value-of select="info/version"/>
+version:       <xsl:value-of select="info/version"/>
 category:      <xsl:value-of select="info/category"/>
 keywords:      <xsl:value-of select="info/keywords"/>
 
@@ -719,11 +726,12 @@ echo "]==== <xsl:value-of select="section-name"/>"
 </xsl:template>
 <xsl:template match="client" mode="copy-no-namespaces">
 # assign clientID variable
-create_clientID add_proxy "<xsl:value-of select="command"/>"
+create_clientID add_proxy "<xsl:value-of select="command"/>" "<xsl:value-of select="label"/>"
 
 # create proxy
 create_proxy  --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>" \
-              --arguments "<xsl:if test="@xdg-config-home"><xsl:text> --xdg-config-home </xsl:text>"<xsl:value-of select="@xdg-config-home"/>"</xsl:if> <xsl:if test="@with-gui='false'"><xsl:text> --exec </xsl:text></xsl:if> -- <xsl:text> </xsl:text><xsl:value-of select="replace(command,'&quot;', '\\&quot;')"/> <xsl:text> </xsl:text><xsl:value-of select="replace(arguments,'&quot;', '\\&quot;')"/>" \
+              --executable "<xsl:value-of select="command"/>" \
+              --arguments "<xsl:text> </xsl:text><xsl:value-of select="replace(arguments,'&quot;', '\\&quot;')"/>" \
               --save_signal <xsl:value-of select="@save_signal"/> \
               --stop_signal <xsl:value-of select="@stop_signal"/> \
               --wait_window <xsl:value-of select="@wait_window"/> \
@@ -734,15 +742,21 @@ set_client_properties --icon "<xsl:value-of select="@icon"/>" \
                       --launched <xsl:value-of select="@launched"/> \
                       --description "<xsl:value-of select="replace(description,'&quot;', '\\&quot;')"/>" \
                       --name "<xsl:value-of select="replace(name,'&quot;', '\\&quot;')"/>" \
-                      --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>" 
- 
+                      --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>"
 <xsl:if test="jack-name">
-set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:value-of select="replace(jack-name,'&quot;', '\\&quot;')"/>" <xsl:if test="window-title-regexp"><xsl:text> --windowtitle </xsl:text>"<xsl:value-of select="replace(window-title-regexp,'&quot;', '\\&quot;')"/>"</xsl:if> <xsl:if test="gui"><xsl:text> --guitoload </xsl:text> "<xsl:value-of select="replace(gui,'&quot;', '\\&quot;')"/>"</xsl:if>
+<xsl:for-each select="jack-name">
+set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:value-of select="replace(.,'&quot;', '\\&quot;')"/>" <xsl:if test="../window-title-regexp"><xsl:text> --windowtitle </xsl:text>"<xsl:value-of select="replace(../window-title-regexp,'&quot;', '\\&quot;')"/>"</xsl:if> <xsl:if test="../gui"><xsl:text> --guitoload </xsl:text> "<xsl:value-of select="replace(../gui,'&quot;', '\\&quot;')"/>"</xsl:if>
+</xsl:for-each>
 </xsl:if>
 
 <xsl:if test="nsm-protocol/prepare-proxy-dir">
 <xsl:apply-templates select="nsm-protocol/prepare-proxy-dir" mode="copy-no-namespaces"/>
 </xsl:if>
+
+<xsl:if test="script">
+<xsl:apply-templates select="script" mode="copy-no-namespaces"/>
+</xsl:if>
+
 </xsl:template>
 
 <xsl:template match="section-name" mode="copy-no-namespaces"/>
