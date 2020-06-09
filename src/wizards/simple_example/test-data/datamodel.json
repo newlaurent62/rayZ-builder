@@ -1,19 +1,24 @@
 {
-  "global.session_name": "My jack capture session19",
-  "global.requirelist": [
-    "raysession"
+  "global.requirelist": [],
+  "global.session_name": "My jack capture session5",
+  "jack.interface": "PCH",
+  "jack.period": "512",
+  "jack.requirelist": [
+    "jack_control"
   ],
+  "jack.samplerate": "48000",
   "jack_capture.audioformat": "oga",
-  "jack_capture.filenameprefix": "20200517-",
-  "jack_capture.jackappname": "Jamulus:output",
+  "jack_capture.filenameprefix": "Mysession",
   "jack_capture.requirelist": [
-    "jack_capture"
+    "jack_capture",
+    "alsaplayer"
   ],
-  "wizard.id": "Jamulus",
+  "wizard.id": "simple_example",
   "wizard.requirelist": [],
   "wizard.sectionnamelist": [
     "global",
+    "jack",
     "jack_capture"
   ],
-  "wizard.sectionnames": "global,jack_capture"
+  "wizard.sectionnames": "global,jack,jack_capture"
 }
