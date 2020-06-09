@@ -6,11 +6,22 @@
     <keywords>jamulus,streaming,recording,multitrack,audio,video,mp3,oga,wav,mp2ts,facebook,youtube,icecast2</keywords>
     <version>1</version>
     <description>
-Select your applications and create a simple or a complex virtual studio setup with Jamulus and other applications using RaySession.
-- Jamulus : online jam session for musicians (server has multitrack capability)
-- Obs : streaming capability (icecast2, facebook, youtube ...)
-- jack_capture : Stereo recording
-- mumble : vocal and written chat
+Select your applications to create a simple or a complex virtual studio setup around Jamulus software.
+
+- Jamulus : online jam session for musicians
+  You can start a Jamulus server (virtual jamming room) and activate multitrack recorder.
+  You can create one channel for each musician or each instrument you have in the setup.
+
+- jack_capture : You can stereo record your Jamulus session.
+  Tips: You can add a mixer Jamulus instance and mix the output to be recorded by jack_capture
+
+- Obs : stream your Jamulus session to icecast2, facebook or youtube ...
+  Tips: You can add a mixer Jamulus instance and mix the output to be streamed to Obs
+
+- Guitarix : add a virtual amplifier and effects for your electric guitar.
+
+- Calf Host : Select the effects to be added in your rack for your instruments or voice. 
+  It uses Calf effects, a set of useful LV2 audio plugins with graphical interface.
     </description>
     <author>Laurent Schwartz</author>
     <email>newlaurent62@gmail.com</email>

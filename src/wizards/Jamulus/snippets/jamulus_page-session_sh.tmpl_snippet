@@ -53,6 +53,8 @@
   <description>$servdescription</description>
   <command>bin/Jamulus</command>
   <arguments>--nojackconnect --connect $jamulus_server:$jamulus_port --inifile ".config/Jamulus/${username}.ini" --clientname "$username"</arguments>
+  <jack-name>Jamulus $username</jack-name>
+  <window-title-regexp>Jamulus.*?$</window-title-regexp>
   <nsm-protocol>
     <prepare-proxy-dir>
       <mkdir proxy-dir="bin"/>
