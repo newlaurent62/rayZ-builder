@@ -81,14 +81,13 @@ One wizard defines the following files and dirs:
 - **dir : src/wizards/$(WIZARD_ID)/tmpl**         -> Cheetah templates (files *.tmpl). Create one when you need to fill a configuration file depending on user inputs. Those files should go to a .config path
 - **dir : src/wizards/$(WIZARD_ID)/test-data**    -> contains a datamodel.json that can be use by Makefile to test a template
 - **dir : src/wizards/$(WIZARD_ID)/xsl**          -> contains custom added or custom xsl ... (Makefile has to be modified for each custom xsl added)
-- **dir : src/wizards/$(WIZARD_ID)/ray-scripts**  -> contains ray session scripts. They let you define custom behaviour during the session load, save or close operation
     
 Global dirs:
 
-- **xsd** : contains schema definition (constraints on wizards XML declaration)
-- **xsl** : contains xsl file that are used by all wizards
-- **gui** : contains custom UI components
-- **bin** : contains wrapper scripts used by the created session 
+- **dir : src/xsd** : contains schema definition (constraints on wizards XML declaration)
+- **dir : src/xsl** : contains xsl file that are used by all wizards
+- **dir : src/gui** : contains custom UI components
+- **dir : src/bin** : contains wrapper scripts used by the created session 
       
 ### file types from rayZ-builder project
 
