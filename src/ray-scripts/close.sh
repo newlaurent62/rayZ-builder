@@ -56,7 +56,7 @@ fi
 
 close_all_if_needed=''
 
-if [ $USE_SETTINGS -eq 1 ]; then
+if [ $USE_JACK_SETTINGS -eq 1 ]; then
   if [[ "$RAY_FUTURE_SCRIPTS_DIR" != "$RAY_SCRIPTS_DIR" ]] &&\
           ! [ -f "$RAY_FUTURE_SCRIPTS_DIR/.jack_config_script" ];then
       close_all_if_needed=close_all
