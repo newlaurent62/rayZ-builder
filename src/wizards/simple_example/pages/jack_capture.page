@@ -37,11 +37,11 @@
   <label>alsaplayer</label>
   <description>Multimedia audio player</description>
   <command>alsaplayer</command>
-  <arguments>--session-name "alsaplayer-\$clientID" --output jack --fragsize $data['jack.period'] --frequency 48000 --realtime</arguments>
-  <jack-name>alsaplayer-\$alsaplayerID</jack-name>
+  <arguments>--session-name "alsaplayer-\$shortclientID" --output jack --fragsize $data['jack.period'] --frequency 48000 --realtime</arguments>
+  <jack-name>alsaplayer-\$shortclientID</jack-name>
   <window-title-regexp>AlsaPlayer</window-title-regexp>
   <script>
-  alsaplayerID=\$clientID
+  alsaplayername="alsaplayer-\$shortclientID"
   </script>
 </client>
 <client 
@@ -53,12 +53,12 @@
     wait_window="0" 
     no_save_level="0"
     with-gui="false">
-  <name>alsaplayer</name>
-  <label>alsaplayer</label>
+  <name>jack_capture</name>
+  <label>jack_capture</label>
   <description>jack_capture will record the alsaplayer output. To start the recording, choose an audio file in alsaplayer, start the jack_capture client and press the start button on jack transport panel. (Go to qjackctl ...). Once done unarm the play button. This will stop the recording and stop jack_capture.</description>
   <command>jack_capture</command>
-  <arguments>--jack-transport -f $data['jack_capture.audioformat'] --port alsaplayer-\$alsaplayerID:out*  --filename-prefix data/\$(date +%Y%m%d)-$data['jack_capture.filenameprefix']</arguments>
-  <jack-name>alsaplayer-\$alsaplayerID</jack-name>
+  <arguments>--jack-transport -f $data['jack_capture.audioformat'] --port \$alsaplayername:out*  --filename-prefix data/\$(date +%Y%m%d)-$data['jack_capture.filenameprefix']</arguments>
+  <jack-name>jack_capture</jack-name>
   <window-title-regexp>JACK Audio Connection Kit.*$</window-title-regexp>
   <gui>qjackctl</gui>
   <nsm-protocol>
