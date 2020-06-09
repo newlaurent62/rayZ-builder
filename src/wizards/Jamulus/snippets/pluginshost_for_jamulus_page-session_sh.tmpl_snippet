@@ -1,28 +1,31 @@
 
 #if 'audio-plugins' in $data['wizard.sectionnamelist']
-
 #if 'audio-plugins.userslist' in $data
 #for $username in $data['audio-plugins.userslist']
-
-# assign clientID variable
-create_clientID add_proxy "calfjackhost"
-
-# create proxy
-create_proxy --label "Calf FX for $username" --arguments "-- bin/CalfHost calf_${username}_fx .config/calf_${username}.state mono ! $data['audio-plugins.users.' + $username + '.plugins'] ! analyzer " --save_signal 0 --stop_signal 2 --wait_window 1 --no_save_level 0
-
-# set client properties
-set_client_properties --launched 1 --description "Rack of audio plugins effects : mono input and Stereo output to Jamulus for $username. Save you preset to the proxy dir in PROXY_DIR/.config/calf_${username}.state to load it next time you start this client rather than the default rack you selected in the wizard." --icon "calf" --name "calfjackhost" 
-
-set_jackclient_properties --jackclientname "calf_${username}_fx"
-
-create_dir_in_client ".config" || error
-
-create_dir_in_client "bin" || error
-
-ln -rs "\$session_path/default/bin/CalfHost" "\$session_path/\$proxy_dir/bin/CalfHost"
-chmomd +x "\$session_path/\$proxy_dir/bin/CalfHost" 
-
-echo "-------- PROXY for calfjackhost created"
+<client 
+    type="proxy" 
+    icon="calf"
+    launched="1"
+    save_signal="0" 
+    stop_signal="2" 
+    wait_window="1" 
+    no_save_level="0"
+    with-gui="true">
+  <name>alsaplayer</name>
+  <label>Calf FX for $username</label>
+  <description>Rack of audio plugins effects : mono input and Stereo output to Jamulus for $username. Save you preset to the proxy dir in PROXY_DIR/.config/calf_${username}.state to load it next time you start this client rather than the default rack you selected in the wizard.</description>
+  <command>bin/CalfHost</command>
+  <arguments>calf_${username}_fx .config/calf_${username}.state mono ! $data['audio-plugins.users.' + $username + '.plugins'] ! analyzer </arguments>
+  <jack-name>calf_${username}_fx</jack-name>
+  <window-title-regexp>.*?calf_${username}_fx$</window-title-regexp>
+  <nsm-protocol>
+    <prepare-proxy-dir>
+      <mkdir proxy-dir=".config"/>
+      <mkdir proxy-dir="bin"/>
+      <link default-src="bin/CalfHost" proxy-dest="bin/CalfHost"/>
+    </prepare-proxy-dir>
+  </nsm-protocol>
+</client>
 #end for
 #end if
 #end if

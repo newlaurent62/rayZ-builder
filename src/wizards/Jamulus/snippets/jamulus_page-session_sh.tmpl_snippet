@@ -4,59 +4,62 @@
 #set $jamulus_port=$data['jamulus.port']
 
 #if $data['jamulus.bool_start_server'] == 'True'
-
-# assign clientID variable
-create_clientID add_proxy "Jamulus"
+#set servargs = ''
+#set servdescription = ''
 #if $data['jamulus.bool_multitrack_record'] == 'True'
-
-# create proxy
-create_proxy --label "jamulus-server"  --arguments "-- bin/Jamulus --server --port $jamulus_port --recording data" --save_signal 10 --stop_signal 15 --no_save_level 2 --wait_window 0
-
-# set client properties
-set_client_properties --launched "1" --description "Jamulus server on localhost with multitrack recording activated" --icon "jamulus-server" --name "jamulus server" 
-
+#set servargs=' --recording data'
+#set servdescription='Jamulus server on localhost with multitrack recording activated'
 #else
-
-# create proxy
-create_proxy --label "jamulus-server"  --arguments "-- bin/Jamulus --server --port $jamulus_port" --save_signal 0 --stop_signal 15 --no_save_level 2 --wait_window 1
-
-# set client properties
-set_client_properties --launched "1" --description "Jamulus server on localhost" --icon "jamulus-server" --name "jamulus server" 
-
-
+#set servargs=''
+#set servdescription='Jamulus server on localhost'
 #end if
-create_dir_in_client ".config/Jamulus" || error
-create_dir_in_client "data" || error
-
-create_dir_in_client "bin"
-ln -rs "\$session_path/default/bin/Jamulus" "\$session_path/\$proxy_dir/bin/Jamulus" || error
-
-
-echo "-------- PROXY for jamulus_server created"
-
+<client 
+    type="proxy" 
+    icon="jamulus-server"
+    launched="0"
+    save_signal="10" 
+    stop_signal="15" 
+    wait_window="1" 
+    no_save_level="2"
+    xdg-config-home=".config"
+    with-gui="true">
+  <name>jamulus server</name>
+  <label>jamulus-server</label>
+  <description>$servdescription</description>
+  <command>bin/Jamulus</command>
+  <arguments>--server --port $jamulus_port --inifile ".config/Jamulus/server.ini"  $servargs</arguments>
+  <nsm-protocol>
+    <prepare-proxy-dir>
+      <mkdir proxy-dir="bin"/>
+      <mkdir proxy-dir="data"/>
+      <mkdir proxy-dir=".config"/>
+      <link default-src="bin/Jamulus" proxy-dest="bin/Jamulus"/>
+    </prepare-proxy-dir>
+  </nsm-protocol>
+</client>
 #end if
 #for $username in $data['global.userslist']
-
-# assign clientID variable
-create_clientID add_proxy "Jamulus"
-
-# create proxy
-create_proxy --label "Jamulus $username" --arguments "-- bin/Jamulus --nojackconnect --connect $jamulus_server:$jamulus_port --inifile \".config/Jamulus/${username}.ini\" --clientname \"$username\"" --save_signal 0 --stop_signal 15 --no_save_level 2 --wait_window 1
-
-# set client properties
-set_client_properties --launched "1" --description "Jamulus $username connected to $jamulus_server:$jamulus_port" --icon "jamulus-client" --name "jamulus"
-
-set_jackclient_properties --jackclientname "Jamulus $username" --windowtitle "Jamulus $username.*"
-
-
-create_dir_in_client ".config/Jamulus" || error
-
-create_dir_in_client "bin"
-ln -rs "\$session_path/default/bin/Jamulus" "\$session_path/\$proxy_dir/bin/Jamulus" || error
-
-echo "-------- PROXY for jamulus $username created"
-
+<client 
+    type="proxy" 
+    icon="jamulus-client"
+    launched="1"
+    save_signal="0" 
+    stop_signal="15" 
+    wait_window="1" 
+    no_save_level="2"
+    with-gui="true">
+  <name>jamulus client</name>
+  <label>Jamulus $username</label>
+  <description>$servdescription</description>
+  <command>bin/Jamulus</command>
+  <arguments>--nojackconnect --connect $jamulus_server:$jamulus_port --inifile ".config/Jamulus/${username}.ini" --clientname "$username"</arguments>
+  <nsm-protocol>
+    <prepare-proxy-dir>
+      <mkdir proxy-dir="bin"/>
+      <mkdir proxy-dir=".config"/>
+      <link default-src="bin/Jamulus" proxy-dest="bin/Jamulus"/>
+    </prepare-proxy-dir>
+  </nsm-protocol>
+</client>
 #end for
 #end if
-
-echo "-------- PROXIES for Jamulus created"

@@ -13,7 +13,7 @@
     <label>Select the Jamulus user to stream</label>
   </group>
   <set id="streaming_type" value="youtube"/>
-  <template-snippet ref-id="raysession_sh">
+  <template-snippet ref-id="session_sh">
 #if 'obs_youtube' in $data['wizard.sectionnamelist']    
 <xi:include href="obs_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
 #end if

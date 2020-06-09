@@ -22,9 +22,6 @@
     <label>Sample rate (Jamulus only supports 48000 Hz)</label>
     <line-edit default-value="48000"><regexp-validator type="custom" regexp="^48000$"/></line-edit>
   </field>
-  <template-snippet ref-id="session_sh">
-  USE_JACK_SETTINGS=0
-  </template-snippet>
   <!-- TEMPLATE DEFINITION APART FROM patch_xml and session_sh -->
   <template>
     <!-- building default obs-studio configuration for icecast2_video_ts -->

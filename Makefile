@@ -36,20 +36,24 @@ build: install-wrapper $(DEFAULT_FILES)
 	mkdir -p build/$(TEMPLATES_DIR)/$(WIZARD_ID)/
 	
 	xmllint --xinclude --schema src/xsd/wizard.xsd build/$(WIZARD_ID)/xml/$(WIZARD_ID).wizard > build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml
+	
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/tmpl_wizard.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/tmpl_wizard.py"
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/install.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/install_dep_wizard.sh"
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/info-template.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/info_wizard.xml"
-	test -f "src/wizards/$(WIZARD_ID)/xsl/session_xml-gen_tmpl.xsl" && saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/session_xml-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_xml.tmpl" || exit 0
-	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/session_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_sh.tmpl"
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/patch_xml-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/patch_xml.tmpl"
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/patch_xml.tmpl -xsl:"src/xsl/nsm-patch.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/nsm_patch.tmpl"
+
+	# create session_sh.tmpl from XML declaration in template_snippet[@ref-id='session_sh']
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/session_xml.xsl" -o:"build/$(WIZARD_ID)/xml/session.xml"
+	xmllint --xinclude --schema "src/xsd/session.xsd" "build/$(WIZARD_ID)/xml/session.xml" > "build/$(WIZARD_ID)/xml/xi-session.xml"
+	saxonb-xslt -s:build/$(WIZARD_ID)/xml/xi-session.xml -xsl:"src/xsl/session_sh.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_sh.tmpl"
 
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/ray_script_load_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray_script_load_sh.tmpl" || exit 0
 
 
 	cheetah c -R --nobackup --idir "build/$(TEMPLATES_DIR)/$(WIZARD_ID)" --odir "build//$(TEMPLATES_DIR)/$(WIZARD_ID)"
 	mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/default" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/share" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/data"
-	cp -r src/gui/* "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/"
+	cp -r src/gui/rayZ_ui.py "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/"
 	test -d src/wizards/$(WIZARD_ID)/default && cp -r src/wizards/$(WIZARD_ID)/default "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
 	test -d src/ray-scripts && cp -r src/ray-scripts "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray-scripts" || exit 0
 	test -d src/wizards/$(WIZARD_ID)/ray-scripts && cp -r src/wizards/$(WIZARD_ID)/ray-scripts "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0

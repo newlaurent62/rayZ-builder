@@ -1,23 +1,54 @@
 {
-  "alsa_devices": [],
-  "alsa_in_devices": [],
-  "alsa_out_devices": [],
-  "global.requirelist": [
-    "session"
+  "audio-plugins.requirelist": [
+    "calfjackhost"
   ],
-  "global.session_name": "My jack capture session",
-  "global.userlist": [
-    "user1_vocal",
-    "user2_guitar"
+  "audio-plugins.users": "vocal",
+  "audio-plugins.users.vocal.jack_inputs": "2->L",
+  "audio-plugins.users.vocal.jack_inputs.inlist": [
+    "system:capture_2"
   ],
-  "global.users": "user1_vocal,user2_guitar",
+  "audio-plugins.users.vocal.plugins": "eq5 ! compressor ! eq5 ! reverb ! vintagedelay",
+  "audio-plugins.users.vocal.pluginslist": [
+    "eq5",
+    "compressor",
+    "eq5",
+    "reverb",
+    "vintagedelay"
+  ],
+  "audio-plugins.userslist": [
+    "vocal"
+  ],
+  "global.requirelist": [],
+  "global.session_name": "My jack capture session-15",
+  "global.users": "bass,vocal",
+  "global.userslist": [
+    "bass",
+    "vocal"
+  ],
+  "guitarix.requirelist": [
+    "guitarix"
+  ],
+  "guitarix.users": "bass",
+  "guitarix.users.bass.jack_inputs": "1->L",
+  "guitarix.users.bass.jack_inputs.inlist": [
+    "system:capture_1"
+  ],
+  "guitarix.userslist": [
+    "bass"
+  ],
+  "jack.interface": "PCH",
+  "jack.period": "512",
+  "jack.requirelist": [
+    "jack_control"
+  ],
+  "jack.samplerate": "48000",
   "jack_capture.audioformat": "wav",
   "jack_capture.requirelist": [
     "jack_capture"
   ],
-  "jack_capture.user.jack_capture_connected": "user1_vocal",
-  "jack_capture.user.jack_capture_connectedlist": [
-    "user1_vocal"
+  "jack_capture.users": "bass",
+  "jack_capture.userslist": [
+    "bass"
   ],
   "jamulus.bool_multitrack_record": "True",
   "jamulus.bool_start_server": "True",
@@ -25,44 +56,36 @@
   "jamulus.requirelist": [
     "Jamulus"
   ],
-  "jamulus.server": "localhost",
-  "jamulus.user.user1_vocal.jack_inputs": "1->L",
-  "jamulus.user.user1_vocal.jack_outputs": "L->1 R->2",
-  "jamulus.user.user2_guitar.jack_inputs": "2->L",
-  "jamulus.userinoutlist": [
-    {
-      "jack_connections": {
-        "left_jack_inputs": [
-          "system:capture_1"
-        ],
-        "left_jack_outputs": [
-          "system:playback_1"
-        ],
-        "right_jack_inputs": [],
-        "right_jack_outputs": [
-          "system:playback_2"
-        ]
-      },
-      "name": "user1_vocal"
-    },
-    {
-      "jack_connections": {
-        "left_jack_inputs": [
-          "system:capture_2"
-        ],
-        "right_jack_inputs": []
-      },
-      "name": "user2_guitar"
-    }
+  "jamulus.server": "collectif-paris.ddns.net",
+  "jamulus.users.bass.jack_inputs.inLlist": [],
+  "jamulus.users.bass.jack_inputs.inRlist": [],
+  "jamulus.users.bass.jack_outputs": "R->1 L->2",
+  "jamulus.users.bass.jack_outputs.outLlist": [
+    "system:playback_2"
   ],
-  "jamulus.userinoutlist.alsa_in_devices": [],
-  "jamulus.userinoutlist.alsa_out_devices": [],
+  "jamulus.users.bass.jack_outputs.outRlist": [
+    "system:playback_1"
+  ],
+  "jamulus.users.vocal.jack_inputs.inLlist": [],
+  "jamulus.users.vocal.jack_inputs.inRlist": [],
+  "jamulus.users.vocal.jack_outputs": "R->2 L->1",
+  "jamulus.users.vocal.jack_outputs.outLlist": [
+    "system:playback_1"
+  ],
+  "jamulus.users.vocal.jack_outputs.outRlist": [
+    "system:playback_2"
+  ],
+  "sound.alsainlist": [],
+  "sound.alsaoutlist": [],
   "wizard.id": "Jamulus",
   "wizard.requirelist": [],
   "wizard.sectionnamelist": [
     "global",
+    "jack",
     "jamulus",
+    "guitarix",
+    "audio-plugins",
     "jack_capture"
   ],
-  "wizard.sectionnames": "global,jamulus,jack_capture"
+  "wizard.sectionnames": "global,jack,jamulus,guitarix,audio-plugins,jack_capture"
 }

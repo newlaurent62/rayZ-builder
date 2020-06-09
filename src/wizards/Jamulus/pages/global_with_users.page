@@ -2,7 +2,6 @@
 <page id='Global' section-name='global' use="required">
   <title>Virtual studio setup section</title>
   <short-title>Virtual studio</short-title>
-  
   <field id='session_name'>
     <label>The session name</label>
     <line-edit default-value="My jack capture session"><session-name-validator/></line-edit>

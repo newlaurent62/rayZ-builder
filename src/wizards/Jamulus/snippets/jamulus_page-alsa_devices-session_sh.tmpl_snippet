@@ -1,36 +1,43 @@
 
 #if 'alsa_in_devices' in $data
 #for $device in $data['alsa_in_devices']
-
+<client 
+    type="proxy" 
+    icon="alsa_in_x11"
+    launched="1"
+    save_signal="0" 
+    stop_signal="15" 
+    wait_window="0" 
+    no_save_level="0"
+    with-gui="false">
+  <name>alsa_in</name>
+  <label>Capture device $device</label>
+  <description>Capture device on sound card hw:$device</description>
+  <command>alsa_in</command>
+  <arguments>-j in_$device -d hw:$device</arguments>
+  <jack-name>in_$device</jack-name>
+</client>
 # assign clientID variable
-create_clientID add_proxy "alsa_in"
-
-# create proxy
-create_proxy --label "Capture device $device"  --arguments "--exec -- alsa_in -j in_$device -d hw:$device" --save_signal 0 --stop_signal 15 --no_save_level 0 --wait_window 0
-
-# set client properties
-set_client_properties --launched "1" --description "Capture device $device" --icon "alsa_in_x11" --name "alsa_in"
-
-set_jackclient_properties --jackclientname "in_$device"
-
 #end for
 #end if
 
 #if 'alsa_out_devices' in $data
 #for $device in $data['alsa_out_devices']
-
-# assign clientID variable
-create_clientID add_executable "alsa_out"
-
-# create proxy
-create_proxy --label "Playback device $device"  --arguments "--exec -- alsa_out -j out_$device -d hw:$device" --save_signal 0 --stop_signal 15 --no_save_level 0 --wait_window 0
-
-# set client properties
-set_client_properties --launched "1" --description "Playback device $device" --icon "alsa_out_x11"  --name "alsa_out"
-
-set_jackclient_properties --jackclientname "out_$device"
-
+<client 
+    type="proxy" 
+    icon="alsa_out_x11"
+    launched="1"
+    save_signal="0" 
+    stop_signal="15" 
+    wait_window="0" 
+    no_save_level="0"
+    with-gui="false">
+  <name>alsa_in</name>
+  <label>Playback device $device</label>
+  <description>Playback device on sound card hw:$device</description>
+  <command>alsa_out</command>
+  <arguments>-j out_$device -d hw:$device</arguments>
+  <jack-name>out_$device</jack-name>
+</client>
 #end for
 #end if
-
-echo "-------- DEVICES added "

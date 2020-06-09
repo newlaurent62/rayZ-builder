@@ -36,6 +36,7 @@
   </xsd:simpleType>
 
   <!-- COMPLEX TYPES DEFINITION -->
+    
   <xsd:complexType name="set">
     <xsd:attribute name="id" type="id" use="required"/>
     <xsd:attribute name="value" use="required" type="xsd:string"/>

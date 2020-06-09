@@ -1,24 +1,30 @@
 
 #if 'jack_capture' in $data['wizard.sectionnamelist']
 #for $username in $data['jack_capture.userslist']
-
-# assign clientID variable
-create_clientID add_proxy "jack_capture"
-
-# create program subdir if needed
-# create proxy
-create_proxy --label "jack_capture" --arguments "--exec -- bin/jack_capture --jack-transport -f $data['jack_capture.audioformat'] --jack-name \"jack_capture-$username\" --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus" --save_signal 0 --stop_signal 2 --wait_window 0 --no_save_level 0
-
-# set client properties
-set_client_properties --launched 1 --description "Stereo recording of Jamulus $username. To start the recording, press the play button on the jack transport panel (for example in qjackctl). To stop recording unarm the play button. jack_capture will create a file in \$session_path/\$proxy_dir/data with an incremented number." --icon "audio-recorder" --name "jack_capture" 
- 
-set_jackclient_properties --jackclientname "jack_capture"
-
-create_dir_in_client "data"
-create_dir_in_client "bin"
-
-ln -rs "\$session_path/default/bin/jack_capture" "\$session_path/\$proxy_dir/bin/jack_capture" || error
-
-echo "-------- PROXY for jack_capture created"
+<client 
+    type="proxy" 
+    icon="audio-recorder"
+    launched="1"
+    save_signal="0" 
+    stop_signal="2" 
+    wait_window="0" 
+    no_save_level="0"
+    with-gui="false">
+  <name>jack_capture</name>
+  <label>jack_capture</label>
+  <description>Stereo recording of Jamulus $username. To start the recording, press the play button on the jack transport panel (for example in qjackctl). To stop recording unarm the play button. jack_capture will create a file in \$session_path/\$proxy_dir/data with an incremented number.</description>
+  <command>bin/jack_capture</command>
+  <arguments>--jack-transport -f $data['jack_capture.audioformat'] --jack-name "jack_capture-$username" --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus</arguments>
+  <jack-name>jack_capture-$username</jack-name>
+  <window-title-regexp>JACK Audio Connection Kit.*$</window-title-regexp>
+  <gui>qjackctl</gui>
+  <nsm-protocol>
+    <prepare-proxy-dir>
+      <mkdir proxy-dir="data"/>
+      <mkdir proxy-dir="bin"/>
+      <link default-src="bin/jack_capture" proxy-dest="bin/jack_capture"/>
+    </prepare-proxy-dir>
+  </nsm-protocol>
+</client>
 #end for
 #end if

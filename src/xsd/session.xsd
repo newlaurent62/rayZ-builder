@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xsd:element name="session">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="info">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="title" type="xsd:string"/>
+              <xsd:element name="category" type="xsd:string"/>
+              <xsd:element name="keywords">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="\w+(,\w+)*"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="version" type="xsd:string"/>
+              <xsd:element name="description" type="xsd:string"/>
+              <xsd:element name="author" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="email" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="creation-date" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="distribution" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="requires" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:complexType>
+                        <xsd:attribute name="executable" type="xsd:string" use="required"/>
+                        <xsd:attribute name="version" type="xsd:string" use="optional"/>
+                        <xsd:attribute name="download-url" type="xsd:string" use="optional"/>
+                        <xsd:attribute name="package-in" use="required">
+                          <xsd:simpleType>
+                            <xsd:restriction base="xsd:string">
+                              <xsd:enumeration value="github"/>
+                              <xsd:enumeration value="official-repo"/>
+                              <xsd:enumeration value="other-repo"/>
+                            </xsd:restriction>
+                          </xsd:simpleType>                    
+                        </xsd:attribute>
+                        <xsd:attribute name="repo-name" type="xsd:string" use="optional"/>
+                      </xsd:complexType>
+                    </xsd:element>
+                  </xsd:sequence>
+                  <xsd:attribute name="os-name" type="xsd:string"/>
+                  <xsd:attribute name="os-version" type="xsd:string"/>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="page" maxOccurs="unbounded">
+          <xsd:complexType mixed="true">
+            <xsd:sequence>
+              <xsd:element name="section-name" type="xsd:string"/>
+              <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="client">
+                  <xsd:complexType>
+                    <xsd:sequence>
+                      <xsd:element name="name" type="xsd:string"/>
+                      <xsd:element name="label" type="xsd:string"/>
+                      <xsd:element name="description" type="xsd:string"/>
+                      <xsd:element name="command" type="xsd:string"/>
+                      <xsd:element name="arguments" type="xsd:string"/>
+                      <xsd:element name="jack-name" type="xsd:string" minOccurs="0"/>
+                      <xsd:element name="window-title-regexp" type="xsd:string" minOccurs="0"/>
+                      <xsd:element name="gui" type="xsd:string" minOccurs="0"/>
+                      <xsd:element name="nsm-protocol" minOccurs="0">
+                        <xsd:complexType>
+                          <xsd:sequence>
+                            <xsd:element name="prepare-proxy-dir">
+                              <xsd:complexType>
+                                <xsd:choice maxOccurs="unbounded">
+                                  <xsd:element name="mkdir">
+                                    <xsd:complexType>
+                                      <xsd:attribute name="proxy-dir" type="xsd:string" use="required"/>
+                                    </xsd:complexType>
+                                  </xsd:element>
+                                  <xsd:element name="link">
+                                    <xsd:complexType>
+                                      <xsd:attribute name="default-src" type="xsd:string" use="required"/>
+                                      <xsd:attribute name="proxy-dest" type="xsd:string" use="required"/>
+                                    </xsd:complexType>
+                                  </xsd:element>
+                                  <xsd:element name="copy-file">
+                                    <xsd:complexType>
+                                      <xsd:attribute name="default-src" type="xsd:string" use="required"/>
+                                      <xsd:attribute name="proxy-dest" type="xsd:string" use="required"/>
+                                    </xsd:complexType>
+                                  </xsd:element>
+                                  <xsd:element name="copy-tree">
+                                    <xsd:complexType>
+                                      <xsd:attribute name="default-src" type="xsd:string" use="required"/>
+                                      <xsd:attribute name="proxy-dest" type="xsd:string" use="required"/>
+                                    </xsd:complexType>
+                                  </xsd:element>
+                                </xsd:choice>
+                              </xsd:complexType>
+                            </xsd:element>
+                          </xsd:sequence>
+                        </xsd:complexType>
+                      </xsd:element>
+                      <xsd:element name="script" type="xsd:string" minOccurs="0"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="xdg-config-home" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="save_signal" type="xsd:integer" use="required"/>
+                    <xsd:attribute name="stop_signal" type="xsd:integer" use="required"/>
+                    <xsd:attribute name="wait_window" use="required">
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:integer">
+                          <xsd:minInclusive value="0"/>
+                          <xsd:maxInclusive value="1"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:attribute>              
+                    <xsd:attribute name="no_save_level" use="required">
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:integer">
+                          <xsd:minInclusive value="0"/>
+                          <xsd:maxInclusive value="2"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:attribute>
+                    <xsd:attribute name="launched" use="required">
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:integer">
+                          <xsd:minInclusive value="0"/>
+                          <xsd:maxInclusive value="1"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:attribute>
+                    <xsd:attribute name="icon" type="xsd:string" use="optional"/>
+                    <xsd:attribute name="with-gui" type="xsd:boolean" use="required"/>
+                    <xsd:attribute name="type" use="required">
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:enumeration value="proxy"/>
+                          <xsd:enumeration value="executable"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>                    
+                    </xsd:attribute>
+                  </xsd:complexType>
+                </xsd:element>
+              </xsd:choice>
+            </xsd:sequence>
+          </xsd:complexType>          
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

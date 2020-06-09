@@ -3,43 +3,49 @@
 #set obssection = 'obs_facebook'
 #set streamingtype = 'facebook'
 #set startrecording = ''
-#set $obs_description = 'Obs video streaming to facebook'
+#set $obs_description = 'Obs video streaming to facebook.'
 #elif 'obs_youtube' in $data['wizard.sectionnamelist'] 
 #set obssection = 'obs_youtube'
 #set streamingtype = 'youtube'
 #set startrecording = ''
-#set $obs_description = 'Obs video streaming to youtube'
+#set $obs_description = 'Obs video streaming to youtube.'
 #elif 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] 
 #set obssection = 'obs_icecast2_audio'
 #set streamingtype = 'icecast2_audio_mp3'
 #set startrecording = '--startrecording'
-#set $obs_description = 'Obs mp3 audio streaming to icecast2 (to read the stream open the URL in vlc, web browser or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' )'
+#set $obs_description = 'Obs mp3 audio streaming to icecast2 (to read the stream open the URL in vlc, web browser or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' ).'
 #elif 'obs_icecast2_video' in $data['wizard.sectionnamelist']
 #set obssection = 'obs_icecast2_video'
 #set streamingtype = 'icecast2_video_ts'
 #set startrecording = ''
-#set $obs_description = 'Obs mp2ts video streaming to icecast2 (to read the stream open the URL in vlc or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' )' 
+#set $obs_description = 'Obs mp2ts video streaming to icecast2 (to read the stream open the URL in vlc or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' ).' 
 #end if
 
 #if len($data[$obssection + '.userslist']) == 1
-# assign clientID variable
-create_clientID add_proxy "obs"
-
-# create proxy
-create_proxy --label "obs" --arguments "--xdg-config-home .config -- obs --profile $streamingtype --scene $streamingtype $startrecording" --save_signal 0 --wait_window 1 --no_save_level 2 --stop_signal 15
-
-# set client properties
-set_client_properties --launched "1" --description "$obs_description" --icon "obs" --label "obs studio" --name "Obs"
-
-set_jackclient_properties --jackclientname "OBS Stream" --windowtitle "OBS.*?$streamingtype"
-
-create_dir_in_client ".config" || error
-
-copy_to_client_dir "\$session_path/default/obs-studio-$streamingtype" ".config/obs-studio" || error
-
+<client 
+    type="proxy" 
+    icon="obs"
+    launched="0"
+    save_signal="0" 
+    stop_signal="15" 
+    wait_window="1" 
+    no_save_level="2"
+    xdg-config-home=".config"
+    with-gui="true">
+  <name>obs studio</name>
+  <label>obs</label>
+  <description>$obs_description</description>
+  <command>obs</command>
+  <arguments>--profile $streamingtype --scene $streamingtype $startrecording</arguments>
+  <jack-name>OBS Stream</jack-name>
+  <window-title-regexp>OBS.*?$streamingtype</window-title-regexp>
+  <nsm-protocol>
+    <prepare-proxy-dir>
+      <mkdir proxy-dir=".config"/>
+      <copy-tree default-src="obs-studio-$streamingtype" proxy-dest=".config/obs-studio"/>
+    </prepare-proxy-dir>
+  </nsm-protocol>
+</client>
 #end if
-
-echo "-------- PROXY for obs studio created"
-
 #end if
 

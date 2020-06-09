@@ -13,9 +13,9 @@
     <label>Select the Jamulus user to stream</label>
   </group>
   <set id="streaming_type" value="facebook"/>
-  <template-snippet ref-id="raysession_sh">
+  <template-snippet ref-id="session_sh">
 #if 'obs_facebook' in $data['wizard.sectionnamelist']
-<xi:include href="obs_for_jamulus_page-raysession_sh.tmpl_snippet" parse="text"/>
+<xi:include href="obs_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>
 #end if
   </template-snippet>
   <template-snippet ref-id="patch_xml">
