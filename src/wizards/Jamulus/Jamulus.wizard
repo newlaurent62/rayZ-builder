@@ -26,8 +26,8 @@ Select your applications to create a simple or a complex virtual studio setup ar
     <author>Laurent Schwartz</author>
     <email>newlaurent62@gmail.com</email>
   </info>
-  <width>800</width>
-  <height>600</height>
+  <width>1000</width>
+  <height>800</height>
   <!-- PAGES -->
   <first-page id='First'>
     <title>Jamulus and related applications</title>
