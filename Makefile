@@ -86,7 +86,7 @@ rayZ_wizards.py:
 exec-main: rayZ_wizards.py
 	$(PYTHON) build/rayZ_wizards.py
 
-install-wrapper:
+install-catia:
 	mkdir -p $(PREFIX)/bin
 	install -m 755 src/bin/getwindidbyregexp $(PREFIX)/bin/getwindidbyregexp
 	install -m 755 src/bin/getwindidbypid $(PREFIX)/bin/getwindidbypid
@@ -94,11 +94,11 @@ install-wrapper:
 	install -m 755 src/bin/switch-to-catia.sh $(PREFIX)/bin/switch-to-catia.sh
 	
 
-uninstall-wrapper:
+uninstall-catia:
 	rm -f $(PREFIX)/bin/ray-config-session
 	rm -f $(PREFIX)/bin/nsm-config-session
 
-install: install-wrapper
+install: install-catia
 	cp src/rayZ_wizards.py build/rayZ_wizards
 	perl -pi -e "s|xxx-TEMPLATES_DIR-xxx|$(PREFIX)/$(TEMPLATES_DIR)|g" build/rayZ_wizards
 	mkdir -p $(PREFIX)/$(TEMPLATES_DIR) $(PREFIX)/bin
