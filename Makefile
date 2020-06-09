@@ -88,8 +88,11 @@ exec-main: rayZ_wizards.py
 
 install-wrapper:
 	mkdir -p $(PREFIX)/bin
-	install -m 755 src/bin/ray-config-session $(PREFIX)/bin/ray-config-session
-	install -m 755 src/bin/nsm-config-session $(PREFIX)/bin/nsm-config-session
+	install -m 755 src/bin/getwindidbyregexp $(PREFIX)/bin/getwindidbyregexp
+	install -m 755 src/bin/getwindidbypid $(PREFIX)/bin/getwindidbypid
+	install -m 755 src/bin/switchto $(PREFIX)/bin/switchto
+	install -m 755 src/bin/switch-to-catia.sh $(PREFIX)/bin/switch-to-catia.sh
+	
 
 uninstall-wrapper:
 	rm -f $(PREFIX)/bin/ray-config-session
