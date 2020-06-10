@@ -100,7 +100,8 @@ function create_proxy() {
   stop_signal=15
   save_signal=0
   xdg_config_home=""
-  
+  wrapper=""
+
   if [ "\$session_path" == "" ]
   then
     echo -e "\e[1m\e[31mThe session_path must be set !\e[0m"
@@ -158,6 +159,7 @@ function create_proxy() {
               executable:"\$executable" \
               stop_signal:"\$stop_signal" 
       else
+        wrapper=ray-config-session
         ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
               config_file:"\$config_file" \
               no_save_level:"\$no_save_level" \
@@ -190,6 +192,7 @@ function create_proxy() {
 ]]>
 EOF2a_rayproxy_xml
       else
+        wrapper=ray-config-session
         cat&lt;&lt;EOF2b_rayproxy_xml &gt; "\$session_path/\$session_name.\$clientID/ray-proxy.xml" || exit 1
 <![CDATA[<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE RAY-PROXY>
@@ -220,6 +223,7 @@ label
     \$label
 EOF_nsmproxya
       else
+        wrapper=nsm-config-session
         cat&lt;&lt;EOF_nsmproxyb &gt; "\$clientDir/nsm-proxy.config"
 executable
     nsm-config-session
@@ -483,8 +487,12 @@ function set_jackclient_properties() {
   else
     echo "      clientid:      \$clientID" &gt;&gt; "\$session_path/default/metadatas.yml"  
   fi
-  echo "      clienttype:    \${ACTION#????}" &gt;&gt; "\$session_path/default/metadatas.yml"
   
+  if [ "\$wrapper" != "" ]; then
+    echo "      clienttype:    proxy-wrapper" &gt;&gt; "\$session_path/default/metadatas.yml"
+  else
+    echo "      clienttype:    \${ACTION#????}" &gt;&gt; "\$session_path/default/metadatas.yml"
+  fi
   echo "" &gt;&gt; "\$session_path/default/metadatas.yml"
 
 }
@@ -754,7 +762,7 @@ create_proxy  --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')
               --save_signal <xsl:value-of select="@save_signal"/> \
               --stop_signal <xsl:value-of select="@stop_signal"/> \
               --wait_window <xsl:value-of select="@wait_window"/> \
-              --no_save_level <xsl:value-of select="@no_save_level"/>
+              --no_save_level <xsl:value-of select="@no_save_level"/> \
               --xdg_config_home "<xsl:value-of select="@xdg-config-home"/>"
 
 # set client properties
