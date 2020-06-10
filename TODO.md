@@ -13,3 +13,5 @@ add Mumble to Jamulus use case ?
 - let the user update the current session and not loosing the already created configuration files and data.
 
 - on X11, let some application use CTRL+s to save their content when saving session.
+
+- jack server check / jack client name check
