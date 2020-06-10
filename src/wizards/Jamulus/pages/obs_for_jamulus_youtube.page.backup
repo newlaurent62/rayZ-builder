@@ -7,7 +7,7 @@
     
   <field id='youtubeid'>
     <label>Input your YouTube streaming ID</label>
-    <line-edit default-value=""/>
+    <line-edit default-value="" blank-allowed="False"/>
   </field>
   <group id="obs_connected" display="ListCheckableH" list-id="global.userslist" min="0" max="1">
     <label>Select the Jamulus user to stream</label>

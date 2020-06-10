@@ -20,7 +20,7 @@
   </field>
   <field id='samplerate'>
     <label>Sample rate (Jamulus only supports 48000 Hz)</label>
-    <line-edit default-value="48000"><regexp-validator type="custom" regexp="^48000$"/></line-edit>
+    <line-edit default-value="48000" blank-allowed="False"><regexp-validator type="custom" regexp="^48000$"/></line-edit>
   </field>
   <!-- TEMPLATE DEFINITION APART FROM patch_xml and session_sh -->
   <template>

@@ -19,7 +19,7 @@
   </field>
   <field id='filenameprefix'>
     <label>The filename prefix of the recorded files</label>
-    <line-edit default-value="My session"><regexp-validator type="custom" regexp="^[a-zA-Z0-9][a-zA-Z0-9-_]+$"/></line-edit>
+    <line-edit default-value="My session" blank-allowed="False"><regexp-validator type="custom" regexp="^[a-zA-Z0-9][a-zA-Z0-9-_]+$"/></line-edit>
   </field>
   <template-snippet ref-id="session_sh">
 <![CDATA[

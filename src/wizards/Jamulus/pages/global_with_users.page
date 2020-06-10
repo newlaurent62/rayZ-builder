@@ -4,10 +4,10 @@
   <short-title>Virtual studio</short-title>
   <field id='session_name'>
     <label>The session name</label>
-    <line-edit default-value="My jack capture session"><session-name-validator/></line-edit>
+    <line-edit default-value="My jack capture session" blank-allowed="False"><session-name-validator/></line-edit>
   </field>
   <field id='users'>
     <label>The user names of the musician connected on this computer (each have a channel on the jamulus server)</label>
-    <line-edit default-value="user1_vocal,user2_guitar"><regexp-validator type="custom" regexp="^[a-z0-9-_]+(,[a-z0-9-_]+)*$"/><model-split seperator=","/></line-edit>
+    <line-edit default-value="user1_vocal,user2_guitar" blank-allowed="True"><regexp-validator type="custom" regexp="^[a-z0-9-_]+(,[a-z0-9-_]+)*$"/><model-split seperator=","/></line-edit>
   </field>
 </page>

@@ -188,6 +188,7 @@
             <xsd:complexContent>
               <xsd:extension base="validatorAndModel">
                 <xsd:attribute name="default-value" type="xsd:string" use="required"/>
+                <xsd:attribute name="blank-allowed" type="boolean" use="required"/>
               </xsd:extension>
             </xsd:complexContent>
           </xsd:complexType>

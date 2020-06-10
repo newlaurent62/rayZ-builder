@@ -7,23 +7,23 @@
   
   <field id='server'>
     <label>Icecast2 server (hostname or IP address)</label>
-    <line-edit default-value="localhost"><regexp-validator type="hostnameOrIP"/></line-edit>
+    <line-edit default-value="localhost" blank-allowed="False"><regexp-validator type="hostnameOrIP"/></line-edit>
   </field>
   <field id='port'>
     <label>Icecast2 port</label>
-    <line-edit default-value="8000"><int-validator min="1" max="65535"/></line-edit>
+    <line-edit default-value="8000" blank-allowed="False"><int-validator min="1" max="65535"/></line-edit>
   </field>
   <field id='source'>
     <label>Source</label>
-    <line-edit default-value="ts"><regexp-validator type="custom" regexp="^\w+$"/></line-edit>
+    <line-edit default-value="ts" blank-allowed="False"><regexp-validator type="custom" regexp="^\w+$"/></line-edit>
   </field>
   <field id='password'>
     <label>Password</label>
-    <line-edit default-value="Jamulus0S"><regexp-validator type="custom" regexp="^\w+$"/></line-edit>
+    <line-edit default-value="Jamulus0S" blank-allowed="False"><regexp-validator type="custom" regexp="^\w+$"/></line-edit>
   </field>
   <field id='mount'>
     <label>Mount point</label>
-    <line-edit default-value="/stream.ts"><regexp-validator type="path"/></line-edit>
+    <line-edit default-value="/stream.ts" blank-allowed="False"><regexp-validator type="path"/></line-edit>
   </field>
   <group id="obs_connected" display="ListCheckableH" list-id="global.userslist" min="0" max="1">
     <label>Select the Jamulus user to stream</label>

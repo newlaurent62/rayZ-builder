@@ -5,6 +5,6 @@
   
   <field id='session_name'>
     <label>The session name</label>
-    <line-edit default-value=""><session-name-validator/></line-edit>
+    <line-edit default-value="" blank-allowed="False"><session-name-validator/></line-edit>
   </field> 
 </page>

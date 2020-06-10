@@ -23,7 +23,7 @@
   </field>
   <field id='samplerate'>
     <label>Sample rate (Jamulus only supports 48000 Hz)</label>
-    <line-edit default-value="48000"><regexp-validator type="custom" regexp="^48000$"/></line-edit>
+    <line-edit default-value="48000" blank-allowed="False"><regexp-validator type="custom" regexp="^48000$"/></line-edit>
   </field>
   <template-snippet ref-id="session_sh">
     <!-- don't use jack_config_script from raysession to save and restore jack setup : It doesn't work -->
