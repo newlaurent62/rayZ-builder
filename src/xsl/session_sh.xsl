@@ -99,6 +99,7 @@ function create_proxy() {
   executable=""
   stop_signal=15
   save_signal=0
+  xdg_config_home=""
   
   if [ "\$session_path" == "" ]
   then
@@ -118,25 +119,6 @@ function create_proxy() {
     exit 1
   fi
 
-<!--  case "\$SESSION_MANAGER" in  
-  ray_control)
-    echo "- ray_control proxy"
-    executable="ray-proxy"
-    ;;
-  ray_xml)
-    echo "- ray_xml proxy"
-    executable="ray-proxy"
-    ;;
-  nsm)
-    echo "- nsm proxy"
-    executable="nsm-config-session"
-    ;;
-  *)
-      echo "Unknown session manager '\$SESSION_MANAGER' !"
-      exit 1
-    ;;
-  esac-->
-  
   while [ \$# -gt 0 ]; do  
     case "\$1" in
     --label)
@@ -167,14 +149,23 @@ function create_proxy() {
   case "\$SESSION_MANAGER" in
     ray_control)      
       mkdir -p "\$session_path/\$session_name.\$clientID"
-      ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
-            config_file:"\$config_file" \
-            no_save_level:"\$no_save_level" \
-            arguments:"\$arguments" \
-            save_signal:"\$save_signal" \
-            executable:"\$executable" \
-            stop_signal:"\$stop_signal" 
-      
+      if [ "\$xdg_config_home" == "" ]; then
+        ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
+              config_file:"\$config_file" \
+              no_save_level:"\$no_save_level" \
+              arguments:"\$arguments" \
+              save_signal:"\$save_signal" \
+              executable:"\$executable" \
+              stop_signal:"\$stop_signal" 
+      else
+        ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
+              config_file:"\$config_file" \
+              no_save_level:"\$no_save_level" \
+              arguments:"--xdg-config-home \"\$xdg_config_home\" -- \$executable \$arguments" \
+              save_signal:"\$save_signal" \
+              executable:"ray-config-session" \
+              stop_signal:"\$stop_signal" 
+      fi
       proxy_dir="\$session_name.\$clientID"
       if [ $? -ne 0 ]
       then
@@ -190,12 +181,23 @@ function create_proxy() {
       arguments="\${arguments//&gt;/\&amp;gt;}"
       proxy_dir="\$session_name.\$clientID"
       mkdir -p "\$session_path/\$session_name.\$clientID"
-      cat&lt;&lt;EOF_rayproxy_xml_2 &gt; "\$session_path/\$session_name.\$clientID/ray-proxy.xml" || exit 1
+
+      if [ "\$xdg_config_home" == "" ]; then
+        cat&lt;&lt;EOF2a_rayproxy_xml &gt; "\$session_path/\$session_name.\$clientID/ray-proxy.xml" || exit 1
 <![CDATA[<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE RAY-PROXY>
 <RAY-PROXY wait_window="\$wait_window" config_file="\$config_file" no_save_level="\$no_save_level" arguments="\$arguments" VERSION="0.9.0" save_signal="\$save_signal" executable="\$executable" stop_signal="\$stop_signal"/>
 ]]>
-EOF_rayproxy_xml_2
+EOF2a_rayproxy_xml
+      else
+        cat&lt;&lt;EOF2b_rayproxy_xml &gt; "\$session_path/\$session_name.\$clientID/ray-proxy.xml" || exit 1
+<![CDATA[<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE RAY-PROXY>
+<RAY-PROXY wait_window="\$wait_window" config_file="\$config_file" no_save_level="\$no_save_level" arguments="--xdg-config-home \&quot;\$xdg_config_home\\&quot; -- \$executable \$arguments" VERSION="0.9.0" save_signal="\$save_signal" executable="\$executable" stop_signal="\$stop_signal"/>
+]]>
+EOF2b_rayproxy_xml
+      fi
+
       ;;
     nsm)
       label="\${label:-NSM Proxy}"
@@ -203,7 +205,9 @@ EOF_rayproxy_xml_2
       clientDir="\$session_path/NSM Proxy.\$clientID"
       mkdir -p "\$clientDir"
       ln -rs "\$session_path/\$proxy_dir" "\$session_path/\${label}.\$clientID"
-      cat&lt;&lt;EOF_nsmproxy &gt; "\$clientDir/nsm-proxy.config"
+
+      if [ "\$xdg_config_home" == "" ]; then
+        cat&lt;&lt;EOF_nsmproxya &gt; "\$clientDir/nsm-proxy.config"
 executable
     \$executable
 arguments
@@ -214,7 +218,22 @@ stop signal
     \$stop_signal
 label
     \$label
-EOF_nsmproxy
+EOF_nsmproxya
+      else
+        cat&lt;&lt;EOF_nsmproxyb &gt; "\$clientDir/nsm-proxy.config"
+executable
+    nsm-config-session
+arguments
+    --xdg-config-home "\$xdg_config_home" -- \$executable \$arguments
+save signal
+    \$save_signal
+stop signal
+    \$stop_signal
+label
+    \$label
+EOF_nsmproxyb
+
+      fi
       ;;
     *)
       echo "unknown session-manager paramater '\$SESSION_MANAGER' error in create_proxy"
@@ -736,6 +755,7 @@ create_proxy  --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')
               --stop_signal <xsl:value-of select="@stop_signal"/> \
               --wait_window <xsl:value-of select="@wait_window"/> \
               --no_save_level <xsl:value-of select="@no_save_level"/>
+              --xdg_config_home "<xsl:value-of select="@xdg-config-home"/>"
 
 # set client properties
 set_client_properties --icon "<xsl:value-of select="@icon"/>" \
