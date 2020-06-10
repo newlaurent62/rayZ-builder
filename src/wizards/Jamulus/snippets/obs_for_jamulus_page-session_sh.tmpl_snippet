@@ -21,7 +21,7 @@
 #set $obs_description = 'Obs mp2ts video streaming to icecast2 (to read the stream open the URL in vlc or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' ).' 
 #end if
 
-#if len($data[$obssection + '.userslist']) == 1
+#if len($data[$obssection + '.obs_connectedlist']) == 1
 <client 
     type="proxy" 
     icon="obs"
