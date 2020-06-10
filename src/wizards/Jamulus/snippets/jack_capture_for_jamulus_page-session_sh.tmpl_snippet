@@ -16,8 +16,8 @@
   <command>bin/jack_capture</command>
   <arguments>--jack-transport -f $data['jack_capture.audioformat'] --jack-name "jack_capture-$username" --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus</arguments>
   <jack-name>jack_capture-$username</jack-name>
-  <window-title-regexp>JACK Audio Connection Kit.*$</window-title-regexp>
-  <gui>qjackctl</gui>
+  <window-title-regexp>Catia$</window-title-regexp>
+  <gui>catia</gui>
   <nsm-protocol>
     <prepare-proxy-dir>
       <mkdir proxy-dir="data"/>
