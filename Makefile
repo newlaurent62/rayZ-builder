@@ -95,8 +95,10 @@ install-catia:
 	
 
 uninstall-catia:
-	rm -f $(PREFIX)/bin/ray-config-session
-	rm -f $(PREFIX)/bin/nsm-config-session
+	rm -f $(PREFIX)/bin/getwindidbyregexp
+	rm -f $(PREFIX)/bin/getwindidbypid
+	rm -f $(PREFIX)/bin/switchto
+	rm -f $(PREFIX)/bin/switch-to-catia.sh
 
 install: install-catia
 	cp src/rayZ_wizards.py build/rayZ_wizards
@@ -107,12 +109,12 @@ install: install-catia
 	cp -r build/$(TEMPLATES_DIR)/simple_example $(PREFIX)/$(TEMPLATES_DIR)
 
 	
-uninstall: uninstall-wrapper
+uninstall: uninstall-catia
 	rm -f $(PREFIX)/bin/rayZ_wizards
 	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/Jamulus
 	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/simple_example
 	
-clean: uninstall-wrapper
+clean: uninstall-catia
 	rm -rf build
 	find -name "__pycache__" | xargs rm -rf 
 	
