@@ -4,9 +4,22 @@
 
 To prepare your ubuntu (tested on 20.04) :
 
-    make prepare-ubuntu
+    make prepare-dev-ubuntu
 
 It will install all required development packages.
+
+
+## Setup softwares used by rayZ wizards
+
+### Jamulus wizards (complex virtual studio conf)
+
+Packaged:
+    
+    make prepare-jamulus-ubuntu
+    
+### simple_example (simple virtual studio conf)
+    
+    make prepare-simple_example-ubuntu
 
 ## Install rayZ scripts 
 

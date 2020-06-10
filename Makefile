@@ -122,11 +122,33 @@ clean: uninstall-catia
 	rm -rf build
 	find -name "__pycache__" | xargs rm -rf 
 	
-prepare-ubuntu:
-	echo "-- development env on ubuntu 20.04"
+prepare-dev-ubuntu:
 	sudo apt update
 	sudo apt install python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java
 	
+prepare-jamulus-ubuntu:
+	sudo apt update
+	sudo apt install calf-plugins guitarix papirus-icon-theme obs-studio obs-plugins
+
+prepare-simple_example-ubuntu:
+	sudo apt update
+	sudo apt install alsaplayer-jack alsaplayer-common papirus-icon-theme
+	
+test-all:
+	mkdir -p test
+	cd test
+	rm -rf Catia-fork rayZ-builder
+	git clone https://github.com/newlaurent62/rayZ-builder.git
+	git clone https://github.com/newlaurent62/Catia-fork.git
+
+	cd rayZ-builder
+	make && rm -rf ~/Ray\ Sessions/My\ jack\ capture\ session* && rm -rf ~/NSM\ Sessions/My\ jack\ capture\ session* && make test-ray-control-template && make test-nsm-template && make WIZARD=simple_example test-ray-control-template && make WIZARD=simple_example test-nsm-template
+
+	cd ../Catia-fork
+	make && sudo make uninstall && sudo make install
+	
+	cd ..
+
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
 debug:
