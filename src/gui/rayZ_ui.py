@@ -280,6 +280,7 @@ class CCheckBox(QtWidgets.QCheckBox, UI):
     config[self.sectionName()][key] = str(self.isChecked())
     
   def defaults(self):
+    print ('defaultvalue:' + str(self.defaultvalue))
     if self.defaultvalue:
       self.setCheckState(QtCore.Qt.Checked)
     else:
@@ -312,6 +313,7 @@ class CComboBox(QtWidgets.QComboBox, UI):
     return combo
   
   def defaults(self):
+    print ('defaultvalue:' + str(self.defaultvalue))
     index = self.findText(self.defaultvalue, QtCore.Qt.MatchFixedString)
     if index >= 0:
       self.setCurrentIndex(index)
@@ -428,7 +430,7 @@ class CListWidget(QtWidgets.QListWidget, UI):
     pass
 
 class CLineEdit(QtWidgets.QWidget, UI):
-  def __init__(self, parent=None, defaultvalue=None, sectionName=None, key=None, message=True, inputMask=None, blankAllowed=True):
+  def __init__(self, parent=None, defaultvalue=None, sectionName=None, key=None, message=True, inputMask=None, blankAllowed=False):
     super(CLineEdit, self).__init__(parent)
     self.message = message
     self.setSectionName(sectionName)
@@ -546,6 +548,7 @@ class CLineEdit(QtWidgets.QWidget, UI):
       validator.setDatamodel(datamodel)
 
   def defaults(self):
+    print ('defaultvalue:' + str(self.defaultvalue))
     self.lineEdit.setText(self.defaultvalue)
 
   def initialize(self):
