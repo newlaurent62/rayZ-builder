@@ -19,7 +19,7 @@
     "vocal"
   ],
   "global.requirelist": [],
-  "global.session_name": "My jack capture session-15",
+  "global.session_name": "My jack capture session-20",
   "global.users": "bass,vocal",
   "global.userslist": [
     "bass",
@@ -75,6 +75,19 @@
   "jamulus.users.vocal.jack_outputs.outRlist": [
     "system:playback_2"
   ],
+  "obs_icecast2_audio.mount": "/stream.mp3",
+  "obs_icecast2_audio.obs_connected": "vocal",
+  "obs_icecast2_audio.obs_connectedlist": [
+    "vocal"
+  ],
+  "obs_icecast2_audio.password": "Jamulus0S",
+  "obs_icecast2_audio.port": "8000",
+  "obs_icecast2_audio.requirelist": [
+    "obs"
+  ],
+  "obs_icecast2_audio.server": "localhost",
+  "obs_icecast2_audio.source": "mp3",
+  "obs_icecast2_audio.streaming_type": "icecast2_audio_mp3",
   "sound.alsainlist": [],
   "sound.alsaoutlist": [],
   "wizard.id": "Jamulus",
@@ -85,7 +98,8 @@
     "jamulus",
     "guitarix",
     "audio-plugins",
-    "jack_capture"
+    "jack_capture",
+    "obs_icecast2_audio"
   ],
-  "wizard.sectionnames": "global,jack,jamulus,guitarix,audio-plugins,jack_capture"
+  "wizard.sectionnames": "global,jack,jamulus,guitarix,audio-plugins,jack_capture,obs_icecast2_audio"
 }
