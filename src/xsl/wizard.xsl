@@ -906,7 +906,7 @@ __init_create_instance RULES
     <xsl:when test="line-edit">
         validator = None
         <xsl:apply-templates select="line-edit/*"/>
-        self._<xsl:value-of select='@id'/> = CLineEdit(sectionName=self.sectionName, key='<xsl:value-of select='@id'/>', message=False<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/> = CLineEdit(sectionName=self.sectionName, key='<xsl:value-of select='@id'/>', defaultvalue='<xsl:value-of select="line-edit/@default-value"/>', blankAllowed=<xsl:value-of select='line-edit/@blank-allowed'/>, message=False<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
         self._<xsl:value-of select='@id'/>.setValidator(validator)
         self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
         fields.append(self._<xsl:value-of select='@id'/>)
