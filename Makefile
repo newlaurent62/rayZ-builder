@@ -92,13 +92,17 @@ install-catia:
 	install -m 755 src/bin/getwindidbypid $(PREFIX)/bin/getwindidbypid
 	install -m 755 src/bin/switchto $(PREFIX)/bin/switchto
 	install -m 755 src/bin/switch-to-catia.sh $(PREFIX)/bin/switch-to-catia.sh
-	
+	install -m 755 src/bin/ray-config-session $(PREFIX)/bin/ray-config-session
+	install -m 755 src/bin/nsm-config-session $(PREFIX)/bin/nsm-config-session
 
 uninstall-catia:
 	rm -f $(PREFIX)/bin/getwindidbyregexp
 	rm -f $(PREFIX)/bin/getwindidbypid
 	rm -f $(PREFIX)/bin/switchto
 	rm -f $(PREFIX)/bin/switch-to-catia.sh
+	rm -rf $(PREFIX)/bin/ray-config-session
+	rm -rf $(PREFIX)/bin/nsm-config-session
+	
 
 install: install-catia
 	cp src/rayZ_wizards.py build/rayZ_wizards
