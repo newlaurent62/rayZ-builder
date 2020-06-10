@@ -10,7 +10,8 @@
     stop_signal="15" 
     wait_window="1" 
     no_save_level="0"
-    with-gui="true">
+    with-gui="true"
+    xdg-config-home=".config">
   <name>Guitarix</name>
   <label>Guitar amp and FX for $username</label>
   <description>Virtual guitar amplifier and effects : mono input and Stereo output to Jamulus for $username.</description>
@@ -18,6 +19,12 @@
   <arguments>--name guitarix-$username --rcset=Gold</arguments>
   <jack-name>guitarix-${username}_amp</jack-name>
   <jack-name>guitarix-${username}_fx</jack-name>
+  <window-title-regexp>guitarix-${username}$</window-title-regexp>
+  <nsm-protocol>
+    <prepare-proxy-dir>
+      <mkdir proxy-dir=".config"/>
+    </prepare-proxy-dir>
+  </nsm-protocol>
 </client>
 #end for
 #end if
