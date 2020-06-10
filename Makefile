@@ -15,9 +15,9 @@ TMPL_ARGS :=
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
 
-all: install-wrapper $(ALL_FILES)
+all: install-catia $(ALL_FILES)
 
-build: install-wrapper $(DEFAULT_FILES)
+build: install-catia $(DEFAULT_FILES)
 
 %.py : WIZARD_ID=$(patsubst src/wizards/%,%, $<)
 %.py : %
