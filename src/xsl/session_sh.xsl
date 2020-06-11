@@ -474,25 +474,27 @@ function set_jackclient_properties() {
       ;;
     esac
   done
-
-
-  echo "__ set_jackclient_properties __ ( \$jackclientname ) : windowtitle: \$windowtitle, layer: \$layer"
+  if [ "\$wrapper" != "" ]; then
+    clienttype="proxy-wrapper"
+  else
+    clienttype="\${ACTION#????}"
+  fi
+  
+  echo "__ set_jackclient_properties __ ( \$jackclientname ) : windowtitle: \$windowtitle, layer: \$layer, clienttype: \$clienttype, with_gui: \$with_gui"
   
   echo "    - name:          \$jackclientname" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "      windowtitle:   \$windowtitle" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "      layer:         \$layer" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "      guitoload:     \$guitoload" &gt;&gt; "\$session_path/default/metadatas.yml"
+  
   if [ "\$layer" == "" ]; then
     echo "      clientid:" &gt;&gt; "\$session_path/default/metadatas.yml"
   else
     echo "      clientid:      \$clientID" &gt;&gt; "\$session_path/default/metadatas.yml"  
   fi
   
-  if [ "\$wrapper" != "" ]; then
-    echo "      clienttype:    proxy-wrapper" &gt;&gt; "\$session_path/default/metadatas.yml"
-  else
-    echo "      clienttype:    \${ACTION#????}" &gt;&gt; "\$session_path/default/metadatas.yml"
-  fi
+  echo "      clienttype:    \$clienttype" &gt;&gt; "\$session_path/default/metadatas.yml"
+  echo "      with_gui:      \$with_gui" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "" &gt;&gt; "\$session_path/default/metadatas.yml"
 
 }
@@ -773,7 +775,11 @@ set_client_properties --icon "<xsl:value-of select="@icon"/>" \
                       --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>"
 <xsl:if test="jack-name">
 <xsl:for-each select="jack-name">
-set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:value-of select="replace(.,'&quot;', '\\&quot;')"/>" <xsl:if test="../window-title-regexp"><xsl:text> --windowtitle </xsl:text>"<xsl:value-of select="replace(../window-title-regexp,'&quot;', '\\&quot;')"/>"</xsl:if> <xsl:if test="../gui"><xsl:text> --guitoload </xsl:text> "<xsl:value-of select="replace(../gui,'&quot;', '\\&quot;')"/>"</xsl:if>
+set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:value-of select="replace(.,'&quot;', '\\&quot;')"/>" \
+                          <xsl:text> --windowtitle </xsl:text>"<xsl:value-of select="replace(../window-title-regexp,'&quot;', '\\&quot;')"/>" \
+                          <xsl:text> --guitoload </xsl:text> "<xsl:value-of select="replace(../gui,'&quot;', '\\&quot;')"/>" \
+                          <xsl:text> --with_gui </xsl:text> "<xsl:value-of select="../@with-gui"/>" \
+                          
 </xsl:for-each>
 </xsl:if>
 
