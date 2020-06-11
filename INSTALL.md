@@ -9,7 +9,7 @@ To prepare your ubuntu (tested on 20.04) :
 It will install all required development packages.
 
 
-## Setup softwares used by rayZ wizards
+## Install softwares used by rayZ wizards
 
 ### Jamulus wizards (complex virtual studio conf)
 
@@ -21,7 +21,7 @@ Packaged:
     
     make prepare-simple_example-ubuntu
 
-## Install rayZ scripts 
+## [un]Install rayZ scripts 
 
 You can install rayZ-builder in your home directory rather than in usr:
 
@@ -39,6 +39,16 @@ to uninstall it:
   
     make uninstall
 
+## Access to all installed wizards
+
 to run rayZ-builder menu:
 
     rayZ_wizards
+
+
+## Test catia and rayZ-builder generated sessions
+    
+to quick test (export / make / make install and generate raysessions and nsm sessions)
+
+    make test-all
+
