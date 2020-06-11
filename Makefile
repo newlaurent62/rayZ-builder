@@ -15,9 +15,9 @@ TMPL_ARGS :=
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
 
-all: install-catia $(ALL_FILES)
+all: install-wrapper install-catia $(ALL_FILES)
 
-build: install-catia $(DEFAULT_FILES)
+build: install-wrapper install-catia $(DEFAULT_FILES)
 
 %.py : WIZARD_ID=$(patsubst src/wizards/%,%, $<)
 %.py : %
@@ -92,19 +92,23 @@ install-catia:
 	install -m 755 src/bin/getwindidbypid $(PREFIX)/bin/getwindidbypid
 	install -m 755 src/bin/switchto $(PREFIX)/bin/switchto
 	install -m 755 src/bin/switch-to-catia.sh $(PREFIX)/bin/switch-to-catia.sh
-	install -m 755 src/bin/ray-config-session $(PREFIX)/bin/ray-config-session
-	install -m 755 src/bin/nsm-config-session $(PREFIX)/bin/nsm-config-session
 
 uninstall-catia:
 	rm -f $(PREFIX)/bin/getwindidbyregexp
 	rm -f $(PREFIX)/bin/getwindidbypid
 	rm -f $(PREFIX)/bin/switchto
 	rm -f $(PREFIX)/bin/switch-to-catia.sh
+	
+install-wrapper:
+	install -m 755 src/bin/ray-config-session $(PREFIX)/bin/ray-config-session
+	install -m 755 src/bin/nsm-config-session $(PREFIX)/bin/nsm-config-session
+
+uninstall-wrapper:
 	rm -rf $(PREFIX)/bin/ray-config-session
 	rm -rf $(PREFIX)/bin/nsm-config-session
-	
 
-install: install-catia
+	
+install: install-catia install-wrapper
 	cp src/rayZ_wizards.py build/rayZ_wizards
 	perl -pi -e "s|xxx-TEMPLATES_DIR-xxx|$(PREFIX)/$(TEMPLATES_DIR)|g" build/rayZ_wizards
 	mkdir -p $(PREFIX)/$(TEMPLATES_DIR) $(PREFIX)/bin
@@ -113,7 +117,7 @@ install: install-catia
 	cp -r build/$(TEMPLATES_DIR)/simple_example $(PREFIX)/$(TEMPLATES_DIR)
 
 	
-uninstall: uninstall-catia
+uninstall: uninstall-catia uninstall-wrapper
 	rm -f $(PREFIX)/bin/rayZ_wizards
 	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/Jamulus
 	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/simple_example
