@@ -1,6 +1,6 @@
 {
   "global.requirelist": [],
-  "global.session_name": "My jack capture session5",
+  "global.session_name": "simple_example",
   "jack.interface": "PCH",
   "jack.period": "512",
   "jack.requirelist": [
