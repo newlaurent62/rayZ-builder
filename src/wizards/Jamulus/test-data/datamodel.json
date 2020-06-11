@@ -19,11 +19,12 @@
     "vocal"
   ],
   "global.requirelist": [],
-  "global.session_name": "My jack capture session-20",
-  "global.users": "bass,vocal",
+  "global.session_name": "My jack capture session-21",
+  "global.users": "bass,vocal,mixer",
   "global.userslist": [
     "bass",
-    "vocal"
+    "vocal",
+    "mixer"
   ],
   "guitarix.requirelist": [
     "guitarix"
@@ -46,9 +47,9 @@
   "jack_capture.requirelist": [
     "jack_capture"
   ],
-  "jack_capture.users": "bass",
+  "jack_capture.users": "mixer",
   "jack_capture.userslist": [
-    "bass"
+    "mixer"
   ],
   "jamulus.bool_multitrack_record": "True",
   "jamulus.bool_start_server": "True",
@@ -59,26 +60,25 @@
   "jamulus.server": "collectif-paris.ddns.net",
   "jamulus.users.bass.jack_inputs.inLlist": [],
   "jamulus.users.bass.jack_inputs.inRlist": [],
-  "jamulus.users.bass.jack_outputs": "R->1 L->2",
-  "jamulus.users.bass.jack_outputs.outLlist": [
+  "jamulus.users.bass.jack_outputs.outLlist": [],
+  "jamulus.users.bass.jack_outputs.outRlist": [],
+  "jamulus.users.mixer.jack_inputs.inLlist": [],
+  "jamulus.users.mixer.jack_inputs.inRlist": [],
+  "jamulus.users.mixer.jack_outputs": "R->1 L->2",
+  "jamulus.users.mixer.jack_outputs.outLlist": [
     "system:playback_2"
   ],
-  "jamulus.users.bass.jack_outputs.outRlist": [
+  "jamulus.users.mixer.jack_outputs.outRlist": [
     "system:playback_1"
   ],
   "jamulus.users.vocal.jack_inputs.inLlist": [],
   "jamulus.users.vocal.jack_inputs.inRlist": [],
-  "jamulus.users.vocal.jack_outputs": "R->2 L->1",
-  "jamulus.users.vocal.jack_outputs.outLlist": [
-    "system:playback_1"
-  ],
-  "jamulus.users.vocal.jack_outputs.outRlist": [
-    "system:playback_2"
-  ],
+  "jamulus.users.vocal.jack_outputs.outLlist": [],
+  "jamulus.users.vocal.jack_outputs.outRlist": [],
   "obs_icecast2_audio.mount": "/stream.mp3",
-  "obs_icecast2_audio.obs_connected": "vocal",
+  "obs_icecast2_audio.obs_connected": "mixer",
   "obs_icecast2_audio.obs_connectedlist": [
-    "vocal"
+    "mixer"
   ],
   "obs_icecast2_audio.password": "Jamulus0S",
   "obs_icecast2_audio.port": "8000",
