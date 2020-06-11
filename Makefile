@@ -142,12 +142,16 @@ test-all:
 	git clone https://github.com/newlaurent62/Catia-fork.git
 
 	cd rayZ-builder
-	make && rm -rf ~/Ray\ Sessions/My\ jack\ capture\ session* && rm -rf ~/NSM\ Sessions/My\ jack\ capture\ session* && make test-ray-control-template && make test-nsm-template && make WIZARD=simple_example test-ray-control-template && make WIZARD=simple_example test-nsm-template
+	make && rm -rf ~/Ray\ Sessions/My\ jack\ capture\ session* && rm -rf ~/NSM\ Sessions/My\ jack\ capture\ session* && make WIZARD=Jamulus test-ray-control-template && make WIZARD=Jamulus test-nsm-template && make WIZARD=simple_example test-ray-control-template && make WIZARD=simple_example test-nsm-template
 
 	cd ../Catia-fork
 	make && sudo make uninstall && sudo make install
 	
 	cd ..
+	
+	catia &
+	
+	raysession &
 
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
