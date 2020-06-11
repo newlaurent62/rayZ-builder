@@ -172,9 +172,9 @@ then
   echo -e "\e[1m\e[31mCommand '$COMMAND' not found on this system !\e[0m"
   error
 fi
-if [ $USE_CATIA -eq 1 ]; then
-  echo "0" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
-fi
+# if [ $USE_CATIA -eq 1 ]; then
+#   echo "0" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
+# fi
 echo "Starting command ..."
 
 if [ $EXEC -eq 0 ]; then
@@ -184,9 +184,9 @@ else
 fi
 
 PID=$!
-if [ $USE_CATIA -eq 1 ]; then
-  echo "$PID" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
-fi
+# if [ $USE_CATIA -eq 1 ]; then
+#   echo "$PID" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
+# fi
 sleep 2
 WINID="$(~/.local/bin/getwindidbypid $PID)"
 echo "window id: $WINID of PID: $PID"
