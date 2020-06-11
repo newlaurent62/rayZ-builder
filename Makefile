@@ -52,9 +52,10 @@ build: install-wrapper install-catia $(DEFAULT_FILES)
 
 
 	cheetah c -R --nobackup --idir "build/$(TEMPLATES_DIR)/$(WIZARD_ID)" --odir "build//$(TEMPLATES_DIR)/$(WIZARD_ID)"
-	mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/default" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/share" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/data"
+	mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/local/bin" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/local/share/icons" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/default"
 	cp -r src/gui/rayZ_ui.py "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/"
 	test -d src/wizards/$(WIZARD_ID)/default && cp -r src/wizards/$(WIZARD_ID)/default "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
+	test -d src/wizards/$(WIZARD_ID)/local && cp -r src/wizards/$(WIZARD_ID)/local "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
 	test -d src/ray-scripts && cp -r src/ray-scripts "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray-scripts" || exit 0
 	test -d src/wizards/$(WIZARD_ID)/ray-scripts && cp -r src/wizards/$(WIZARD_ID)/ray-scripts "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
 	test -d src/wizards/$(WIZARD_ID)/rayZ-bin/ && mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" || exit 0

@@ -42,7 +42,7 @@
   <nsm-protocol>
     <prepare-proxy-dir>
       <mkdir proxy-dir=".config"/>
-      <copy-tree default-src="obs-studio-$streamingtype" proxy-dest=".config/obs-studio"/>
+      <copy-tree session-src="default/obs-studio-$streamingtype" proxy-dest=".config/obs-studio"/>
     </prepare-proxy-dir>
   </nsm-protocol>
 </client>

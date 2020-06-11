@@ -42,6 +42,15 @@ class SessionTemplate:
     else:
       print ('-- no default dir found in ' + rayZtemplatedir)
 
+    srcpath = rayZtemplatedir + os.sep + 'local'
+    if os.path.isdir(srcpath):
+      destfilepath = outdir + os.sep + '.local'
+      shutil.copytree(srcpath, destfilepath)
+      print ("-- Copy local dir from rayZtemplatedir in temporary .local dir")
+    else:
+      print ('-- no local dir found in ' + rayZtemplatedir)
+
+      
     srcpath = rayZtemplatedir + os.sep + 'ray-scripts'
     if os.path.isdir(srcpath):
       destfilepath = outdir + os.sep + 'ray-scripts'

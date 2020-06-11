@@ -459,6 +459,7 @@ function set_jackclient_properties() {
   windowtitle=""
   layer="RaySession - \$session_name"
   guitoload=""
+  with_gui="False"
   
   while [ \$# -gt 0 ]; do  
     case "\$1" in
@@ -482,7 +483,16 @@ function set_jackclient_properties() {
   
   echo "__ set_jackclient_properties __ ( \$jackclientname ) : windowtitle: \$windowtitle, layer: \$layer, clienttype: \$clienttype, with_gui: \$with_gui"
   
-  echo "    - name:          \$jackclientname" &gt;&gt; "\$session_path/default/metadatas.yml"
+  if [ "\$layer" != "" -a "\$SESSION_MANAGER" == "ray_control" ]; then
+    ray_control client "\$clientID" set_custom_data jacknames "\$jackclientname"
+    ray_control client "\$clientID" set_custom_data windowtitle "\$windowtitle"
+    ray_control client "\$clientID" set_custom_data layer "\$layer"
+    ray_control client "\$clientID" set_custom_data guitoload "\$guitoload"
+    ray_control client "\$clientID" set_custom_data with_gui "\$with_gui"  
+    ray_control client "\$clientID" set_custom_data clienttype "\$clienttype"  
+    
+  fi
+<!--  echo "    - name:          \$jackclientname" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "      windowtitle:   \$windowtitle" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "      layer:         \$layer" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "      guitoload:     \$guitoload" &gt;&gt; "\$session_path/default/metadatas.yml"
@@ -495,7 +505,7 @@ function set_jackclient_properties() {
   
   echo "      clienttype:    \$clienttype" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo "      with_gui:      \$with_gui" &gt;&gt; "\$session_path/default/metadatas.yml"
-  echo "" &gt;&gt; "\$session_path/default/metadatas.yml"
+  echo "" &gt;&gt; "\$session_path/default/metadatas.yml"-->
 
 }
 
@@ -552,7 +562,10 @@ EOF_raysession_init
 
   cp -r "\$filltemplate_dir/default" "\$session_path/" || error
   echo "-------- default dir copied"
-  
+
+  cp -r "\$filltemplate_dir/.local" "\$session_path/" || error
+  echo "-------- .local dir copied "
+
   echo  "sessionname:  \$session_name" &gt; "\$session_path/default/metadatas.yml"
   echo  "port:         xxx-PORT-xxx" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo  "jackclients:" &gt;&gt; "\$session_path/default/metadatas.yml"
@@ -774,13 +787,10 @@ set_client_properties --icon "<xsl:value-of select="@icon"/>" \
                       --name "<xsl:value-of select="replace(name,'&quot;', '\\&quot;')"/>" \
                       --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>"
 <xsl:if test="jack-name">
-<xsl:for-each select="jack-name">
-set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:value-of select="replace(.,'&quot;', '\\&quot;')"/>" \
-                          <xsl:text> --windowtitle </xsl:text>"<xsl:value-of select="replace(../window-title-regexp,'&quot;', '\\&quot;')"/>" \
-                          <xsl:text> --guitoload </xsl:text> "<xsl:value-of select="replace(../gui,'&quot;', '\\&quot;')"/>" \
-                          <xsl:text> --with_gui </xsl:text> "<xsl:value-of select="../@with-gui"/>" \
-                          
-</xsl:for-each>
+set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:for-each select="jack-name"><xsl:if test="position() > 1">;</xsl:if><xsl:value-of select="replace(.,'&quot;', '\\&quot;')"/></xsl:for-each>" \
+                          <xsl:text> --windowtitle </xsl:text>"<xsl:value-of select="replace(window-title-regexp,'&quot;', '\\&quot;')"/>" \
+                          <xsl:text> --guitoload </xsl:text> "<xsl:value-of select="replace(gui,'&quot;', '\\&quot;')"/>" \
+                          <xsl:text> --with_gui </xsl:text> "<xsl:value-of select="@with-gui"/>"
 </xsl:if>
 
 <xsl:if test="nsm-protocol/prepare-proxy-dir">
@@ -796,15 +806,15 @@ set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:value-of
 <xsl:template match="section-name" mode="copy-no-namespaces"/>
 
 <xsl:template match="link" mode="copy-no-namespaces">
-  ln -rs "\$session_path/default/<xsl:value-of select="@default-src"/>" "\$session_path/\$proxy_dir/<xsl:value-of select="@proxy-dest"/>"
+  ln -rs "\$session_path/<xsl:value-of select="@session-src"/>" "\$session_path/\$proxy_dir/<xsl:value-of select="@proxy-dest"/>"
 </xsl:template>
 
 <xsl:template match="copy-file" mode="copy-no-namespaces">
-  cp "\$session_path/default/<xsl:value-of select="@default-src"/>" "\$session_path/\$proxy_dir/<xsl:value-of select="@proxy-dest"/>"
+  cp "\$session_path/<xsl:value-of select="@session-src"/>" "\$session_path/\$proxy_dir/<xsl:value-of select="@proxy-dest"/>"
 </xsl:template>
 
 <xsl:template match="copy-tree" mode="copy-no-namespaces">
-  cp -r "\$session_path/default/<xsl:value-of select="@default-src"/>" "\$session_path/\$proxy_dir/<xsl:value-of select="@proxy-dest"/>"
+  cp -r "\$session_path/<xsl:value-of select="@session-src"/>" "\$session_path/\$proxy_dir/<xsl:value-of select="@proxy-dest"/>"
 </xsl:template>
 
 <xsl:template match="mkdir" mode="copy-no-namespaces">

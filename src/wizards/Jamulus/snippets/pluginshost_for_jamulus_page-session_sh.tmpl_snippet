@@ -22,7 +22,7 @@
     <prepare-proxy-dir>
       <mkdir proxy-dir=".config"/>
       <mkdir proxy-dir="bin"/>
-      <link default-src="bin/CalfHost" proxy-dest="bin/CalfHost"/>
+      <link session-src=".local/bin/CalfHost" proxy-dest="bin/CalfHost"/>
     </prepare-proxy-dir>
   </nsm-protocol>
 </client>

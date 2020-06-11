@@ -77,19 +77,19 @@
                                   </xsd:element>
                                   <xsd:element name="link">
                                     <xsd:complexType>
-                                      <xsd:attribute name="default-src" type="xsd:string" use="required"/>
+                                      <xsd:attribute name="session-src" type="xsd:string" use="required"/>
                                       <xsd:attribute name="proxy-dest" type="xsd:string" use="required"/>
                                     </xsd:complexType>
                                   </xsd:element>
                                   <xsd:element name="copy-file">
                                     <xsd:complexType>
-                                      <xsd:attribute name="default-src" type="xsd:string" use="required"/>
+                                      <xsd:attribute name="session-src" type="xsd:string" use="required"/>
                                       <xsd:attribute name="proxy-dest" type="xsd:string" use="required"/>
                                     </xsd:complexType>
                                   </xsd:element>
                                   <xsd:element name="copy-tree">
                                     <xsd:complexType>
-                                      <xsd:attribute name="default-src" type="xsd:string" use="required"/>
+                                      <xsd:attribute name="session-src" type="xsd:string" use="required"/>
                                       <xsd:attribute name="proxy-dest" type="xsd:string" use="required"/>
                                     </xsd:complexType>
                                   </xsd:element>
