@@ -8,7 +8,7 @@
 #elif 'obs_icecast2_video' in $data['wizard.sectionnamelist']
 #set obssection = 'obs_icecast2_video'
 #end if
-#set key = $obssection + '..obs_connectedlist'
+#set key = $obssection + '.obs_connectedlist'
 #if $key in $data
 #for $username in $data[$obssection + '.obs_connectedlist']
  <connection to="OBS Stream:in_1" from="Jamulus $username:output left"/>
