@@ -98,7 +98,6 @@ def usage():
   print ("   -s|--start-gui             : Once the raysession document has been created start the raysession GUI.")
   print ("   -m|--session-manager       : set the session-manager of the resulting document")
   print ("                                - ray_control : create a raysession document. You will need raysession software for the processing,")
-  print ("                                - ray_xml     : create a raysession document. You wont need raysession for the document generation,")
   print ("                                - nsm         : create a nsm session. You wont need non-session-manager for the document generation,")
 
 if __name__ == '__main__':
@@ -134,8 +133,8 @@ if __name__ == '__main__':
         startgui = True
     elif opt in ("-m", "--session-manager"):
       session_manager=arg
-      if session_manager not in ['ray_control', 'ray_xml', 'nsm']:  
-        print ('--session-manager options : "ray_control|ray_xml|nsm"')
+      if session_manager not in ['ray_control', 'nsm']:  
+        print ('--session-manager options : "ray_control|nsm"')
         sys.exit(2)
   
   tmpdir = tempfile.mkdtemp()

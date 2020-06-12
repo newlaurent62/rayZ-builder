@@ -71,9 +71,6 @@ exec:
 test-ray-control-template:
 	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=src/wizards/$(WIZARD)/test-data/datamodel.json --session-manager=ray_control $(TMPL_ARGS)
 
-test-ray-xml-template:
-	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=src/wizards/$(WIZARD)/test-data/datamodel.json --session-manager=ray_xml $(TMPL_ARGS)
-
 test-nsm-template:
 	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=src/wizards/$(WIZARD)/test-data/datamodel.json --session-manager=nsm $(TMPL_ARGS)
 
@@ -145,6 +142,8 @@ test-all:
 	cd test/rayZ-builder && make clean && sudo make uninstall && make && rm -rf ~/Ray\ Sessions/Jamulus && rm -rf ~/NSM\ Sessions/Jamulus && rm -rf ~/Ray\ Sessions/simple_example && rm -rf ~/NSM\ Sessions/simple_example && make WIZARD=Jamulus test-ray-control-template && make WIZARD=Jamulus test-nsm-template && make WIZARD=simple_example test-ray-control-template && make WIZARD=simple_example test-nsm-template && sudo make install
 
 	cd test/Catia-fork && make && sudo make uninstall && sudo make install
+
+	killall catia || exit 0
 	
 # -----------------------------------------------------------------------------------------------------------------------------------------
 

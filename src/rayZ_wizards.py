@@ -29,9 +29,8 @@ class MainWindow(QtWidgets.QWidget):
 
     self.labelType = QtWidgets.QLabel('Select the session type you want to generate at the end of the wizard steps')
     self.comboBoxType = QtWidgets.QComboBox(self)
-    self.comboBoxType.insertItem(0, 'nsm')
-    self.comboBoxType.insertItem(1,'ray_xml')
-    self.comboBoxType.insertItem(2,'ray_control')
+    self.comboBoxType.insertItem(0,'ray_control')
+    self.comboBoxType.insertItem(1, 'nsm')
 
     self.labelWizards = QtWidgets.QLabel("Click on the wizard you want to execute")
 

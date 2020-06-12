@@ -68,12 +68,6 @@ function create_clientID() {
       fi
       shortclientID="\$(generate_nsm_clientID)"
     ;;
-    ray_xml)
-      echo "set clientID with rayZ generation"
-      shortclientID="\$(generate_nsm_clientID)"
-      clientCount=\$(( clientCount + 1 ))
-      clientID="\${label}-\${shortclientID}"
-    ;;
     nsm)
       echo "set clientID with rayZ generation"
       clientCount=\$(( clientCount + 1 ))
@@ -175,33 +169,6 @@ function create_proxy() {
         error
       fi
       ;;
-    ray_xml)
-      arguments="\${arguments//\&amp;/\&amp;amp;}"
-      arguments="\${arguments//\"/\&amp;quot;}"
-      arguments="\${arguments//\'/\&amp;apos;}"
-      arguments="\${arguments//&lt;/\&amp;lt;}"
-      arguments="\${arguments//&gt;/\&amp;gt;}"
-      proxy_dir="\$session_name.\$clientID"
-      mkdir -p "\$session_path/\$session_name.\$clientID"
-
-      if [ "\$xdg_config_home" == "" ]; then
-        cat&lt;&lt;EOF2a_rayproxy_xml &gt; "\$session_path/\$session_name.\$clientID/ray-proxy.xml" || exit 1
-<![CDATA[<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE RAY-PROXY>
-<RAY-PROXY wait_window="\$wait_window" config_file="\$config_file" no_save_level="\$no_save_level" arguments="\$arguments" VERSION="0.9.0" save_signal="\$save_signal" executable="\$executable" stop_signal="\$stop_signal"/>
-]]>
-EOF2a_rayproxy_xml
-      else
-        wrapper=ray-config-session
-        cat&lt;&lt;EOF2b_rayproxy_xml &gt; "\$session_path/\$session_name.\$clientID/ray-proxy.xml" || exit 1
-<![CDATA[<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE RAY-PROXY>
-<RAY-PROXY wait_window="\$wait_window" config_file="\$config_file" no_save_level="\$no_save_level" arguments="--xdg-config-home \&quot;\$xdg_config_home\\&quot; -- \$executable \$arguments" VERSION="0.9.0" save_signal="\$save_signal" executable="\$executable" stop_signal="\$stop_signal"/>
-]]>
-EOF2b_rayproxy_xml
-      fi
-
-      ;;
     nsm)
       label="\${label:-NSM Proxy}"
       proxy_dir="NSM Proxy.\$clientID"
@@ -260,10 +227,6 @@ function set_session_root_and_path() {
 
       # We don't create the session_path ray_control creates it
       ;;
-    ray_xml)      
-      echo "RAY_SESSION_ROOT: '\$RAY_SESSION_ROOT'"
-      session_root=\${RAY_SESSION_ROOT:-\$HOME/Ray Sessions}
-      ;;
     nsm)
       echo "NSM_SESSION_ROOT: '\$NSM_SESSION_ROOT'"  
       session_root=\${NSM_SESSION_ROOT:-\$HOME/NSM Sessions}
@@ -305,11 +268,6 @@ function create_dir_in_client() {
       mkdir -p "\$dir" || error
       echo "\$dir created"
       ;;
-    ray_xml)
-      dir="\$session_path/\$proxy_dir/\$1"
-      mkdir -p "\$dir" || error
-      echo "\$dir created"
-      ;;
     nsm)
       dir="\$session_path/\$proxy_dir/\$1"
       mkdir -p "\$dir" || error
@@ -337,11 +295,6 @@ function copy_to_client_dir () {
 
   case "\$SESSION_MANAGER" in
     ray_control)
-      dirfile="\$session_path/\$proxy_dir/\$2"
-      mkdir -p "\$(dirname "\$dirfile")" || error
-      echo "\$dir created"
-      ;;
-    ray_xml)
       dirfile="\$session_path/\$proxy_dir/\$2"
       mkdir -p "\$(dirname "\$dirfile")" || error
       echo "\$dir created"
@@ -425,11 +378,6 @@ function set_client_properties() {
       fi
       ray_control client \$clientID set_description "\$description"
       ;;
-    ray_xml)
-      cat &lt;&lt; EOF_raysession_xml &gt;&gt; "\$session_path/raysession.xml"
-&lt;client id="\$clientID" description="\$description" launched="\$launched" label="\$label" icon="\$icon" description="\$description"  executable="\$executable" name="\$name"/&gt;
-EOF_raysession_xml
-      ;;
     nsm)
       if [ "\$ACTION" == "add_proxy" ]; then
       
@@ -492,21 +440,6 @@ function set_jackclient_properties() {
     ray_control client "\$clientID" set_custom_data clienttype "\$clienttype"  
     
   fi
-<!--  echo "    - name:          \$jackclientname" &gt;&gt; "\$session_path/default/metadatas.yml"
-  echo "      windowtitle:   \$windowtitle" &gt;&gt; "\$session_path/default/metadatas.yml"
-  echo "      layer:         \$layer" &gt;&gt; "\$session_path/default/metadatas.yml"
-  echo "      guitoload:     \$guitoload" &gt;&gt; "\$session_path/default/metadatas.yml"
-  
-  if [ "\$layer" == "" ]; then
-    echo "      clientid:" &gt;&gt; "\$session_path/default/metadatas.yml"
-  else
-    echo "      clientid:      \$clientID" &gt;&gt; "\$session_path/default/metadatas.yml"  
-  fi
-  
-  echo "      clienttype:    \$clienttype" &gt;&gt; "\$session_path/default/metadatas.yml"
-  echo "      with_gui:      \$with_gui" &gt;&gt; "\$session_path/default/metadatas.yml"
-  echo "" &gt;&gt; "\$session_path/default/metadatas.yml"-->
-
 }
 
 function init_session() {
@@ -526,18 +459,6 @@ function init_session() {
       session_path="\$(ray_control get_session_path)" || error
       
       patchID="\$(ray_control add_executable ray-jackpatch no_start)"
-      
-      ;;
-    ray_xml)
-      clientID="\$(generate_nsm_clientID)"
-      patchLabel="patch"
-      patchID="\$clientID"
-      mkdir -p "\$session_path" || error
-      cat &lt;&lt; EOF_raysession_init &gt; "\$session_path/raysession.xml" || error 
-&lt;RAYSESSION VERSION="0.8.3" name="\$session_name"&gt;
-&lt;Clients&gt;
-  &lt;client icon="curve-connector" description="load/save the jack connections." executable="ray-jackpatch" launched="1" id="\$patchLabel-\$clientID" name="JACK Patch Memory"/&gt;
-EOF_raysession_init
       
       ;;
     nsm)
@@ -578,13 +499,6 @@ EOF_raysession_init
 
 function ray_patch() {
   case "\$SESSION_MANAGER" in
-    ray_xml)
-      filename="\$session_path/\$session_name.\$patchLabel-\$patchID.xml"
-      echo "-------- Install patch.xml to '\$filename'"
-      cp "\$filltemplate_dir/default/patch.xml" "\$filename" || error
-      cp "\$filltemplate_dir/default/patch.xml" "\$session_path/default/\$session_name.\$patchLabel-\$patchID.xml" || error
-      test -f "\$filltemplate_dir/default/jack_parameters" &amp;&amp; cp "\$filltemplate_dir/default/jack_parameters" "\$session_path/jack_parameters"
-      ;;
     ray_control)
       filename="\$session_path/\$session_name.\$patchID.xml"
       echo "-------- Install patch.xml to '\$filename'"
@@ -626,27 +540,6 @@ function end_session() {
       echo -e "\e[1m\e[32mRay Session '\$session_name' in '\$session_path' created successfully.\e[0m"
 
       ;;
-    ray_xml)
-      cat &lt;&lt; EOF_raysession_end &gt;&gt; "\$session_path/raysession.xml"
-<![CDATA[</Clients>
-<RemovedClients/>
-<Windows/>
-</RAYSESSION>]]>
-EOF_raysession_end
-      
-      ray_patch
-
-      ray_scripts
-
-      echo "-------- Copy raysession.xml to 'default/raysession.xml.backup'"
-      filename="\$session_path/raysession.xml"
-      cp "\$filename" "\$session_path/default/raysession.xml.backup" || error
-
-
-      echo -e "\e[1m\e[32mRay Session '\$session_name' in '\$session_path' created successfully.\e[0m"
-  
-      
-      ;;
     nsm)
       echo -e "\e[1m\e[32mNSM Session '\$session_name' in '\$session_path' created successfully.\e[0m"
 
@@ -671,9 +564,6 @@ function gui_session() {
   if [ "\$startgui" == "gui" ];then
     case "\$SESSION_MANAGER" in
       ray_control)
-        raysession --session="\$session_name" &amp;
-        ;;
-      ray_xml)
         raysession --session="\$session_name" &amp;
         ;;
       nsm)
