@@ -34,16 +34,19 @@
 # script here some actions to run before loading the session.
 
 # [VARIABLES]
-CHECK_SERVER=1
-USE_JACK=1
-USE_JACK_SETTINGS=0
-CHECK_ADDITIONNAL_AUDIO_DEVICES=1
-CHECK_PROGRAMS=1
-USE_CATIA=1
+CHECK_SERVER=true
+USE_JACK=true
+USE_JACK_SETTINGS=false
+CHECK_ADDITIONNAL_AUDIO_DEVICES=true
+CHECK_PROGRAMS=true
+USE_CATIA=true
+RAY_HOSTNAME_SENSIBLE=false
 
 if [ -f "\$RAY_SCRIPTS_DIR/.env" ]; then
   source "\$RAY_SCRIPTS_DIR/.env"
 fi
+
+export RAY_HOSTNAME_SENSIBLE
 
 # [/VARIABLES]
 
@@ -73,9 +76,22 @@ function check_server_running() {
   fi
 }
 
-if [ \$USE_JACK -eq 1 ]
-then
-  if [ \$USE_JACK_SETTINGS -eq 1 ]; then
+if \$USE_JACK; then
+  
+  if \$USE_JACK_SETTINGS; then
+    if jack_control status; then
+      echo "\get_diff"
+      DIFF_JACK_PARAM="\$(ray-jack_config_script get_diff)"
+      echo "\$DIFF_JACK_PARAM"
+      echo "/get_deff"
+      if [ "\$DIFF_JACK_PARAM" != "" ]; then
+        if ray_control script_user_action "The jack settings of this ray session differs from the current jack settings ! If you choose ignore, the jack server will be restarted with the jack settings of this ray session otherwise if you click Yes, the session load will be stopped. Your choice ?"; then
+            echo "The session load has been aborted by user."
+            ray_control script_info "The session load has been aborted by user."
+            exit 0
+        fi    
+      fi
+    fi
     ray-jack_config_script load || exit 0
     ray_control hide_script_info    
   else
@@ -92,8 +108,7 @@ fi
 
 # CHECK FOR ADDITIONNAL AUDIO DEVICES DEFINED IN THE SETUP IF anyway
 #if 'alsa_devices' in $data and len($data['alsa_devices']) > 0
-if [ \$CHECK_ADDITIONNAL_AUDIO_DEVICES -eq 1 ]
-then
+if \$CHECK_ADDITIONNAL_AUDIO_DEVICES; then
   echo "Check that additionnal device(s) are available ..."
   COUNT=0
   MISSING_DEVICES=""
@@ -124,8 +139,7 @@ fi
 #end if
 
 # CHECK THE PROGRAM USED BY THIS SESSION
-if [ \$CHECK_PROGRAMS -eq 1 ]
-then
+if \$CHECK_PROGRAMS; then
   echo "Check that program(s) are available on the system ..."
   MISSING_PROGRAMS=""
   COUNT=0
@@ -158,8 +172,7 @@ then
   fi
 fi
 
-if [ \$USE_CATIA -eq 1 ]
-then
+if \$USE_CATIA; then
   mkdir -p /tmp/catia
   RAY_SESSION_NAME="\$(basename "\$RAY_SESSION_PATH")"
   echo "RAY_SESSION_PATH: \$RAY_SESSION_PATH"

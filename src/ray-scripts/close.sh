@@ -34,29 +34,20 @@
 # if for some reasons you want all clients to stop
 # set this variable true !
 close_all_clients=false
-USE_CATIA=1
+
+USE_JACK_SETTINGS=false
+RAY_HOSTNAME_SENSIBLE=false
 
 if [ -f "$RAY_SCRIPTS_DIR/.env" ]; then
   source "$RAY_SCRIPTS_DIR/.env"
 fi
 
-
-if [ $USE_CATIA -eq 1 ]
-then
-  RAY_SESSION_NAME="$(basename "$RAY_SESSION_PATH")"
-  echo "RAY_SESSION_PATH: $RAY_SESSION_PATH"
-  echo "RAY_SESSION_NAME: $RAY_SESSION_NAME"  
-  if [ -d "/tmp/catia" ]
-  then
-    rm -f "/tmp/catia/${RAY_SESSION_NAME}.*.pid"
-    mv "/tmp/catia/${RAY_SESSION_NAME}.yml" "/tmp/catia/${RAY_SESSION_NAME}.yml.session_closed" || exit 1
-    touch "/tmp/catia/${RAY_SESSION_NAME}.yml.session_closed" || exit 1
-  fi
-fi
+export RAY_HOSTNAME_SENSIBLE
 
 close_all_if_needed=''
 
-if [ $USE_JACK_SETTINGS -eq 1 ]; then
+if $USE_JACK_SETTINGS; then
+
   if [[ "$RAY_FUTURE_SCRIPTS_DIR" != "$RAY_SCRIPTS_DIR" ]] &&\
           ! [ -f "$RAY_FUTURE_SCRIPTS_DIR/.jack_config_script" ];then
       close_all_if_needed=close_all
@@ -65,7 +56,7 @@ fi
 
 ray_control run_step $close_all_if_needed
 
-if [ $USE_JACK_SETTINGS -eq 1 ]; then
+if $USE_JACK_SETTINGS; then
   if [ -n "$close_all_if_needed" ];then
       ray-jack_config_script putback && ray_control hide_script_info
   fi

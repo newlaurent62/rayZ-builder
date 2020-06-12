@@ -19,8 +19,16 @@
 
 
 # script here some actions to run before saving the session
+USE_JACK_SETTINGS=false
+RAY_HOSTNAME_SENSIBLE=false
 
-if [ $USE_JACK_SETTINGS -eq 1 ]; then
+if [ -f "$RAY_SCRIPTS_DIR/.env" ]; then
+  source "$RAY_SCRIPTS_DIR/.env"
+fi
+
+export RAY_HOSTNAME_SENSIBLE
+
+if $USE_JACK_SETTINGS; then
   ray-jack_config_script save
 fi
 ray_control run_step

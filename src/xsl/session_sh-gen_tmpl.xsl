@@ -443,12 +443,12 @@ function set_jackclient_properties() {
 }
 
 function init_session() {
-  USE_JACK=1
-  USE_JACK_SETTINGS=1
-  USE_CATIA=1
-  CHECK_ADDITIONNAL_AUDIO_DEVICES=1
-  CHECK_SERVER=1
-  CHECK_PROGRAMS=1
+  USE_JACK=true
+  USE_JACK_SETTINGS=true
+  USE_CATIA=true
+  CHECK_ADDITIONNAL_AUDIO_DEVICES=true
+  CHECK_SERVER=true
+  CHECK_PROGRAMS=true
 
   case "\$SESSION_MANAGER" in
     ray_control)
@@ -491,10 +491,7 @@ function init_session() {
   echo  "port:         xxx-PORT-xxx" &gt;&gt; "\$session_path/default/metadatas.yml"
   echo  "jackclients:" &gt;&gt; "\$session_path/default/metadatas.yml"
 
-  mkdir -p "\$session_path/ray-scripts" || error
-  echo -n > "\$session_path/ray-scripts/.env" || error
-  
-  
+  mkdir -p "\$session_path/ray-scripts" || error  
 }
 
 function ray_patch() {
@@ -513,9 +510,9 @@ function ray_scripts() {
   if [ "\$SESSION_MANAGER" == ray_xml -o "\$SESSION_MANAGER" == ray_control ] &amp;&amp; [ -d "\$filltemplate_dir/ray-scripts" ];then
     dir="\$session_path/ray-scripts"
     mkdir -p "\$dir"
-    echo "-------- Copy ray-scripts to '"\$session_path/"'"
-    cp -r "\$filltemplate_dir/ray-scripts/"*.sh "\$session_path/ray-scripts/" || error
-    cp -r "\$filltemplate_dir/ray-scripts/.jack_config_script" "\$session_path/ray-scripts/" || error
+    echo "-------- Copy ray-scripts to '\$session_path/'"
+    cp "\$filltemplate_dir/ray-scripts/"*.sh "\$session_path/ray-scripts/" || error
+    cp "\$filltemplate_dir/ray-scripts/.jack_config_script" "\$session_path/ray-scripts/" || error
   fi
 
 }
@@ -552,12 +549,12 @@ function end_session() {
       ;;
   esac
   
-  echo "USE_JACK=\$USE_JACK" > "\$session_path/ray-scripts/.env" || error
-  echo "USE_JACK_SETTINGS=\$USE_JACK_SETTINGS" > "\$session_path/ray-scripts/.env" || error
-  echo "USE_CATIA=\$USE_CATIA" >> "\$session_path/ray-scripts/.env" || error
-  echo "CHECK_ADDITIONNAL_AUDIO_DEVICES=\$CHECK_ADDITIONNAL_AUDIO_DEVICES" >> "\$session_path/ray-scripts/.env" || error
-  echo "CHECK_SERVER=\$CHECK_SERVER" >> "\$session_path/ray-scripts/.env" || error
-  echo "CHECK_PROGRAMS=\$CHECK_PROGRAMS" >> "\$session_path/ray-scripts/.env" || error    
+  echo "USE_JACK=\$USE_JACK" &gt; "\$session_path/ray-scripts/.env" || error
+  echo "USE_JACK_SETTINGS=\$USE_JACK_SETTINGS" &gt;&gt; "\$session_path/ray-scripts/.env" || error
+  echo "USE_CATIA=\$USE_CATIA" &gt;&gt; "\$session_path/ray-scripts/.env" || error
+  echo "CHECK_ADDITIONNAL_AUDIO_DEVICES=\$CHECK_ADDITIONNAL_AUDIO_DEVICES" &gt;&gt; "\$session_path/ray-scripts/.env" || error
+  echo "CHECK_SERVER=\$CHECK_SERVER" &gt;&gt; "\$session_path/ray-scripts/.env" || error
+  echo "CHECK_PROGRAMS=\$CHECK_PROGRAMS" &gt;&gt; "\$session_path/ray-scripts/.env" || error
 }
 
 function gui_session() {
