@@ -167,11 +167,6 @@ then
   perl -p -e "s/xxx-PORT-xxx/\$RAY_CONTROL_PORT/g" &lt; "\$RAY_SESSION_PATH/default/metadatas.yml" &gt; "/tmp/catia/\${RAY_SESSION_NAME}.yml" || exit 0
 fi
 
-
-echo "Install session icons ..."
-export XDG_UTILS_INSTALL_MODE=user
-find "\$RAY_SESSION_PATH/.local/share/icons" -type f -name "*.png" -name "*.svg" | while read FILE; do xdg-icon-resource install --size \$(echo "\$FILE" | perl -p -e 's|^.*?icons/(\d+)x.*$|\$1|g') \$FILE; done
-
 # set this var true if you want all running clients to stop (see top of this file).
 clear_all_clients=false
 

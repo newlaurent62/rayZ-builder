@@ -65,10 +65,6 @@ fi
 
 ray_control run_step $close_all_if_needed
 
-echo "Uninstall session icons ..."
-export XDG_UTILS_INSTALL_MODE=user
-find "$RAY_SESSION_PATH/.local/share/icons" -type f -name "*.png" -name "*.svg" | while read FILE; do xdg-icon-resource uninstall --size $(echo "$FILE" | perl -p -e 's|^.*?icons/(\d+)x.*$|$1|g') $FILE; done
-
 if [ $USE_JACK_SETTINGS -eq 1 ]; then
   if [ -n "$close_all_if_needed" ];then
       ray-jack_config_script putback && ray_control hide_script_info
