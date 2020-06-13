@@ -3,7 +3,7 @@
 # ---------------------- #
 # Created by newlaurent62
 #
-PREFIX = /home/laurent/.local
+PREFIX = /usr/local
 TEMPLATES_DIR = share/rayZ-builder/session-templates
 PYTHON := /usr/bin/python3
 #WIZARD := simple_example
@@ -15,9 +15,9 @@ TMPL_ARGS :=
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
 
-all: install-wrapper install-catia $(ALL_FILES)
+all: $(ALL_FILES)
 
-build: install-wrapper install-catia $(DEFAULT_FILES)
+build: $(DEFAULT_FILES)
 
 %.py : WIZARD_ID=$(patsubst src/wizards/%,%, $<)
 %.py : %
