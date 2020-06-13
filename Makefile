@@ -120,7 +120,7 @@ uninstall: uninstall-catia uninstall-wrapper
 	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/Jamulus
 	rm -rf $(PREFIX)/$(TEMPLATES_DIR)/simple_example
 	
-clean: uninstall-catia
+clean: 
 	rm -rf build
 	find -name "__pycache__" | xargs rm -rf 
 	
