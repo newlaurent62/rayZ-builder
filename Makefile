@@ -126,7 +126,7 @@ clean: uninstall-catia
 	
 prepare-dev-ubuntu:
 	sudo apt update
-	sudo apt install python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java
+	sudo apt install python-cheetah libxml2-utils python3-pyqt5 libsaxonb-java default-jre python3-lxml pyqt5-dev-tools qttools5-dev-tools qt5-default
 	
 prepare-jamulus-ubuntu:
 	sudo apt update
@@ -137,11 +137,13 @@ prepare-simple_example-ubuntu:
 	sudo apt install alsaplayer-jack alsaplayer-common papirus-icon-theme
 	
 test-all:
+	mkdir -p ~/NSM\ Sessions ~/Ray\ Sessions
 	mkdir -p test && cd test && rm -rf Catia-fork rayZ-builder && git clone https://github.com/newlaurent62/rayZ-builder.git && git clone https://github.com/newlaurent62/Catia-fork.git
-
+	cd test && rm -rf RaySession && git clone https://github.com/newlaurent62/RaySession.git
+	cd test/RaySession && sudo make uninstall || exit 0
+	cd test/RaySession && make clean && make && sudo make install
 	cd test/rayZ-builder && sudo make uninstall || exit 0
 	cd test/rayZ-builder && make clean && make && rm -rf ~/Ray\ Sessions/Jamulus && rm -rf ~/NSM\ Sessions/Jamulus && rm -rf ~/Ray\ Sessions/simple_example && rm -rf ~/NSM\ Sessions/simple_example && make WIZARD=Jamulus test-ray-control-template && make WIZARD=Jamulus test-nsm-template && make WIZARD=simple_example test-ray-control-template && make WIZARD=simple_example test-nsm-template && sudo make install
-
 	cd test/Catia-fork && sudo make uninstall || exit 0
 	cd test/Catia-fork && make && sudo make install
 
