@@ -139,9 +139,9 @@ prepare-simple_example-ubuntu:
 test-all:
 	mkdir -p test && cd test && rm -rf Catia-fork rayZ-builder && git clone https://github.com/newlaurent62/rayZ-builder.git && git clone https://github.com/newlaurent62/Catia-fork.git
 
-	cd test/rayZ-builder && make clean && sudo make uninstall && make && rm -rf ~/Ray\ Sessions/Jamulus && rm -rf ~/NSM\ Sessions/Jamulus && rm -rf ~/Ray\ Sessions/simple_example && rm -rf ~/NSM\ Sessions/simple_example && make WIZARD=Jamulus test-ray-control-template && make WIZARD=Jamulus test-nsm-template && make WIZARD=simple_example test-ray-control-template && make WIZARD=simple_example test-nsm-template && sudo make install
+	cd test/rayZ-builder && make clean && make && rm -rf ~/Ray\ Sessions/Jamulus && rm -rf ~/NSM\ Sessions/Jamulus && rm -rf ~/Ray\ Sessions/simple_example && rm -rf ~/NSM\ Sessions/simple_example && make WIZARD=Jamulus test-ray-control-template && make WIZARD=Jamulus test-nsm-template && make WIZARD=simple_example test-ray-control-template && make WIZARD=simple_example test-nsm-template && sudo make install
 
-	cd test/Catia-fork && make && sudo make uninstall && sudo make install
+	cd test/Catia-fork && make && sudo make install
 
 	killall catia || exit 0
 	
