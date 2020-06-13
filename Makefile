@@ -31,7 +31,7 @@ build: $(DEFAULT_FILES)
 
 	cp src/wizards/$(WIZARD_ID)/*.wizard src/wizards/$(WIZARD_ID)/pages/*.page build/$(WIZARD_ID)/xml/
 	test -d src/wizards/$(WIZARD_ID)/snippets && cp src/wizards/$(WIZARD_ID)/snippets/*.tmpl_snippet build/$(WIZARD_ID)/xml/ || exit 0
-	cheetah c -R --nobackup --idir src/wizards/$(WIZARD_ID)/tmpl --odir build/$(TEMPLATES_DIR)/$(WIZARD_ID)/
+	cheetah3 c -R --nobackup --idir src/wizards/$(WIZARD_ID)/tmpl --odir build/$(TEMPLATES_DIR)/$(WIZARD_ID)/
 
 	mkdir -p build/$(TEMPLATES_DIR)/$(WIZARD_ID)/
 	
@@ -51,7 +51,7 @@ build: $(DEFAULT_FILES)
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/ray_script_load_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray_script_load_sh.tmpl"
 
 
-	cheetah c -R --nobackup --idir "build/$(TEMPLATES_DIR)/$(WIZARD_ID)" --odir "build//$(TEMPLATES_DIR)/$(WIZARD_ID)"
+	cheetah3 c -R --nobackup --idir "build/$(TEMPLATES_DIR)/$(WIZARD_ID)" --odir "build//$(TEMPLATES_DIR)/$(WIZARD_ID)"
 	mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/local/bin" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/local/share/icons" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/default"
 	cp -r src/gui/rayZ_ui.py "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/"
 	test -d src/wizards/$(WIZARD_ID)/default && cp -r src/wizards/$(WIZARD_ID)/default "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/" || exit 0
@@ -126,7 +126,7 @@ clean: uninstall-catia
 	
 prepare-dev-ubuntu:
 	sudo apt update
-	sudo apt install python-cheetah libxml2-utils python3-pyqt5 libsaxonb-java default-jre python3-lxml pyqt5-dev-tools qttools5-dev-tools qt5-default
+	sudo apt install python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java default-jre python3-lxml pyqt5-dev-tools qttools5-dev-tools qt5-default
 	
 prepare-jamulus-ubuntu:
 	sudo apt update
