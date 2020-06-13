@@ -11,7 +11,7 @@
 clientCount=0
 
 function generate_nsm_clientID() {
-python&lt;&lt;EOF_python_nsm
+python3 &lt;&lt;EOF_python_nsm
 import random
 import string
 client_id = 'n'
