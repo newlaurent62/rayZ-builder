@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<page id='Jack' section-name='jack' use="optional" xmlns:xi="http://www.w3.org/2001/XInclude">
+<page id='Jack' section-name='jack' use="required" xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Jack settings section</title>
   <short-title>Jack settings</short-title>
   <requires executable="jack_control"/>
