@@ -20,5 +20,6 @@
     "jack",
     "jack_capture"
   ],
-  "wizard.sectionnames": "global,jack,jack_capture"
+  "wizard.sectionnames": "global,jack,jack_capture",
+  "wizard.version" : "1"
 }
