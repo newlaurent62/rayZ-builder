@@ -8,11 +8,11 @@ rayZ-builder is compatible with:
   - non-session-manager (a fast and reliable session manager)
   - raysession (compatible with non-session-manager. It adds some useful features)
 
-The purpose of rayZ-builder is to create wizards that fill templates to create a session documents.
+The purpose of rayZ-builder is to create wizards that fill templates to create session documents.
 
 It uses declarative XML files and cheetah template engine.
 
-Once walking through the wizard steps and validated the inputs, those inputs are passed to the template to create the final session document.
+Once walking through the wizard steps and the inputs are validated, those inputs are passed to the template to create the final session document.
 
 ## Try the wizards
 
@@ -22,7 +22,7 @@ Create all the wizards:
 
 Main window, let you start one of the wizards available in the install dir. 
 
-rayZ wizards can be added at any time in the install dir. They will be recognized.
+rayZ wizards can be added at any time in the install dir. They will be found.
 
     make exec-main
     
@@ -43,10 +43,6 @@ Ex: src/wizards/mywizard/test-data
 fill the $(WIZARD) template from test-data inputs to generate a ray session with ray_control.
 
     make test-ray-control-template
-
-fill the $(WIZARD) template from test-data inputs to generate a ray session without ray_control.
-    
-    make test-ray-xml-template
 
 fill the $(WIZARD) template from test-data inputs to generate an nsm session.
 
