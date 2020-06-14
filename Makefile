@@ -126,7 +126,7 @@ clean:
 	
 prepare-dev-ubuntu:
 	sudo apt update
-	sudo apt install python3 python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java default-jre python3-lxml pyqt5-dev-tools qttools5-dev-tools qt5-default
+	sudo apt install git make build-essential python3 python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java default-jre python3-lxml pyqt5-dev-tools qttools5-dev-tools qt5-default libjack-jackd2-dev
 	
 prepare-jamulus-ubuntu:
 	sudo apt update
