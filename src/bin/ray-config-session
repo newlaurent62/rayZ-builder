@@ -188,7 +188,7 @@ PID=$!
 #   echo "$PID" > "/tmp/catia/${RAY_SESSION_NAME}.${NSM_CLIENT_ID}.pid" || error
 # fi
 sleep 2
-WINID="$(~/.local/bin/getwindidbypid $PID)"
+WINID="$(getwindidbypid $PID)"
 echo "window id: $WINID of PID: $PID"
 wait $PID
 stopclient
