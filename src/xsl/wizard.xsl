@@ -403,7 +403,7 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         
     def initializePage(self):
         self.setTitle('<xsl:value-of select='first-page/title'/>')
-        self.labelDescription.setText('<xsl:value-of select='first-page/description'/>')
+        self.labelDescription.setText('<xsl:apply-templates select='first-page/description' mode="description"/>')
         if self.wizard().startguioption:
           self.checkStartgui.setText('Check if you want to start GUI once the Session document has been created')
           self.checkStartgui.show()
@@ -650,7 +650,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
 
     def initializePage(self):
       self.setTitle('<xsl:value-of select='last-page/title'/>')
-      self.labelDescription.setText('<xsl:value-of select='last-page/description'/>')
+      self.labelDescription.setText('<xsl:apply-templates select='last-page/description' mode="description"/>')
       
       str_conf = self.wizard().cleanConfAsString()  
       self.textEdit.setPlainText(str_conf)
@@ -993,4 +993,7 @@ __init_create_instance RULES
         roleitemlist.append(('<xsl:value-of select='@id'/>', '<xsl:value-of select='@label'/>'))
   </xsl:for-each>
 </xsl:template>
+
+<xsl:template match="description" mode="description"><xsl:for-each select="tokenize(., '\n')[normalize-space()]"><xsl:value-of select="." />\n</xsl:for-each></xsl:template>
+
 </xsl:stylesheet>
