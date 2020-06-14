@@ -15,7 +15,7 @@ import lxml
 
 class SessionTemplate:
     
-  def fillInTemplate(self, datamodelfile, rayZtemplatedir, outdir, fillonly=False, startgui=False, session_manager=None):
+  def fillInTemplate(self, conffile, datamodelfile, rayZtemplatedir, outdir, fillonly=False, startgui=False, session_manager=None):
     
     if not os.path.isfile(rayZtemplatedir + os.sep + "info_wizard.xml"):
       raise Exception('%s is not a rayZtemplatedir !' % rayZtemplatedir)
@@ -24,6 +24,9 @@ class SessionTemplate:
       raise Exception('rayZtemplatedir "%s" must be a directory !' % rayZtemplatedir)
     
     sys.path.append(rayZtemplatedir)
+
+    if not os.path.isfile(conffile):
+      raise Exception('conf file "%s" must be a file !' % conffile)
 
     if not os.path.isfile(datamodelfile):
       raise Exception('datamodel "%s" must be a file !' % datamodelfile)
@@ -79,6 +82,11 @@ class SessionTemplate:
     print ("-- Fill template in temporary dir")
 
     shutil.copy(datamodelfile, destfilepath)
+    print ("---- %s copied" % destfilepath)
+
+    destfilepath = outdir + os.sep + 'default' + os.sep + conffile
+    os.makedirs(os.path.dirname(destfilepath),exist_ok=True)    
+    shutil.copy(conffile, destfilepath)
     print ("---- %s copied" % destfilepath)
 
     <xsl:apply-templates select="//template" mode="build"/>

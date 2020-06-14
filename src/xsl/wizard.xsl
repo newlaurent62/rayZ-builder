@@ -688,15 +688,16 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
         else:
           datamodelfile = self.wizard().jsonfilename
         
+        conffile = datamodel.configfilename
         print(self.wizard().writeJSON(datamodelfile))
           
         templatedir = os.path.abspath(os.path.dirname(__file__))
         print ('sys.path' + str(sys.path))
-        print ('-- datamodel file:' + str(datamodelfile) + '\n-- rayZtemplatedir:' + str(templatedir) + '\n-- tmp dir:' + str(tmpdir) + '\n-- startgui:' + str(self.wizard().startgui) + "\n-- session_manager:" + self.wizard().session_manager)
+        print ('-- conf file:' + str(conffile) + '\n-- datamodel file:' + str(datamodelfile) + '\n-- rayZtemplatedir:' + str(templatedir) + '\n-- tmp dir:' + str(tmpdir) + '\n-- startgui:' + str(self.wizard().startgui) + "\n-- session_manager:" + self.wizard().session_manager)
         
         from tmpl_wizard import SessionTemplate
         try:
-          SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager)
+          SessionTemplate().fillInTemplate(conffile, datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager)
           QtWidgets.QMessageBox.information(self,
                                             "Session creation ...",
                                             "The Session has been successfully created.")
