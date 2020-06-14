@@ -53,13 +53,13 @@ readData : initialize the component from config file that has been loaded at wiz
 updateData : update config file (in memory) and in json data (in memory). Don't forget to register the added key if any to the datamodel.
 in json data, list property key ends with 'list' for example global.users in config file and global.userslist in json data.
 
-### ray-scripts load.sh
+### ray-scripts load.sh on RaySession only
 
-The ray session check for required executable of the document being loaded. If one or more of the required program are not available during the session load, then raysession prompt a question "ignore or stop loading the session".
+The ray session check for required executable when loading. If one or more of the required program are not available during the session load, then raysession prompt a question "ignore or stop loading the session".
 
-It looks also for Jack server running. If not available prompt a question "ignore or stop loading the session".
+It looks also for Jack server running. If not available prompt a question "ignore or stop loading the session". It uses session-dir/jack_parameters file as jack settings.
 
-And It looks for any additionnal devices (alsa_in, alsa_out) if any. If one or more devices are not available prompt a question "ignore or stop loading the session".
+And It looks for any missing additionnal devices (alsa_in, alsa_out) if any. If one or more devices are not available prompt a question "ignore or stop loading the session".
 
 Some functions on server/service have been added (to check for availability of localhost server such as icecast2.service, mumble-server.service, jamulus.service ...)
 see xsl/ray_script_load_sh-gen_tmpl.xsl

@@ -2,9 +2,11 @@
 
 ## Wizards
 
-OBS connection to check
+Jamulus:
 
-add Mumble to Jamulus use case ?
+- add Mumble to Jamulus use case ?
+
+- Facebook and YouTube streaming
 
 ## Overall
 
