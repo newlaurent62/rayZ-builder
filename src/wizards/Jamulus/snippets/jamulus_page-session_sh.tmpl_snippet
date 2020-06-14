@@ -50,7 +50,7 @@
     with-gui="true">
   <name>jamulus client</name>
   <label>Jamulus $username</label>
-  <description>$servdescription</description>
+  <description>Jamulus for $username connected to $jamulus_server:$jamulus_port</description>
   <command>bin/Jamulus</command>
   <arguments>--nojackconnect --connect $jamulus_server:$jamulus_port --inifile ".config/Jamulus/${username}.ini" --clientname "$username"</arguments>
   <jack-name>Jamulus $username</jack-name>
