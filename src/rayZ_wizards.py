@@ -3,12 +3,10 @@ import getopt
 import sys
 from PyQt5 import QtGui
 from PyQt5 import QtCore, QtWidgets
-jsonfilename = None
-startguioption = False
-session_manager = 'ray_control'
 import sys
 import os
 import xml.etree.ElementTree as ET
+import configparser
 
 # Subclass QMainWindow to customise your application's main window
 class MainWindow(QtWidgets.QWidget):
@@ -93,11 +91,31 @@ class MainWindow(QtWidgets.QWidget):
                                     "No wizards could be found in " + str(rayZtemplatesdir) + " !")
       sys.exit(2)
 
-      
+def startWizard(wizardid, session_manager):
+  _path = rayZtemplatesdir + os.sep + wizardid
+  sys.path.append(_path)
+  command = "/usr/bin/env python3 " + _path + os.sep + "wizard.py --start-gui-option --session-manager=" + session_manager
+  try:
+    os.system(command)
+  except:
+    print("Unexpected error:", sys.exc_info()[0] + "\nExecuting the command: '" + command + "'")
+
+def usage():
+  print ("Usage:")
+  print ("rayZ_wizards [options)")
+  print ("   -h|--help              : print this help text")
+  print ("   -c|--conf-file         : set the conf filename to read/write")
+  print ("   -m|--session-manager   : set the session-manager of the resulting document")
+  print ("                             - ray_control : (default) create a raysession document. You will need raysession software for the processing,")
+  print ("                             - nsm         : create a nsm session. You wont need non-session-manager for the document generation,")
+        
 if __name__ == '__main__':
   rayZtemplatesdir = 'xxx-TEMPLATES_DIR-xxx'
+  conffilename = None
+  session_manager = 'ray_control'
+  
   try:                                
-    opts, args = getopt.getopt(sys.argv[1:], "hdt:", ["help", "debug","templates-dir="])
+    opts, args = getopt.getopt(sys.argv[1:], "hdt:c:m:", ["help", "debug","templates-dir=","conf-file=", "sesssion-manager="])
     print ("args list: ")
     print(opts)
   except getopt.GetoptError:          
@@ -110,22 +128,35 @@ if __name__ == '__main__':
     elif opt in ('-d', "--debug"):
       global _debug               
       _debug = 1               
-    elif opt in ("-j", "--write-json-file"):
-      jsonfilename = arg
-      print ("will write a json file '%s' when finishing the wizard steps." % jsonfilename)
-    elif opt in ("-s", "--start-gui-option"):
-      startguioption=True
+    elif opt in ("-m", "--session-manager"):
+      session_manager = arg
+      if session_manager not in ('ray_control', 'nsm'):
+        raise Exception('Unknown session manager: %s' % session_manager)
+      print ('will generate a session using %s' % session_manager)
+    elif opt in ("-c", "--conf-file"):
+      conffilename = arg
+      print ("will read/write conf file '%s'" % conffilename)
     elif opt in ("-t", "templates-dir"):
-      rayZtemplatesdir = args
+      rayZtemplatesdir = arg
       if not os.path.isdir(rayZtemplatesdir):
         print ("templates-dir argument must be a directory !")
         sys.exit(2)
-    elif opt in ("-m", "--session-manager"):
-      session_manager=arg
-      if session_manager not in ['ray_control', 'ray_xml', 'nsm']:  
-        print ('--session-manager options : "ray_control|ray_xml|nsm"')
-        sys.exit(2)
 
+  if conffilename:
+    config = configparser.ConfigParser()
+    if os.path.isfile(conffilename):      
+      config.read(conffilename)
+      if 'wizard' in config.sections() and 'id' in config['wizard']:
+        print ('Reading ' + conffilename)
+        wizardid = config['wizard']['id']
+        print ('Try to load "%s" wizard ...' % wizardid)
+        startWizard(wizardid, session_manager)
+        sys.exit()
+      else:
+        print('Cannot determine the wizard to load ... "id" property of [wizard] section is missing !')
+    else:
+      print('Could not find conf file "%s"' % conffilename)
+      
   app = QtWidgets.QApplication(sys.argv)
   mainWindow = MainWindow(rayZtemplatesdir)
   mainWindow.show()

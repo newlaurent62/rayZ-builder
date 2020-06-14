@@ -56,10 +56,10 @@ class DataModel:
 
   data = {}
   
-  def __init__(self, wizard, session_root):
+  def __init__(self, wizard, session_root, conffilename):
     self.wizard = wizard
     self.config = None
-    self.configfilename = '<xsl:value-of select='@id'/>.conf'
+    self.configfilename = conffilename
     self.session_path = None
     self.registeredkey = {}
     self.allowedSections = []
@@ -71,8 +71,18 @@ class DataModel:
     if os.path.isfile(self.configfilename):      
       print ('Reading ' + self.configfilename)
       config.read(self.configfilename)
+      if 'wizard' in config.sections() and 'id' in config['wizard']:
+        if not (config['wizard']['id'] == '<xsl:value-of select="@id"/>'):
+          QtWidgets.QMessageBox.critical(self,
+                                            "Wizard loading ...",
+                                            "The conf file (%s) has not been built by this wizard (%s)" % (self.configfilename, '<xsl:value-of select="@id"/>'))
+          
+          raise Exception('The %s file is not has not been built by %s wizard !' % (self.configfilename, '<xsl:value-of select="@id"/>'))
+      else:
+        print ('wizard.id is missing ... Try to use %s anyway !' % self.configfilename)
     
     self.config = config
+    self.config
    
   def registerkey(self, sectionName, key):
     key = key.lower()
@@ -197,7 +207,7 @@ class SessionWizard(QtWidgets.QWizard):
     
     pagenameByIdx = {}
     
-    def __init__(self, parent=None, jsonfilename=None, startguioption=False, session_manager="ray_control"):
+    def __init__(self, parent=None, jsonfilename=None, startguioption=False, session_manager="ray_control", configfilename='<xsl:value-of select='@id'/>.conf'):
         super(SessionWizard, self).__init__(parent)
 
         
@@ -226,7 +236,7 @@ class SessionWizard(QtWidgets.QWizard):
         
         print ('session_root:"' + session_root + '"') 
 
-        self.datamodel = DataModel(self, session_root)
+        self.datamodel = DataModel(self, session_root, configfilename)
         self.datamodel.readConf()
 
         self.startguioption = startguioption
@@ -319,8 +329,16 @@ class SessionWizard(QtWidgets.QWizard):
       
     def updateConfSections(self):
       sections=['wizard']
+      config = self.datamodel.config
       if not('wizard' in self.datamodel.config.sections()):
-        self.datamodel.config.add_section('wizard')
+        config.add_section('wizard')
+      
+      config['wizard']['id'] = '<xsl:value-of select="@id"/>'
+      self.datamodel.registerkey('wizard', 'id')
+      
+      config['wizard']['version'] = '<xsl:value-of select="info/version"/>'
+      self.datamodel.registerkey('wizard', 'version')
+      
       for pageid in self.pageSteps:
         sectionname = self.page(pageid).sectionName
         if sectionname:
@@ -680,7 +698,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
         try:
           SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager)
           QtWidgets.QMessageBox.information(self,
-                                            "Sessionn creation ...",
+                                            "Session creation ...",
                                             "The Session has been successfully created.")
           return True
         except Exception as exception:
@@ -688,12 +706,12 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
           print("Exception: {}".format(type(exception).__name__))
           print("Exception message: {}".format(exception))          
           QtWidgets.QMessageBox.critical(self,
-                                            "Sessionn creation ...",
+                                            "Session creation ...",
                                             "An error occured during the creation process (see logs for more details)")
           return False
       else:
         QtWidgets.QMessageBox.critical(self,
-                                            "Sessionn creation ...",
+                                            "Session creation ...",
                                             "The Session already exists ! '" + self.wizard().datamodel.session_path + "'&lt;br/&gt;Please try another name.")
       return False
 
@@ -703,6 +721,7 @@ def usage():
   print ("wizard.py [options)")
   print ("   -h|--help              : print this help text")
   print ("   -d                     : debug information")
+  print ("   -c|--conf-file         : set the conf filename to read/write")
   print ("   -j|--write-json-file   : set the JSON file to write. It is used to fill the template and contains user inputs and wizard outputs variables.")
   print ("   -s|--start-gui-option  : the wizard will display an option for starting raysession software at the end of the document creation.")
   print ("   -m|--session-manager   : set the session-manager of the resulting document")
@@ -713,9 +732,10 @@ if __name__ == '__main__':
   jsonfilename = None
   startguioption = False
   session_manager = 'ray_control'
+  conffile = "<xsl:value-of select="@id"/>.conf"
   import sys
   try:                                
-    opts, args = getopt.getopt(sys.argv[1:], "hj:ds", ["help", "write-json-file=","debug","start-gui-option","session-manager="])
+    opts, args = getopt.getopt(sys.argv[1:], "hc:j:dsm:", ["help", "conf-file=", "write-json-file=","debug","start-gui-option","session-manager="])
     print ("args list: ")
     print(opts)
   except getopt.GetoptError:          
@@ -725,6 +745,9 @@ if __name__ == '__main__':
     if opt in ("-h", "--help"):
       usage()                     
       sys.exit()                  
+    elif opt in ('-c', '--conf-file'):
+      conffile = arg
+      print ('read/write conf file %s' % conffile)
     elif opt in ('-d', "--debug"):
       global _debug               
       _debug = 1               
@@ -740,7 +763,7 @@ if __name__ == '__main__':
         sys.exit(2)
   
   app = QtWidgets.QApplication(sys.argv)
-  wizard = SessionWizard(jsonfilename=jsonfilename, startguioption=startguioption, session_manager=session_manager)
+  wizard = SessionWizard(jsonfilename=jsonfilename, startguioption=startguioption, session_manager=session_manager, configfilename=conffile)
   layout = [QtWidgets.QWizard.CustomButton1, QtWidgets.QWizard.CustomButton2, QtWidgets.QWizard.BackButton, QtWidgets.QWizard.CancelButton, QtWidgets.QWizard.NextButton, QtWidgets.QWizard.FinishButton]
   wizard.setButtonLayout(layout);    
   wizard.setButtonText(QtWidgets.QWizard.CustomButton1, "Defaults")
@@ -909,7 +932,7 @@ __init_create_instance RULES
         roleitemlist = None
         itemlist = None
         <xsl:apply-templates select="combobox/*"/>
-        self._<xsl:value-of select='@id'/> = CComboBox(itemlist=itemlist, roleitemlist=roleitemlist, defaultvalue='<xsl:value-of select='checkbox/@default-value'/>', sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/> = CComboBox(itemlist=itemlist, roleitemlist=roleitemlist, defaultvalue='<xsl:value-of select='combobox/@default-value'/>', sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
         self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
         fields.append(self._<xsl:value-of select='@id'/>)
     </xsl:when>
