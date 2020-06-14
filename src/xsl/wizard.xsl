@@ -368,16 +368,6 @@ class BasePage(QtWidgets.QWizardPage):
     def __init__(self, parent=None):
         super(BasePage, self).__init__(parent)
     
-    def registerField(self, name, *args, **kwargs):
-        self.field_names.add(name)
-        super().registerField(name, *args, **kwargs)
-
-    def updateFieldsOfSection(self):
-      self.wizard().datamodel.updateConf(self)
-    
-    def initFieldsOfSection(self):
-      self.wizard().datamodel.initFieldsOfSection(self)
-      
     def nextId(self):
       return self.wizard().nextId()
 
@@ -389,7 +379,7 @@ class BasePage(QtWidgets.QWizardPage):
       
     def readData(self, config, datamodel):
       pass
-    
+      
 class <xsl:value-of select='first-page/@id'/>Page(BasePage):
     def __init__(self, parent=None):
         super(<xsl:value-of select='first-page/@id'/>Page, self).__init__(parent)
