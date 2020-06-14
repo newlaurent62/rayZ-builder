@@ -89,7 +89,7 @@ class SessionTemplate:
 
 def usage():
   print ("Usage:")
-  print ("<xsl:value-of select="@id"/>.py [options)")
+  print ("tmpl_wizard.py [options)")
   print ("   -h|--help                  : print this help text")
   print ("   -d                         : debug information")
   print ("   -j|--read-json-file  arg   : set the JSON file to read. It is used to fill template and contains wizard inputs. (default to ./datamodel.json)")

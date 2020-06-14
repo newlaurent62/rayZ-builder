@@ -700,7 +700,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
       
 def usage():
   print ("Usage:")
-  print ("<xsl:value-of select="@id"/>.py [options)")
+  print ("wizard.py [options)")
   print ("   -h|--help              : print this help text")
   print ("   -d                     : debug information")
   print ("   -j|--write-json-file   : set the JSON file to write. It is used to fill the template and contains user inputs and wizard outputs variables.")
