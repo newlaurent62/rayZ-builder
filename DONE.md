@@ -20,7 +20,7 @@ A context menu on jackclient boxes with useful app to switch to (the application
 Windows switch is declarative, that means when you create a template with rayZ-builder, you declare the applications to load or switch to from catia:
 
 - During the session load, those metadatas are sent to catia using ray_control. Catia polls ray_control every 5 sec for new sessions or closed sessions.
-- Metadatas are declared in the session.sh or session.sh snippets (in &lt;client/&gt; XML element) used to create the session. 
+- Metadatas are declared in the session.sh or session.sh snippets (in **&lt;client/&gt;** XML element) used to create the session. 
   They are persisted using ray_control thus this does not work with nsm.
 
 ### session_sh supports nsmd and ray-daemon
@@ -33,10 +33,10 @@ Currently, nsm and ray session are supported by rayZ-builder. The ray session ge
 
 ### interface UI and component classes
 
-rayZ-builder has its own gui classes derived from PyQt5. It adds some functions like copyUI that allow to make a clone of a component. It is not a deep clone but it clones the object hierarchy created with &lt;field/&gt; or &lt;group/&gt; inner XML element parameters.
+rayZ-builder has its own gui classes derived from PyQt5. It adds some functions like copyUI that allow to make a clone of a component. It is not a deep clone but it clones the object hierarchy created with **&lt;field/&gt;** or **&lt;group/&gt;** inner XML element parameters.
 
 There is a "group of component" UI that can be tab or list display fields. 
-For example, if you have a list of users and you want to input informations for each users with checkbox, line edit, combobox ... It's possible with rayZ-builder generator. (See Jamulus wizard and &lt;group/&gt; element)
+For example, if you have a list of users and you want to input informations for each users with checkbox, line edit, combobox ... It's possible with rayZ-builder generator. (See Jamulus wizard and **&lt;group/&gt;** element)
 
 To create a new UI component:
 
@@ -46,7 +46,7 @@ To create a new UI component:
 
 - the UI class should implement:
 
-copyUI : clone the field (for use with &lt;group/&gt; components)
+copyUI : clone the field (for use with **&lt;group/&gt;** components)
 
 readData : initialize the component from config file that has been loaded at wizard startup.
 
@@ -75,8 +75,8 @@ One wizard defines the following files and dirs:
 
 - **file : src/wizards/**                         -&gt; contains all wizard main entries (files $(WIZARD_ID).wizard)
 - **dir : src/wizards/$(WIZARD_ID)/default**      -&gt; contains all defaults config files. Create a subdir for each application or application conf.
-- **dir : src/wizards/$(WIZARD_ID)/pages**        -&gt; contains all wizard pages (files *.page). Pages can be include in wizard file using &lt;xi:include/&gt; instruction.
-                                                     Pages defines how the templates behave (see &lt;template/&gt; and &lt;template-snippet/&gt; elements).
+- **dir : src/wizards/$(WIZARD_ID)/pages**        -&gt; contains all wizard pages (files *.page). Pages can be include in wizard file using **&lt;xi:include/&gt;** instruction.
+                                                     Pages defines how the templates behave (see **&lt;template/&gt;** and **&lt;template-snippet/&gt;** elements).
 - **dir : src/wizards/$(WIZARD_ID)/snippets**     -&gt; contains template snippets (files *.tmpl_snippet) use by pages to generate their conf (session.sh, patch_xml)
 - **dir : src/wizards/$(WIZARD_ID)/tmpl**         -&gt; Cheetah templates (files *.tmpl). Create one when you need to fill a configuration file depending on user inputs. Those files should go to a .config path
 - **dir : src/wizards/$(WIZARD_ID)/test-data**    -&gt; contains a datamodel.json that can be use by Makefile to test a template
@@ -98,7 +98,7 @@ Document file types:
 - tmpl snippet files ***.tmpl_snippet** : Cheetah template snippet for session_sh and patch_xml of a page. A Cheetah snippet can be reused by several pages
 - tmpl files ***.tmpl** : Cheetah Cheetah template for configuration files creation
 
-wizard, page and tmpl_snippet have to be in the same directory when combined to a single xml (done in the Makefile) because of &lt;xi:include/&gt; XML processing instructions.
+wizard, page and tmpl_snippet have to be in the same directory when combined to a single xml (done in the Makefile) because of **&lt;xi:include/&gt;** XML processing instructions.
 
 a wizard is composed of one or more setup pages.
 Before walking through the wizard steps, the final user selects the pages (applications related) he wants to use.
