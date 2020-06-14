@@ -2,7 +2,7 @@
 
 This tool let you create simple or complex virtual studio setup.
 
-These virtual studio called session, let you connect, save or close all audio applications in one click.
+These virtual studio called session, let you load and connect, save or close all audio applications in one click.
 
 rayZ-builder is compatible with:
   - non-session-manager (a fast and reliable session manager)

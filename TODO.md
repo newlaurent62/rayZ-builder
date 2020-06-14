@@ -2,6 +2,8 @@
 
 ## Wizards
 
+OBS connection to check
+
 add Mumble to Jamulus use case ?
 
 ## Overall
@@ -10,8 +12,9 @@ add Mumble to Jamulus use case ?
     
 - Document the examples
 
-- let the user update the current session and not loosing the already created configuration files and data.
+KEYBOARD SHORTCUTS:
+  
+  on X11, let some application use CTRL+s to save their content when saving session.
 
-- on X11, let some application use CTRL+s to save their content when saving session.
-
-- jack server check / jack client name check
+- Debug mode
+    currently, all debug information are printed even if -d is not set on command line
