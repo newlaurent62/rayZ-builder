@@ -43,7 +43,7 @@ usersre = "^((?!--)([_A-Za-z0-9-]|\\.)+)(,((?!--)([_A-Za-z0-9-]|\\.)+))*$"
 usersQregexp = QtCore.QRegularExpression(usersre)
 
 jackinputmonore = "^(((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*-&gt;(L)\s*)+$"
-jackinputstereore = "^(((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*-&gt;(LR|L|R|)\s*)+$"
+jackinputstereore = "^(((([a-zA-Z]\w*):)?([0-9]+))(,((([a-zA-Z]\w*):)?([0-9]+)))*-&gt;(LR|L|R)\s*)+$"
 jackoutputmonore = "^((L)-&gt;(([a-zA-Z]\w*):)?([0-9]+)(,(([a-zA-Z]\w*):)?([0-9]+))*\s*)+$"
 jackoutputstereore = "^((LR|L|R)-&gt;(([a-zA-Z]\w*):)?([0-9]+)(,(([a-zA-Z]\w*):)?([0-9]+))*\s*)+$"
 jackinputmonoQregexp = QtCore.QRegularExpression(jackinputmonore)
@@ -451,14 +451,18 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         allrequired = False
         if not(group):
           group = QtWidgets.QTreeWidgetItem(self.treeApplications)
-          group.setText(0, "<xsl:value-of select="../short-title"/>")
+          group.setText(0, "<xsl:value-of select="../short-title"/>")          
           group.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
           group.setCheckState(0, QtCore.Qt.Unchecked)
+          group.setToolTip(0,"[optional] <xsl:value-of select="../title"/>")
+          group.setToolTip(1,"[optional] <xsl:value-of select="../title"/>")
           
         child = QtWidgets.QTreeWidgetItem(group)
         child.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         child.setText(0, "<xsl:value-of select="short-title"/>")
         child.setText(1, "<xsl:value-of select="@section-name"/>")
+        child.setToolTip(0,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
+        child.setToolTip(1,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
         if child.text(1) in sectionnames:
           child.setCheckState(0, QtCore.Qt.Checked)
           group.setCheckState(0, QtCore.Qt.Checked)
@@ -472,6 +476,8 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         parent = QtWidgets.QTreeWidgetItem(self.treeApplications)
         parent.setText(0, "<xsl:value-of select="short-title"/>")
         parent.setText(1, "<xsl:value-of select="@section-name"/>")
+        parent.setToolTip(0,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
+        parent.setToolTip(1,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
         parent.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
           <xsl:if test="@use = 'optional'">
         allrequired = False
