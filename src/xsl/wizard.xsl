@@ -697,7 +697,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
         
         from tmpl_wizard import SessionTemplate
         try:
-          SessionTemplate().fillInTemplate(conffile, datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager)
+          SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager, conffile=conffile)
           QtWidgets.QMessageBox.information(self,
                                             "Session creation ...",
                                             "The Session has been successfully created.")
