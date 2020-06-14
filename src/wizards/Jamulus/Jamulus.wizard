@@ -31,7 +31,9 @@ Select your applications to create a simple or a complex virtual studio setup ar
   <!-- PAGES -->
   <first-page id='First'>
     <title>Jamulus and related applications</title>
-    <description>This wizard let you create a session with Jamulus and other related applications.</description>
+    <description>This wizard let you create a session with Jamulus and other related applications.
+Please select the section you need to setup your virtual studio.
+    </description>
   </first-page>
   <!-- SINGLE PAGES -->
   <xi:include href='global_with_users.page'/>

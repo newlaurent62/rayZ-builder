@@ -16,7 +16,8 @@ Input the jack_capture settings you need and record your virtual studio output i
   <!-- PAGES -->
   <first-page id='First'>
     <title>Simple example with jack_capture program and alsaplayer</title>
-    <description>This wizard let you create a session with jack_capture.</description>
+    <description>This wizard let you create a session with jack_capture.
+Please select the section you need to setup your virtual studio.</description>
   </first-page>
   <!-- SINGLE PAGES -->
   <xi:include href='global.page'/>
