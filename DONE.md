@@ -10,24 +10,18 @@ see README.md for notes on rayZ development operations (Makefile targets)
 
 ## Resume
 
-### EXPERIMENTAL Interprocess communication with catia for the "go to app" feature 
+### Interprocess communication with catia for the "go to app" feature 
 
 Patch i've done in Catia-fork on github (in cadence from falkTX)
 
 It let you switch to application window related to the jackclient from catia.
 A context menu on jackclient boxes with useful app to switch to (the application related to the jackclient or raysession or other application).
 
-Synchronization is declarative, that means when you create a template with rayZ-builder, you declare the applications to load or switch to from catia:
+Windows switch is declarative, that means when you create a template with rayZ-builder, you declare the applications to load or switch to from catia:
 
-- During the session load, these metadatas are sent to catia in /tmp/catia. Catia polls the directory every 5 sec.
-- Metadatas are declared in the session.sh or session.sh snippets used to create the session. 
-  They are write to $session_path/default/metadata-jackclients.yml. It can be modified manually.
-  
-Would like to implement it with messages like
-ray_control client $clientID set_metadata name:value
-ray_control client $clientID get_metadata name
-
-The main problem with this implementation is that jack lib does not implement jack_client_get_pid function. So raysession clients has to register their pid to catia.
+- During the session load, those metadatas are sent to catia using ray_control. Catia polls ray_control every 5 sec for new sessions or closed sessions.
+- Metadatas are declared in the session.sh or session.sh snippets (in <client/> XML element) used to create the session. 
+  They are persisted using ray_control thus this does not work with nsm.
 
 ### session_sh supports nsmd and ray-daemon
 
