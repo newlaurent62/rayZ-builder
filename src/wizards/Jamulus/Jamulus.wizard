@@ -32,7 +32,7 @@ Select your applications to create a simple or a complex virtual studio setup ar
   <first-page id='First'>
     <title>Jamulus and related applications</title>
     <description>This wizard let you create a session with Jamulus and other related applications.
-Please select the section you need to setup your virtual studio.
+Please select the sections you need to setup in your virtual studio.
     </description>
   </first-page>
   <!-- SINGLE PAGES -->
