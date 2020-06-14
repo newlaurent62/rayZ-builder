@@ -172,14 +172,6 @@ if \$CHECK_PROGRAMS; then
   fi
 fi
 
-if \$USE_CATIA; then
-  mkdir -p /tmp/catia
-  RAY_SESSION_NAME="\$(basename "\$RAY_SESSION_PATH")"
-  echo "RAY_SESSION_PATH: \$RAY_SESSION_PATH"
-  echo "RAY_SESSION_NAME: \$RAY_SESSION_NAME"
-  perl -p -e "s/xxx-PORT-xxx/\$RAY_CONTROL_PORT/g" &lt; "\$RAY_SESSION_PATH/default/metadatas.yml" &gt; "/tmp/catia/\${RAY_SESSION_NAME}.yml" || exit 0
-fi
-
 # set this var true if you want all running clients to stop (see top of this file).
 clear_all_clients=false
 
