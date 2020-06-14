@@ -744,7 +744,7 @@ if __name__ == '__main__':
   layout = [QtWidgets.QWizard.CustomButton1, QtWidgets.QWizard.CustomButton2, QtWidgets.QWizard.BackButton, QtWidgets.QWizard.CancelButton, QtWidgets.QWizard.NextButton, QtWidgets.QWizard.FinishButton]
   wizard.setButtonLayout(layout);    
   wizard.setButtonText(QtWidgets.QWizard.CustomButton1, "Defaults")
-  wizard.setButtonText(QtWidgets.QWizard.CustomButton2, "Read wizard.conf")
+  wizard.setButtonText(QtWidgets.QWizard.CustomButton2, "Read conf")
   wizard.show()
   wizard.button(QtWidgets.QWizard.CustomButton1).clicked.connect(wizard.defaults)
   wizard.button(QtWidgets.QWizard.CustomButton2).clicked.connect(wizard.readData)
