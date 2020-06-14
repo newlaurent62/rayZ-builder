@@ -487,10 +487,6 @@ function init_session() {
   cp -r "\$filltemplate_dir/.local" "\$session_path/" || error
   echo "-------- .local dir copied "
 
-  echo  "sessionname:  \$session_name" &gt; "\$session_path/default/metadatas.yml"
-  echo  "port:         xxx-PORT-xxx" &gt;&gt; "\$session_path/default/metadatas.yml"
-  echo  "jackclients:" &gt;&gt; "\$session_path/default/metadatas.yml"
-
   mkdir -p "\$session_path/ray-scripts" || error  
 }
 
