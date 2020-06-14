@@ -56,3 +56,18 @@ fill the $(WIZARD) template from test-data inputs to generate an nsm session.
 
     make clean
 
+## Access to all installed wizards
+
+To Run rayZ-builder menu:
+
+    rayZ_wizards
+
+to start from a configuration file:
+
+    rayZ_wizards -c myJamulus.conf
+
+## Test catia, RaySession and rayZ-builder generated sessions
+    
+to quick test (export / make / make install and generate raysessions and nsm sessions)
+
+    make test-all

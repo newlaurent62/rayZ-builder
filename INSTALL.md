@@ -39,16 +39,4 @@ to uninstall it:
   
     make uninstall
 
-## Access to all installed wizards
-
-to run rayZ-builder menu:
-
-    rayZ_wizards
-
-
-## Test catia and rayZ-builder generated sessions
-    
-to quick test (export / make / make install and generate raysessions and nsm sessions)
-
-    make test-all
 
