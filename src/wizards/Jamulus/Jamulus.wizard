@@ -42,9 +42,9 @@ Please select the sections you need to setup in your virtual studio.
   <xi:include href='guitarix_for_jamulus.page'/>
   <xi:include href='pluginshost_for_jamulus.page'/>
   <xi:include href='jack_capture_for_jamulus.page'/>
-  <!-- GROUPS OF EXCLUSIVE PAGES / CAN ONLY HAVE ONE AT A TIME IN WIZARD-->
+  <!-- GROUPS OF EXCLUSIVE PAGES / CAN ONLY HAVE ONE PAGE AT A TIME IN WIZARD-->
   <page-group>
-    <title>Obs Streaming audio and video</title>
+    <title>Streaming audio or video using OBS studio</title>
     <short-title>Obs streaming</short-title>
     <description>Obs studio let you stream audio or video to icecast2, Facebook, Youtube and more !</description>
 <!--    <xi:include href='obs_for_jamulus_facebook.page'/> -->
