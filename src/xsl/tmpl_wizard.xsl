@@ -160,8 +160,15 @@ if __name__ == '__main__':
 <xsl:template match="copy-file" mode="build">
 
   
+    <xsl:choose>
+      <xsl:when test="ancestor::page/@section-name">
     section = "<xsl:value-of select="../../@section-name"/>"
-    if section == '' or section in data['wizard.sectionnamelist']:
+      </xsl:when>
+      <xsl:otherwise>
+    section = None
+      </xsl:otherwise>
+    </xsl:choose>
+    if not section or section in data['wizard.sectionnamelist']:
       destfilepath = outdir + os.sep + '<xsl:value-of select='@dest'/>'
       os.makedirs(os.path.dirname(destfilepath),exist_ok=True)    
       print ('---- Copy file to %s' % destfilepath)
@@ -171,16 +178,31 @@ if __name__ == '__main__':
 
 <xsl:template match="copy-tree" mode="build">
     
+    <xsl:choose>
+      <xsl:when test="ancestor::page/@section-name">
     section = "<xsl:value-of select="../../@section-name"/>"
-    if section == '' or section in data['wizard.sectionnamelist']:
+      </xsl:when>
+      <xsl:otherwise>
+    section = None
+      </xsl:otherwise>
+    </xsl:choose>
+    if not section or section in data['wizard.sectionnamelist']:
       destfilepath = outdir + os.sep + '<xsl:value-of select='@dest'/>'
       print ('---- Copy tree to %s' % destfilepath) 
       shutil.copytree(rayZtemplatedir + os.sep +  '<xsl:value-of select="@src"/>', destfilepath)
     
 </xsl:template>
-<xsl:template match="fill-template" mode="build">
+
+<xsl:template match="fill-template[@type != 'create-session' and @type != 'patch_xml']" mode="build">
+    <xsl:choose>
+      <xsl:when test="ancestor::page/@section-name">
     section = "<xsl:value-of select="../../@section-name"/>"
-    if section == '' or section in data['wizard.sectionnamelist']:
+      </xsl:when>
+      <xsl:otherwise>
+    section = None
+      </xsl:otherwise>
+    </xsl:choose>
+    if not section or section in data['wizard.sectionnamelist']:
       t = <xsl:value-of select='@id'/>()
       t.data = data
       destfilepath = outdir + os.sep + '<xsl:value-of select='@dest'/>'
@@ -190,7 +212,6 @@ if __name__ == '__main__':
       content=str(t)
       f.write(content)
       f.close()
-      os.chmod(destfilepath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
       
       <!-- FILE SYNTAX CHECK -->
       <xsl:choose>
@@ -202,6 +223,7 @@ if __name__ == '__main__':
         raise e
       </xsl:when>
       <xsl:when test="ends-with(@dest,'.sh')">
+      os.chmod(destfilepath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
       print ("---- %s checking shell script syntax" % destfilepath)
       shellcheck_create_command = ['bash', '-n', destfilepath]
       output = subprocess.check_call(shellcheck_create_command,stdout=sys.stdout)
@@ -210,8 +232,24 @@ if __name__ == '__main__':
       print ("---- %s generated" % destfilepath)
 </xsl:template>
 
+
 <xsl:template match="fill-template[@type='create-session']">
-    if not fillonly:
+    t = session_sh()
+    t.data = data
+    destfilepath = outdir + os.sep + '<xsl:value-of select="@dest"/>'
+    os.makedirs(os.path.dirname(destfilepath),exist_ok=True)
+    
+    f = open(destfilepath,"w+")
+    content=str(t)
+    f.write(content)
+    f.close()
+
+    os.chmod(destfilepath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+    print ("---- %s checking shell script syntax" % destfilepath)
+    shellcheck_create_command = ['bash', '-n', destfilepath]
+    output = subprocess.check_call(shellcheck_create_command,stdout=sys.stdout)
+
+    if not fillonly:      
       print ("---- Executing shell script %s " % (outdir + os.sep + '<xsl:value-of select="@dest"/>'))
       guioption = None
       if startgui:
@@ -247,14 +285,31 @@ if __name__ == '__main__':
       f.write(result)
       f.close()
     else:
+      t = patch_xml()
+      t.data = data
+      destfilepath = outdir + os.sep + 'default' + os.sep + "patch.xml"
+      os.makedirs(os.path.dirname(destfilepath),exist_ok=True)
+      
+      f = open(destfilepath,"w+")
+      
+      f = open(destfilepath,"w+")
+      content=str(t)
+      f.write(content)
+      f.close()
+
+      print ("---- %s : checking xml syntax " % destfilepath)
+      try:
+        doc = etree.XML(content.encode())
+      except lxml.etree.XMLSyntaxError as e:
+        raise e
+      
+      
       dest1 = outdir + os.sep + 'default' + os.sep + "patch.xml"
       dest2 = outdir + os.sep + '<xsl:value-of select='@dest'/>'
       if not os.path.samefile(dest1,dest2):
-        destfilepath = dest1
-        shutil.copy('<xsl:value-of select='@src'/>', destfilepath)
+        shutil.copy(dest1, dest2)
       
     print ("---- %s generated" % destfilepath)
 </xsl:template>
-
 
 </xsl:stylesheet>
