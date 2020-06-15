@@ -266,9 +266,7 @@ if __name__ == '__main__':
 
     destfilepath = ''
 
-    if session_manager == 'nsm':
-      os.remove(outdir + os.sep + '<xsl:value-of select='@dest'/>')
-      
+    if session_manager == 'nsm':      
       t = nsm_patch()
       t.data = data
       destfilepath = outdir + os.sep + 'default' + os.sep + "nsm_patch.jackpatch"
