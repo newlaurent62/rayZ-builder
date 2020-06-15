@@ -1,0 +1,12 @@
+
+#if 'jack' in $data['wizard.sectionnamelist']
+<script>
+USE_JACK=true
+USE_JACK_SETTINGS=true
+</script>
+#else
+<script>
+USE_JACK=true
+USE_JACK_SETTINGS=false
+</script>
+#end if
