@@ -647,6 +647,11 @@ echo "[==== <xsl:value-of select="section-name"/>"
 echo "]==== <xsl:value-of select="section-name"/>"
   
 </xsl:template>
+
+<xsl:template match="script" mode="copy-no-namesapces">
+<xsl:value-of select="."/>
+</xsl:template>
+
 <xsl:template match="client" mode="copy-no-namespaces">
 # assign clientID variable
 create_clientID add_proxy "<xsl:value-of select="command"/>" "<xsl:value-of select="label"/>"
@@ -677,11 +682,6 @@ set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:for-each
 <xsl:if test="nsm-protocol/prepare-proxy-dir">
 <xsl:apply-templates select="nsm-protocol/prepare-proxy-dir" mode="copy-no-namespaces"/>
 </xsl:if>
-
-<xsl:if test="script">
-<xsl:apply-templates select="script" mode="copy-no-namespaces"/>
-</xsl:if>
-
 </xsl:template>
 
 <xsl:template match="section-name" mode="copy-no-namespaces"/>

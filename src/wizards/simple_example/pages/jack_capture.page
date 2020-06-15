@@ -40,10 +40,10 @@
   <arguments>--session-name "alsaplayer-\$shortclientID" --output jack --fragsize $data['jack.period'] --frequency 48000 --realtime</arguments>
   <jack-name>alsaplayer-\$shortclientID</jack-name>
   <window-title-regexp>AlsaPlayer</window-title-regexp>
-  <script>
-  alsaplayername="alsaplayer-\$shortclientID"
-  </script>
 </client>
+<script>
+alsaplayername="alsaplayer-\$shortclientID"
+</script>
 <client 
     type="proxy" 
     icon="audio-recorder"

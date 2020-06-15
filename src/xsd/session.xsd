@@ -53,6 +53,7 @@
             <xsd:sequence>
               <xsd:element name="section-name" type="xsd:string"/>
               <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="script" type="xsd:string"/>
                 <xsd:element name="client">
                   <xsd:complexType>
                     <xsd:sequence>
@@ -99,7 +100,6 @@
                           </xsd:sequence>
                         </xsd:complexType>
                       </xsd:element>
-                      <xsd:element name="script" type="xsd:string" minOccurs="0"/>
                     </xsd:sequence>
                     <xsd:attribute name="xdg-config-home" type="xsd:string" use="optional"/>
                     <xsd:attribute name="save_signal" type="xsd:integer" use="required"/>
