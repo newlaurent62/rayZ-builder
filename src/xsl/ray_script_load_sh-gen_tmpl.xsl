@@ -59,16 +59,16 @@ function check_server_running() {
         then
           
           if ray_control script_user_action "It seems that \$1 is not running in systemd. This RaySession use it. Please start it using 'sudo systemctl start \$SERVICE'. Do you want to stop loading the session ?"; then
-            echo "The session load has been aborted by user."
-            ray_control script_info "The session load has been aborted by user."
+            echo "The session load has been aborted by the user."
+            ray_control script_info "The session load has been aborted by the user."
             exit 0
           fi
         fi
     else
         echo "\$1 does not exist in systemd."
         if ray_control script_user_action "It seems that \$1 is not installed in systemd. This RaySession use it. Please install it. Do you want to stop loading the session ?"; then
-          echo "The session load has been aborted by user."
-          ray_control script_info "The session load has been aborted by user."
+          echo "The session load has been aborted by the user."
+          ray_control script_info "The session load has been aborted by the user."
           exit 0
         fi
     fi
@@ -85,8 +85,8 @@ if \$USE_JACK; then
       echo "/get_deff"
       if [ "\$DIFF_JACK_PARAM" != "" ]; then
         if ray_control script_user_action "The jack settings of this ray session differs from the current jack settings ! If you choose ignore, the jack server will be restarted with the jack settings of this ray session otherwise if you click Yes, the session load will be stopped. Your choice ?"; then
-            echo "The session load has been aborted by user."
-            ray_control script_info "The session load has been aborted by user."
+            echo "The session load has been aborted by the user."
+            ray_control script_info "The session load has been aborted by the user."
             exit 0
         fi    
       fi
@@ -97,8 +97,8 @@ if \$USE_JACK; then
     jack_control status
     if [ $? -ne 0 ]; then      
       if ray_control script_user_action "The jack server is not started ! Please start it using qjackctl (or other software). Do you want to stop loading the session ?"; then
-        echo "The session load has been aborted by user."
-        ray_control script_info "The session load has been aborted by user."
+        echo "The session load has been aborted by the user."
+        ray_control script_info "The session load has been aborted by the user."
         exit 0
       fi
     fi
@@ -129,8 +129,8 @@ if \$CHECK_ADDITIONNAL_AUDIO_DEVICES; then
       fi
       if [ $? -eq 0 ]
       then
-        echo "The session load has been aborted by user."
-        ray_control script_info "The session load has been aborted by user."
+        echo "The session load has been aborted by the user."
+        ray_control script_info "The session load has been aborted by the user."
         exit 0
       fi
   fi
@@ -164,8 +164,8 @@ if \$CHECK_PROGRAMS; then
       fi
       if [ $? -eq 0 ]
       then
-        echo "The session load has been aborted by user."
-        ray_control script_info "The session load has been aborted by user."
+        echo "The session load has been aborted by the user."
+        ray_control script_info "The session load has been aborted by the user."
         exit 0
       fi
   fi
