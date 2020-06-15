@@ -21,7 +21,6 @@
     stop_signal="15" 
     wait_window="1" 
     no_save_level="2"
-    xdg-config-home=".config"
     with-gui="true">
   <name>jamulus server</name>
   <label>jamulus-server</label>
