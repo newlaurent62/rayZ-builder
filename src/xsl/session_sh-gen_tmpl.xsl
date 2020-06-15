@@ -445,7 +445,6 @@ function set_jackclient_properties() {
 function init_session() {
   USE_JACK=true
   USE_JACK_SETTINGS=true
-  USE_CATIA=true
   CHECK_ADDITIONNAL_AUDIO_DEVICES=true
   CHECK_SERVER=true
   CHECK_PROGRAMS=true
@@ -547,7 +546,6 @@ function end_session() {
   
   echo "USE_JACK=\$USE_JACK" &gt; "\$session_path/ray-scripts/.env" || error
   echo "USE_JACK_SETTINGS=\$USE_JACK_SETTINGS" &gt;&gt; "\$session_path/ray-scripts/.env" || error
-  echo "USE_CATIA=\$USE_CATIA" &gt;&gt; "\$session_path/ray-scripts/.env" || error
   echo "CHECK_ADDITIONNAL_AUDIO_DEVICES=\$CHECK_ADDITIONNAL_AUDIO_DEVICES" &gt;&gt; "\$session_path/ray-scripts/.env" || error
   echo "CHECK_SERVER=\$CHECK_SERVER" &gt;&gt; "\$session_path/ray-scripts/.env" || error
   echo "CHECK_PROGRAMS=\$CHECK_PROGRAMS" &gt;&gt; "\$session_path/ray-scripts/.env" || error
