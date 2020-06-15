@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- PAGE REQUIRED BECAUSE OF ALSAPLAYER PARAMETERS -->
 <page id='Jack' section-name='jack' use="required" xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Jack settings section</title>
   <short-title>Jack settings</short-title>
@@ -26,12 +28,13 @@
     <line-edit default-value="48000" blank-allowed="False"><regexp-validator type="custom" regexp="^48000$"/></line-edit>
   </field>
   <template-snippet ref-id="session_sh">
-    <!-- don't use jack_config_script from raysession to save and restore jack setup : It doesn't work -->
-echo "USE_JACK_SETTINGS=0" >> "\$session_path/ray-scripts/.env"
+<![CDATA[<script>
+USE_JACK=true
+USE_JACK_SETTINGS=true
+</script>
+]]>
   </template-snippet>
-  <!-- TEMPLATE DEFINITION APART FROM patch_xml and session_sh -->
   <template>
-    <!-- building default obs-studio configuration for icecast2_video_ts -->
     <fill-template id="jack_parameters" type="conf" dest="default/jack_parameters"/>
   </template>  
 </page>
