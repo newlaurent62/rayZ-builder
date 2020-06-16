@@ -137,7 +137,7 @@ function create_proxy() {
   done
 
   if [ "\$label" == "" ]; then
-    echo -e "\e[1m\e[31mThe label must set ! clientID: '\$clientID'\e[0m"
+    echo -e "\e[1m\e[31mThe label must be set ! clientID: '\$clientID'\e[0m"
     exit 1
   fi
 
@@ -456,9 +456,14 @@ function init_session() {
       ray_control new_session "\$session_name"  || error
 
       session_path="\$(ray_control get_session_path)" || error
-      
-      patchID="\$(ray_control add_executable ray-jackpatch no_start)"
-      
+
+      create_clientID add_executable "ray-jackpatch" "JACK Connections"
+      patchID="\$clientID"
+      set_client_properties --icon "curve-connector" \
+                            --launched 1 \
+                            --description "Manage save/restore jack conections." \
+                            --name "Jack Patch"
+      clientID=""
       ;;
     nsm)
       clientID="\$(generate_nsm_clientID)"
