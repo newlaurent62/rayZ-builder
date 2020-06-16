@@ -24,7 +24,7 @@
 #if len($data[$obssection + '.obs_connectedlist']) == 1
 <client 
     type="proxy" 
-    icon="obs"
+    icon="com.obsproject.Studio"
     launched="0"
     save_signal="0" 
     stop_signal="15" 
