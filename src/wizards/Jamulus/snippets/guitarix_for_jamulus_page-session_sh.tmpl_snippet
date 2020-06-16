@@ -4,7 +4,7 @@
 #for $username in $data['guitarix.userslist']
 <client 
     type="proxy" 
-    icon="guitarix"
+    icon="gx_head"
     launched="1"
     save_signal="0" 
     stop_signal="15" 
