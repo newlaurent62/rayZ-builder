@@ -25,7 +25,7 @@
     <label>Mount point</label>
     <line-edit default-value="/stream.ts" blank-allowed="False"><regexp-validator type="path"/></line-edit>
   </field>
-  <group id="obs_connected" display="ListCheckableH" list-id="global.userslist" min="0" max="1">
+  <group id="obs_connected" display="ListCheckableH" list-id="global.userslist" min="1" max="1">
     <label>Select the Jamulus user to stream</label>
   </group>
   
@@ -45,7 +45,7 @@
     <!-- building default obs-studio configuration for icecast2_video_ts -->
     <copy-tree src="default/obs-studio" dest="default/obs-studio-icecast2_video_ts"/>
     <fill-template id="obs_scene_ts_json" type="conf"  dest="default/obs-studio-icecast2_video_ts/basic/scenes/icecast2_video_ts.json"/>
-    <fill-template id="obs_profile_basic_ini" type="conf" dest="default/obs-studio-icecast2_video_ts/basic/profiles/icecast2_video_ts/basic.ini"/>
+    <fill-template id="obs_profile_basic_ini_video_ts" type="conf" dest="default/obs-studio-icecast2_video_ts/basic/profiles/icecast2_video_ts/basic.ini"/>
     <fill-template id="obs_global_ini" type="conf" dest="default/obs-studio-icecast2_video_ts/global.ini"/>
   </template>  
 

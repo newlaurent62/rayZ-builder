@@ -594,7 +594,7 @@ class CCheckableTabWidget(QtWidgets.QTabWidget, UI):
     return tabnames
   
 class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
-  def __init__(self, groupnamelist, componentlist,sectionName=None, headerlist=None,parent=None, key=None, display='TabH'):
+  def __init__(self, groupnamelist, componentlist,sectionName=None, minChecked=None, maxChecked=None, headerlist=None,parent=None, key=None, display='TabH'):
     super(CGroupOfComponentWidget, self).__init__(parent)
     self.componentlist = componentlist
     self.display = display
@@ -602,10 +602,12 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
     self.groupnamelist = groupnamelist
     self.setSectionName(sectionName)
     self.key = key
-    self.checkcount = {}
+    self.checkcountByKey = {}
     self.componentlistDict = {}
     self.groupnamelabellist = []
     self.groupnamecheckboxlist = []
+    self.minChecked = minChecked
+    self.maxChecked = maxChecked
     
     layout = None
     if 'Tab' in self.display:
@@ -656,7 +658,7 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
   
   def initialize(self, groupnamelist):      
     self.groupnamelist = groupnamelist
-    self.checkcount = {}
+    self.checkcountByKey = {}
     self.componentlistDict = {}
     self.groupnamelabellist = []
     self.groupnamecheckboxlist = []    
@@ -779,35 +781,48 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
       
     layout.addWidget(self.tabs)
 
-  def component(self, key):
-    for component in self.componenlist:
-      if component.key == key:
-        return component
+  def text(self):
+    return self.key
+  
+  def getComponentByKey(self, key):
+    if key == self.key:
+      return self
+    else:
+      for component in self.componenlist:
+        if component.key == key:
+          return component
     raise Exception('The component with key "%s" has not been found !' % key)
 
   # header and component have the same order
-  def header(self, key):
-    for i in range(len(self.componenlist)):
-      if component[i].key == key:
-        return self.headerlist[i]
+  def getHeaderByKey(self, key):
+    if key == self.key:
+      return self
+    else:
+      for i in range(len(self.componenlist)):
+        if component[i].key == key:
+          return self.headerlist[i]
     raise Exception('The component with key "%s" has not been found !' % key)
   
   def message(self, message):
-    dialog = QMessageBox()
-    dialog.setIcon(QMessageBox.Critical)
+    dialog = QtWidgets.QMessageBox(self)
+    dialog.setIcon(QtWidgets.QMessageBox.Critical)
     dialog.setText("Input error: %s" % message)
-    dialog.addButton(QMessageBox.Ok)
+    dialog.addButton(QtWidgets.QMessageBox.Ok)
     dialog.exec()
     
   def hasAcceptableInput(self):
-    hasAcceptableInput = True
-    checkedcount = {}
+    print ("[==== hasAcceptableInput")
+    boolhasAcceptableInput = True
+    checkcountByKey = {}
     
     if self.componentlist:
       for component in self.componentlist:
         if isinstance(component, CCheckBox):
-          checkedcount[component.key] = 0
+          checkcountByKey[component.key] = 0
         
+    if self.minChecked or self.maxChecked:
+      checkcountByKey[self.key] = len(self.groupnameCheckedlist())
+
     if self.groupnamelist:
       for i in range(len(self.groupnamelist)):
         groupname = self.groupnamelist[i]
@@ -816,11 +831,13 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
         for j in range(len(componentlist)):
           component = componentlist[j]
           if isinstance(component, CCheckBox) and component.isChecked():
-            checkedcount[component.key] += 1
+            checkcountByKey[component.key] += 1
           
-          if isinstance(component, CLineEdit) and component.hasAcceptableInput():
+          if isinstance(component, CLineEdit) and not component.hasAcceptableInput():
             if 'Tab' in self.display:
               self.tabs.setTabText(i, groupname + ' X Error')
+            pagehasAcceptableInput = False
+              
           # if list display we don't display information on each subgroup as all the information are display on a single tab
             #elif 'List' in self.display:
               #self.groupnamelabellist[i].setText(groupname + ' ' + ' X')
@@ -833,21 +850,32 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
           #elif 'List' in self.display:
             #self.groupnamelabellist[i].setText(groupname + ' ' + u'\u2713')
         else:
-          hasAcceptableInput = False
+          boolhasAcceptableInput = False
     
-    for key in checkedcount:
-      component = component(key)
-      if (not component.minChecked or checkedcount[key] < component.minChecked) and (not component.maxChecked or checkedcount[key] > component.maxChecked):
-        if component.minChecked and component.maxChecked:
-          self.message('You must select between %d and %d elements for %s' % (component.minChecked, component.maxChecked, header(key).text()))
-        if component.minChecked and not component.maxChecked:
-          self.message('You must select a minimum of %d elements for %s' % (component.minChecked, header(key).text()))
-        if not component.minChecked and component.maxChecked:
-          self.message('You must select a maximum of %d elements for %s' % (component.maxChecked, header(key).text()))
-        hasAcceptableInput = False
-        break;
+    if boolhasAcceptableInput:
+      for key in checkcountByKey:
+        print ('key %s : %d' % (key, checkcountByKey[key]))
+        component = self.getComponentByKey(key)
+        if component.minChecked and component.maxChecked and component.minChecked == component.maxChecked and checkcountByKey[key] != component.minChecked:
+          self.message('You must select %d elements for %s' % (component.maxChecked, self.getHeaderByKey(key).text()))
+          boolhasAcceptableInput = False
+          break;
+        if component.minChecked and component.maxChecked and (checkcountByKey[key] < component.minChecked or checkcountByKey[key] > component.maxChecked):
+          self.message('You must select between %d and %d elements for %s' % (component.minChecked, component.maxChecked, self.getHeaderByKey(key).text()))
+          boolhasAcceptableInput = False
+          break;
+        if component.minChecked and not component.maxChecked and checkcountByKey[key] < component.minChecked:
+          self.message('You must select a minimum of %d elements for %s' % (component.minChecked, self.getHeaderByKey(key).text()))
+          boolhasAcceptableInput = False
+          break;
+        if not component.minChecked and component.maxChecked and checkcountByKey[key] > component.maxChecked:
+          self.message('You must select a maximum of %d elements for %s' % (component.maxChecked, self.getHeaderByKey(key).text()))
+          boolhasAcceptableInput = False
+          break;
     
-    return hasAcceptableInput
+    print ('min: %s, max: %s hasAcceptableInput: %s' % (str(self.minChecked), str(self.maxChecked), str(boolhasAcceptableInput)))
+    print ("]==== hasAcceptableInput")
+    return boolhasAcceptableInput
       
     
   def readData(self, config, datamodel, keyprefix=''):
