@@ -1,0 +1,55 @@
+#if 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] 
+#set obssection = 'obs_icecast2_audio'
+#set streamingtype = 'icecast2_audio_mp3'
+#elif 'obs_icecast2_video' in $data['wizard.sectionnamelist']
+#set obssection = 'obs_icecast2_video'
+#set streamingtype = 'icecast2_video_ts'
+#end if
+
+[General]
+Name=${streamingtype}
+
+[Twitch]
+AddonChoice=3
+
+[Video]
+BaseCX=1920
+BaseCY=1080
+OutputCX=1280
+OutputCY=720
+
+[Panels]
+CookieId=6F277F2B39AE8BDD
+
+[Output]
+Mode=Advanced
+
+[AdvOut]
+TrackIndex=1
+RecType=FFmpeg
+RecTracks=1
+FLVTrack=1
+FFOutputToFile=false
+FFURL=icecast://$data[$obssection + '.source']:$data[$obssection + '.password']@$data[$obssection + '.server']:$data[$obssection + '.port']$data[$obssection + '.mount']
+FFFormat=mpegts
+FFFormatMimeType=video/MP2T
+FFExtension=ts
+FFVEncoderId=27
+FFVEncoder=libx264
+FFABitrate=320
+FFAEncoderId=86018
+FFAEncoder=aac
+FFAudioMixes=1
+FFIgnoreCompat=true
+FFACustom=
+FFMCustom=content_type=video/m2ts
+FFVCustom=
+FFVBitrate=2500
+FFRescale=false
+FFVGOPSize=250
+FFRescaleRes=1280x720
+
+[Audio]
+MonitoringDeviceName=default
+MonitoringDeviceId=default
+
