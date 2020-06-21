@@ -684,6 +684,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
       
       datamodel = self.wizard().datamodel
       if not (datamodel.sessionNameAlreadyUsed()):
+        QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
         self.wizard().writeConf()
         
         tmpdir = tempfile.mkdtemp()      
@@ -704,6 +705,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
         from tmpl_wizard import SessionTemplate
         try:
           SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager, conffile=conffile)
+          QtWidgets.QApplication.restoreOverrideCursor()
           QtWidgets.QMessageBox.information(self,
                                             "Session creation ...",
                                             "The Session has been successfully created.")
@@ -712,6 +714,7 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
           traceback.print_exc()
           print("Exception: {}".format(type(exception).__name__))
           print("Exception message: {}".format(exception))          
+          QtWidgets.QApplication.restoreOverrideCursor()
           QtWidgets.QMessageBox.critical(self,
                                             "Session creation ...",
                                             "An error occured during the creation process (see logs for more details)")
@@ -914,7 +917,7 @@ __init_create_instance RULES
         headers=[]
         self._label_<xsl:value-of select='@id'/> = CLabel('<xsl:value-of select='label'/>')
         <xsl:apply-templates select="field" mode="__init__create_instance"/>
-        self._<xsl:value-of select='@id'/> = CGroupOfComponentWidget(None, fields,sectionName=self.sectionName, headerlist=headers,key='<xsl:value-of select='@id'/>', display='<xsl:value-of select='@display'/>')
+        self._<xsl:value-of select='@id'/> = CGroupOfComponentWidget(None, fields,sectionName=self.sectionName, headerlist=headers<xsl:if test="@min">,minChecked=<xsl:value-of select="@min"/></xsl:if><xsl:if test="@max">,maxChecked=<xsl:value-of select="@max"/></xsl:if>,key='<xsl:value-of select='@id'/>', display='<xsl:value-of select='@display'/>')
 </xsl:template>
 
 <xsl:template match="field" mode="__init__create_instance">
