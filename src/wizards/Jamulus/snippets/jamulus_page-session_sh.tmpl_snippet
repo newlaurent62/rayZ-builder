@@ -62,5 +62,9 @@
     </prepare-proxy-dir>
   </nsm-protocol>
 </client>
+<script>
+generate_file_from_template "jamulus_ini" "{'username': '$username'}" "\$proxy_dir/.config/Jamulus/${username}.ini" || error
+
+</script>
 #end for
 #end if

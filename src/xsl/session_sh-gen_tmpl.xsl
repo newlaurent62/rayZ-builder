@@ -2,13 +2,39 @@
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="text" encoding="utf-8" indent="yes" />
 <xsl:template match="/session">#!/bin/bash
-#!/bin/bash
-#
-# $1 : new_session_name
-# $2 : copy the fill in config files to the new raysession name
-# $3 : gui | nogui : start the raysession gui at the end of the creation process
+# Parameters
+session_name="\$1"
+filltemplate_dir="\$2"
+startgui="\$4"
+SESSION_MANAGER="\$3"
+rayZ_templatedir="\$5"
 
 clientCount=0
+
+######
+# 1 : template id
+# 2 : data
+# 3 : destination file
+function generate_file_from_template() {
+python3 &lt;&lt;EOF_python_template
+import sys
+import os
+sys.path.append("\$rayZ_templatedir")
+from \$1 import \$1
+
+t = \$1()
+t.data = \$2
+destfilepath = '\$session_path' + os.sep + '\$3'
+os.makedirs(os.path.dirname(destfilepath),exist_ok=True)    
+
+f = open(destfilepath,"w+")
+content=str(t)
+f.write(content)
+f.close()
+EOF_python_template
+}
+
+
 
 function generate_nsm_clientID() {
 python3 &lt;&lt;EOF_python_nsm
@@ -587,20 +613,30 @@ function error() {
   exit 1
 }
 
-if [ $# -ne 4 ]
+################################################################"
+# MAIN
+#
+
+if [ $# -ne 5 ]
 then
   echo "Usage:"
   echo "  session.sh NEW_RAYSESSION_NAME TEMPLATE_DIR ray_control|ray_xml|nsm gui|nogui"
   exit 1
 fi
 
-session_name="\$1"
-filltemplate_dir="\$2"
-startgui="\$4"
-SESSION_MANAGER="\$3"
+if [ ! -d "\$rayZ_templatedir" ]; then
+  echo "'\$rayZ_templatedir' is not a directory !"
+  error
+fi
+
+if [ ! -d "\$filltemplate_dir" ]; then
+  echo "'\$filltemplate_dir' is not a directory !"
+  error
+fi
 
 set_session_root_and_path
 
+echo "------ rayZ_templatedir: \$rayZ_templatedir"
 echo "------ filltemplate_dir: \$filltemplate_dir"
 echo "------ session_path: \$session_path"
 echo "------ \$startgui"

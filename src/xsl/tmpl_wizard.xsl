@@ -33,10 +33,7 @@ class SessionTemplate:
 
     if not os.path.isdir(outdir):
       raise Exception('outdir "%s" must be a directory !' % outdir)
-    
-    if os.path.isdir(rayZtemplatedir + os.sep + 'tmpl'):
-      sys.path.append(rayZtemplatedir + os.sep + 'tmpl')
-    
+        
     srcpath = rayZtemplatedir + os.sep + 'default'
     if os.path.isdir(srcpath):
       destfilepath = outdir + os.sep + 'default'
@@ -256,7 +253,7 @@ if __name__ == '__main__':
         guioption = 'gui'
       else:
         guioption = 'nogui'
-      raysession_create_command = [outdir + os.sep + '<xsl:value-of select='@dest'/>', session_name, outdir, session_manager, guioption]
+      raysession_create_command = [outdir + os.sep + '<xsl:value-of select='@dest'/>', session_name, outdir, session_manager, guioption, rayZtemplatedir]
       
       output = subprocess.check_call(raysession_create_command,stdout=sys.stdout)
     return True
