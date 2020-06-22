@@ -781,9 +781,6 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
       
     layout.addWidget(self.tabs)
 
-  def text(self):
-    return self.key
-  
   def getComponentByKey(self, key):
     if key == self.key:
       return self
@@ -857,19 +854,19 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
         print ('key %s : %d' % (key, checkcountByKey[key]))
         component = self.getComponentByKey(key)
         if component.minChecked and component.maxChecked and component.minChecked == component.maxChecked and checkcountByKey[key] != component.minChecked:
-          self.message('You must select %d elements for %s' % (component.maxChecked, self.getHeaderByKey(key).text()))
+          self.message('You must select %d elements for %s' % (component.maxChecked, key))
           boolhasAcceptableInput = False
           break;
         if component.minChecked and component.maxChecked and (checkcountByKey[key] < component.minChecked or checkcountByKey[key] > component.maxChecked):
-          self.message('You must select between %d and %d elements for %s' % (component.minChecked, component.maxChecked, self.getHeaderByKey(key).text()))
+          self.message('You must select between %d and %d elements for %s' % (component.minChecked, component.maxChecked, key))
           boolhasAcceptableInput = False
           break;
         if component.minChecked and not component.maxChecked and checkcountByKey[key] < component.minChecked:
-          self.message('You must select a minimum of %d elements for %s' % (component.minChecked, self.getHeaderByKey(key).text()))
+          self.message('You must select a minimum of %d elements for %s' % (component.minChecked, key))
           boolhasAcceptableInput = False
           break;
         if not component.minChecked and component.maxChecked and checkcountByKey[key] > component.maxChecked:
-          self.message('You must select a maximum of %d elements for %s' % (component.maxChecked, self.getHeaderByKey(key).text()))
+          self.message('You must select a maximum of %d elements for %s' % (component.maxChecked, key))
           boolhasAcceptableInput = False
           break;
     
