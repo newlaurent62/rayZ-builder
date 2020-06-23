@@ -28,8 +28,14 @@
   <group id="obs_connected" display="ListCheckableH" list-id="global.userslist" min="1" max="1">
     <label>Select the Jamulus user to stream</label>
   </group>
-  
   <set id="streaming_type" value="icecast2_video_ts"/>
+  <template-snippet ref-id="ray_script_load_sh">
+#if 'obs_icecast2_video' in $data['wizard.sectionnamelist']
+#set server = $data['obs_icecast2_video.server']
+#set port = $data['obs_icecast2_video.port']
+<xi:include href="obs_for_jamulus_page-ray_script_load_sh.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
   <template-snippet ref-id="session_sh">
 #if 'obs_icecast2_video' in $data['wizard.sectionnamelist']  
 <xi:include href="obs_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>

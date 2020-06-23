@@ -32,6 +32,13 @@
   <set id="streaming_type" value="icecast2_audio_mp3"/>
   
   <!-- TEMPLATE SNIPPETS -->
+  <template-snippet ref-id="ray_script_load_sh">
+#if 'obs_icecast2_audio' in $data['wizard.sectionnamelist']
+#set server = $data['obs_icecast2_audio.server']
+#set port = $data['obs_icecast2_audio.port']
+<xi:include href="obs_for_jamulus_page-ray_script_load_sh.tmpl_snippet" parse="text"/>
+#end if
+  </template-snippet>
   <template-snippet ref-id="session_sh">
 #if 'obs_icecast2_audio' in $data['wizard.sectionnamelist']
 <xi:include href="obs_for_jamulus_page-session_sh.tmpl_snippet" parse="text"/>
