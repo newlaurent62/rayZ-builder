@@ -58,7 +58,7 @@ function check_server_running() {
         if [ "\$(systemctl status \$SERVICE | grep "active (running)")" == "" ]
         then
           
-          if ray_control script_user_action "It seems that \$1 is not running in systemd. This RaySession use it. Please start it using 'sudo systemctl start \$SERVICE'. Do you want to stop loading the session ?"; then
+          if ray_control script_user_action "It seems that \$1 is not running in systemd. This session use it. Please start it using 'sudo systemctl start \$SERVICE'. Do you want to stop loading the session ?"; then
             echo "The session load has been aborted by the user."
             ray_control script_info "The session load has been aborted by the user."
             exit 0
@@ -66,7 +66,7 @@ function check_server_running() {
         fi
     else
         echo "\$1 does not exist in systemd."
-        if ray_control script_user_action "It seems that \$1 is not installed in systemd. This RaySession use it. Please install it. Do you want to stop loading the session ?"; then
+        if ray_control script_user_action "It seems that \$1 is not installed in systemd. This session use it. Please install it. Do you want to stop loading the session ?"; then
           echo "The session load has been aborted by the user."
           ray_control script_info "The session load has been aborted by the user."
           exit 0
@@ -110,9 +110,9 @@ if \$CHECK_PROGRAMS; then
   then
     if [ \$count -gt 1 ]
     then
-      ray_control script_user_action "\$missing_executables are missing on this system or are not in the PATH. They are used by this RaySession. Do you want to stop loading the session ?"
+      ray_control script_user_action "\$missing_executables are missing on this system or are not in the PATH. They are used by this session. Do you want to stop loading the session ?"
     else
-      ray_control script_user_action "\$missing_executables is missing on this system or is not in the PATH. It is used by this RaySession. Do you want to stop loading the session ?"      
+      ray_control script_user_action "\$missing_executables is missing on this system or is not in the PATH. It is used by this session. Do you want to stop loading the session ?"      
     fi
     if [ $? -eq 0 ]
     then
@@ -179,10 +179,10 @@ if \$CHECK_ADDITIONNAL_AUDIO_DEVICES; then
       if [ \$count -gt 1 ]
       then
         echo -e "\e[31mMissing device \$missing_devices\e[0m"
-        ray_control script_user_action "\$missing_devices audio devices are missing on this system. They are used by this RaySession. Do you want to stop loading the session ?"
+        ray_control script_user_action "\$missing_devices audio devices are missing on this system. They are used by this session. Do you want to stop loading the session ?"
       else
         echo -e "\e[31mMissing devices \$missing_devices\e[0m"
-        ray_control script_user_action "\$missing_devices audio device is missing on this system. It is used by this RaySession. Do you want to stop loading the session ?"
+        ray_control script_user_action "\$missing_devices audio device is missing on this system. It is used by this session. Do you want to stop loading the session ?"
       fi
       if [ $? -eq 0 ]
       then

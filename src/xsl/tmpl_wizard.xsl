@@ -157,7 +157,7 @@ if __name__ == '__main__':
   tmpdir = tempfile.mkdtemp()
   
   if SessionTemplate().fillInTemplate(datamodelfile, rayZtemplatedir, tmpdir, fillonly=fillonly, startgui=startgui, session_manager=session_manager, debug=_debug) == 0:          
-    print('The RaySession has been successfully created.')
+    print('The session has been successfully created.')
   
 </xsl:template>
 
