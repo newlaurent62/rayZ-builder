@@ -178,7 +178,6 @@ class CJackModelAction(CModelAction):
     for m in self.inputsre.finditer(content):
       device = 'system'
       temp=[]
-      #print(m.groups())
       for i in range(len (m.groups())+1):
         match = m.group(i)
         if match != None:             
@@ -206,7 +205,6 @@ class CJackModelAction(CModelAction):
     for m in self.outputsre.finditer(content):
       currenttype = None
       device = 'system'
-      #print(m.groups())    
       for i in range(len (m.groups())+1):
         match = m.group(i)
         if match != None:
@@ -272,6 +270,9 @@ class CCheckBox(QtWidgets.QCheckBox, UI):
     if value and value.lower() == 'true':
       self.setCheckState(QtCore.Qt.Checked)
     
+    if not value:
+      self.defaults()
+    
   def updateData(self, config, datamodel, keyprefix=''):
     key = keyprefix + '.' + self.key
     if keyprefix == '':
@@ -280,7 +281,6 @@ class CCheckBox(QtWidgets.QCheckBox, UI):
     config[self.sectionName()][key] = str(self.isChecked())
     
   def defaults(self):
-    print ('defaultvalue:' + str(self.defaultvalue))
     if self.defaultvalue:
       self.setCheckState(QtCore.Qt.Checked)
     else:
@@ -313,7 +313,6 @@ class CComboBox(QtWidgets.QComboBox, UI):
     return combo
   
   def defaults(self):
-    print ('defaultvalue:' + str(self.defaultvalue))
     index = self.findText(self.defaultvalue, QtCore.Qt.MatchFixedString)
     if index >= 0:
       self.setCurrentIndex(index)
@@ -328,7 +327,7 @@ class CComboBox(QtWidgets.QComboBox, UI):
       if index >= 0:
         self.setCurrentIndex(index)
     else:
-      self.lineEdit.setText('')
+      self.defaults()
     
   def updateData(self, config, datamodel, keyprefix=''):
     key = self.key
@@ -402,7 +401,7 @@ class CListWidget(QtWidgets.QListWidget, UI):
       else:
         raise Exception('Unknown selection mode ! ("multiple" or "single") only')
     else:
-      self.setCurrentIndex(0)
+      self.defaults()
     
   def updateData(self, config, datamodel, keyprefix=''):
     key = self.key
@@ -463,9 +462,9 @@ class CLineEdit(QtWidgets.QWidget, UI):
           
   def check(self,input):
     self.setText(input)
-    self.printcheck(self.hasAcceptableInput())
+    self.displayCheck(self.hasAcceptableInput())
   
-  def printcheck(self, hasAcceptableInput):
+  def displayCheck(self, hasAcceptableInput):
     if hasAcceptableInput:
       self.labelCheck.setText(u'\u2713')
       self.labelCheck.setStyleSheet("color: green;font-weight: bold;")
@@ -487,9 +486,9 @@ class CLineEdit(QtWidgets.QWidget, UI):
 
   def hasAcceptableInput(self):
     if self.blankAllowed and self.text() == '':
-      self.printcheck(True)
+      self.displayCheck(True)
       return True
-    self.printcheck(self.lineEdit.hasAcceptableInput())
+    self.displayCheck(self.lineEdit.hasAcceptableInput())
     return self.lineEdit.hasAcceptableInput()
       
   def text(self):
@@ -528,7 +527,7 @@ class CLineEdit(QtWidgets.QWidget, UI):
     if key in config[self.sectionName()]:
       self.lineEdit.setText(config[self.sectionName()][key])
     else:
-      self.lineEdit.setText('')
+      self.defaults()
     
   def updateData(self, config, datamodel, keyprefix=''):
     key = self.key
@@ -548,7 +547,6 @@ class CLineEdit(QtWidgets.QWidget, UI):
       validator.setDatamodel(datamodel)
 
   def defaults(self):
-    print ('defaultvalue:' + str(self.defaultvalue))
     self.lineEdit.setText(self.defaultvalue)
 
   def initialize(self):
@@ -716,7 +714,7 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
         if self.display.endswith('H'):
           gridlayout.addWidget(component, currentrow, i+1)
         else:
-          gridlayout.addWidget(self.headerlist[i], currentrow, 0)
+          gridlayout.addWidget(self.headerlist[i].copyUI(parent=self), currentrow, 0)
           currentrow += 1
           gridlayout.addWidget(component, currentrow, 0)
           gridlayout.setRowStretch(currentrow,0);
@@ -756,7 +754,7 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
     for j in range(len(groupnamelist)):        
       mylist = []
       currentrow = 0
-      gridlayout = QtWidgets.QGridLayout(self)
+      gridlayout = QtWidgets.QGridLayout()
       if self.display.endswith('H') and self.headerlist:
         for i in range(len(self.headerlist)):
           gridlayout.addWidget(self.headerlist[i].copyUI(parent=self), 0, i+1)
@@ -774,7 +772,7 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
         mylist.append(component)
       self.componentlistDict[groupnamelist[j]] = mylist
       playout = self.pages[j].layout()
-      if layout:
+      if playout:
         playout.addLayout(gridlayout)
       else:
         self.pages[j].setLayout(gridlayout)
@@ -808,7 +806,6 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
     dialog.exec()
     
   def hasAcceptableInput(self):
-    print ("[==== hasAcceptableInput")
     boolhasAcceptableInput = True
     checkcountByKey = {}
     
@@ -851,7 +848,6 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
     
     if boolhasAcceptableInput:
       for key in checkcountByKey:
-        print ('key %s : %d' % (key, checkcountByKey[key]))
         component = self.getComponentByKey(key)
         if component.minChecked and component.maxChecked and component.minChecked == component.maxChecked and checkcountByKey[key] != component.minChecked:
           self.message('You must select %d elements for %s' % (component.maxChecked, key))
@@ -870,8 +866,6 @@ class CGroupOfComponentWidget(QtWidgets.QWidget, UI):
           boolhasAcceptableInput = False
           break;
     
-    print ('min: %s, max: %s hasAcceptableInput: %s' % (str(self.minChecked), str(self.maxChecked), str(boolhasAcceptableInput)))
-    print ("]==== hasAcceptableInput")
     return boolhasAcceptableInput
       
     
@@ -967,9 +961,7 @@ class CListOfComboBox(QtWidgets.QWidget, UI):
   def hasAcceptableInput(self):
     return True
 
-  def readData(self, config, datamodel, keyprefix=''):
-    print('Reading ' + self.key + '...')
-    
+  def readData(self, config, datamodel, keyprefix=''):    
     key = self.key
     if keyprefix!='':
       key = keyprefix + '.' + self.key
@@ -977,17 +969,18 @@ class CListOfComboBox(QtWidgets.QWidget, UI):
     values = []
     if key in config[self.sectionName()]:
       values = config[self.sectionName()][key]
-    
-    if values:
-      listOfValues =  values.split(self.seperator)
-      for i in range(min(len(listOfValues),self.count)):
-        if self.ignoreblank and listOfValues[i].strip() != '':
-          combo = self.combolist[i]
-          index = combo.findText(listOfValues[i], QtCore.Qt.MatchFixedString)
-          if index >= 0:
-            combo.setCurrentIndex(index)
-          else:
-            combo.setCurrentIndex(0)
+      if values:
+        listOfValues =  values.split(self.seperator)
+        for i in range(min(len(listOfValues),self.count)):
+          if self.ignoreblank and listOfValues[i].strip() != '':
+            combo = self.combolist[i]
+            index = combo.findText(listOfValues[i], QtCore.Qt.MatchFixedString)
+            if index >= 0:
+              combo.setCurrentIndex(index)
+            else:
+              combo.setCurrentIndex(0)
+    else:
+      self.defaults()
   
   def defaults(self):
     values = self.defaultvalue
@@ -1005,7 +998,6 @@ class CListOfComboBox(QtWidgets.QWidget, UI):
     
     
   def updateData(self, config, datamodel, keyprefix=''):
-    print('Updating ' + self.key + '...')
     key = self.key
     if keyprefix!='':
       key = keyprefix + '.' + self.key
@@ -1058,29 +1050,22 @@ class CRadioButtonDelegate(QtWidgets.QStyledItemDelegate):
     return value
 
 def clearLayout(layout):
-  print ("<clearLayout>")
-  print("-- -- input layout: "+str(layout))
   for i in reversed(range(layout.count())):
     layoutItem = layout.itemAt(i)
     if layoutItem.widget() is not None:
         widgetToRemove = layoutItem.widget()
-        print("found widget: " + str(widgetToRemove))
         widgetToRemove.setParent(None)
         layout.removeWidget(widgetToRemove)
     elif layoutItem.spacerItem() is not None:
-        print("found spacer: " + str(layoutItem.spacerItem()))
+        pass
     else:
         layoutToRemove = layout.itemAt(i)
-        print("-- found Layout: "+str(layoutToRemove))
         clearLayout(layoutToRemove)
-  print ("</clearLayout>")
   
 def printWidget(widget, prefix=''):
-  print ("<printWidget>")
   print (str(widget))
   layout = widget.layout()  
   printLayout(layout)
-  print ("</printWidget>")
   
 def printLayout(layout):
   if layout:
