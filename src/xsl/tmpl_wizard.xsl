@@ -126,7 +126,7 @@ if __name__ == '__main__':
   session_manager= 'ray_control'
   import sys
   try:                                
-    opts, args = getopt.getopt(sys.argv[1:], "ht:j:dfs:", ["help", "read-json-file=","rayZ-template-dir=","fill-only","start-gui","session-manager="])
+    opts, args = getopt.getopt(sys.argv[1:], "hj:dt:fsm:", ["help", "read-json-file=","debug", "rayZ-template-dir=","fill-only","start-gui","session-manager="])
     print ("optlist: ")
     print(opts)
   except getopt.GetoptError:          
