@@ -8,6 +8,8 @@ import os
 import xml.etree.ElementTree as ET
 import configparser
 
+_debug = False
+
 # Subclass QMainWindow to customise your application's main window
 class MainWindow(QtWidgets.QWidget):
 
@@ -126,8 +128,7 @@ if __name__ == '__main__':
       usage()                     
       sys.exit()                  
     elif opt in ('-d', "--debug"):
-      global _debug               
-      _debug = 1               
+      _debug = False              
     elif opt in ("-m", "--session-manager"):
       session_manager = arg
       if session_manager not in ('ray_control', 'nsm'):

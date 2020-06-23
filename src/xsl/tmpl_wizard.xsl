@@ -15,8 +15,8 @@ import lxml
 
 class SessionTemplate:
     
-  def fillInTemplate(self, datamodelfile, rayZtemplatedir, outdir, fillonly=False, startgui=False, session_manager=None, conffile=None):
-    
+  def fillInTemplate(self, datamodelfile, rayZtemplatedir, outdir, fillonly=False, startgui=False, session_manager=None, conffile=None, debug=None):
+    print ('[==== fillInTemplate:')
     if not os.path.isfile(rayZtemplatedir + os.sep + "info_wizard.xml"):
       raise Exception('%s is not a rayZtemplatedir !' % rayZtemplatedir)
     
@@ -38,26 +38,32 @@ class SessionTemplate:
     if os.path.isdir(srcpath):
       destfilepath = outdir + os.sep + 'default'
       shutil.copytree(srcpath, destfilepath)
-      print ("-- Copy default dir from rayZtemplatedir in temporary dir")
+      if debug:
+        print ("-- Copy default dir from rayZtemplatedir in temporary dir")
     else:
-      print ('-- no default dir found in ' + rayZtemplatedir)
+      if debug:
+        print ('-- no default dir found in ' + rayZtemplatedir)
 
     srcpath = rayZtemplatedir + os.sep + 'local'
     if os.path.isdir(srcpath):
       destfilepath = outdir + os.sep + '.local'
       shutil.copytree(srcpath, destfilepath)
-      print ("-- Copy local dir from rayZtemplatedir in temporary .local dir")
+      if debug:
+        print ("-- Copy local dir from rayZtemplatedir in temporary .local dir")
     else:
-      print ('-- no local dir found in ' + rayZtemplatedir)
+      if debug:
+        print ('-- no local dir found in ' + rayZtemplatedir)
 
       
     srcpath = rayZtemplatedir + os.sep + 'ray-scripts'
     if os.path.isdir(srcpath):
       destfilepath = outdir + os.sep + 'ray-scripts'
       shutil.copytree(srcpath, destfilepath)
-      print ("-- Copy ray-scripts dir from rayZtemplatedir in temporary dir")
+      if debug:
+        print ("-- Copy ray-scripts dir from rayZtemplatedir in temporary dir")
     else:
-      print ('-- no ray-scripts dir found in ' + rayZtemplatedir)
+      if debug:
+        print ('-- no ray-scripts dir found in ' + rayZtemplatedir)
       
     <xsl:for-each select='//fill-template'>
     from <xsl:value-of select='@id'/> import <xsl:value-of select='@id'/>
@@ -71,21 +77,26 @@ class SessionTemplate:
 
     destfilepath = outdir + os.sep + 'default' + os.sep + 'datamodel.json'
     os.makedirs(os.path.dirname(destfilepath),exist_ok=True)    
-    print ('---- Copying datamodel.json to %s' % destfilepath)
+    if debug:
+      print ('---- Copying datamodel.json to %s' % destfilepath)
 
-    print(json.dumps(data, indent=4, sort_keys=True))
+    if debug:
+      print(json.dumps(data, indent=4, sort_keys=True))
     session_name = data['global.session_name']
     
-    print ("-- Fill template in temporary dir")
+    if debug:
+      print ("-- Fill template in temporary dir")
 
     shutil.copy(datamodelfile, destfilepath)
-    print ("---- %s copied" % destfilepath)
+    if debug:
+      print ("---- %s copied" % destfilepath)
 
     if conffile:
       destfilepath = outdir + os.sep + 'default' + os.sep + conffile
       os.makedirs(os.path.dirname(destfilepath),exist_ok=True)    
       shutil.copy(conffile, destfilepath)
-      print ("---- %s copied" % destfilepath)
+      if debug:
+        print ("---- %s copied" % destfilepath)
 
     <xsl:apply-templates select="//template" mode="build"/>
 
@@ -111,6 +122,7 @@ if __name__ == '__main__':
   rayZtemplatedir = '.'
   fillonly = False
   startgui = False
+  _debug = False
   session_manager= 'ray_control'
   import sys
   try:                                
@@ -125,8 +137,7 @@ if __name__ == '__main__':
         usage()                     
         sys.exit()                  
     elif opt in ('-d', "--debug"):
-        global _debug               
-        _debug = 1               
+        _debug = True               
     elif opt in ("-j", "--read-json-file"):
         datamodelfile = arg
         print ("will write a json file '%s' when finishing the wizard steps." % datamodelfile)
@@ -145,7 +156,7 @@ if __name__ == '__main__':
   
   tmpdir = tempfile.mkdtemp()
   
-  if SessionTemplate().fillInTemplate(datamodelfile, rayZtemplatedir, tmpdir, fillonly=fillonly, startgui=startgui, session_manager=session_manager) == 0:          
+  if SessionTemplate().fillInTemplate(datamodelfile, rayZtemplatedir, tmpdir, fillonly=fillonly, startgui=startgui, session_manager=session_manager, debug=_debug) == 0:          
     print('The RaySession has been successfully created.')
   
 </xsl:template>
@@ -168,7 +179,8 @@ if __name__ == '__main__':
     if not section or section in data['wizard.sectionnamelist']:
       destfilepath = outdir + os.sep + '<xsl:value-of select='@dest'/>'
       os.makedirs(os.path.dirname(destfilepath),exist_ok=True)    
-      print ('---- Copy file to %s' % destfilepath)
+      if debug:
+        print ('---- Copy file to %s' % destfilepath)
       shutil.copy(rayZtemplatedir + os.sep + '<xsl:value-of select="@src"/>', destfilepath)
     
 </xsl:template>
@@ -185,7 +197,8 @@ if __name__ == '__main__':
     </xsl:choose>
     if not section or section in data['wizard.sectionnamelist']:
       destfilepath = outdir + os.sep + '<xsl:value-of select='@dest'/>'
-      print ('---- Copy tree to %s' % destfilepath) 
+      if debug:
+        print ('---- Copy tree to %s' % destfilepath) 
       shutil.copytree(rayZtemplatedir + os.sep +  '<xsl:value-of select="@src"/>', destfilepath)
     
 </xsl:template>
@@ -213,7 +226,8 @@ if __name__ == '__main__':
       <!-- FILE SYNTAX CHECK -->
       <xsl:choose>
       <xsl:when test="ends-with(@dest,'.xml')">
-      print ("---- %s : checking xml syntax " % destfilepath)
+      if debug:
+        print ("---- %s : checking xml syntax " % destfilepath)
       try:
         doc = etree.XML(content.encode())
       except lxml.etree.XMLSyntaxError as e:
@@ -221,12 +235,14 @@ if __name__ == '__main__':
       </xsl:when>
       <xsl:when test="ends-with(@dest,'.sh')">
       os.chmod(destfilepath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
-      print ("---- %s checking shell script syntax" % destfilepath)
+      if debug:
+        print ("---- %s checking shell script syntax" % destfilepath)
       shellcheck_create_command = ['bash', '-n', destfilepath]
       output = subprocess.check_call(shellcheck_create_command,stdout=sys.stdout)
       </xsl:when>
       </xsl:choose>    
-      print ("---- %s generated" % destfilepath)
+      if debug:
+        print ("---- %s generated" % destfilepath)
 </xsl:template>
 
 
@@ -242,20 +258,30 @@ if __name__ == '__main__':
     f.close()
 
     os.chmod(destfilepath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
-    print ("---- %s checking shell script syntax" % destfilepath)
+    if debug:
+      print ("---- %s checking shell script syntax" % destfilepath)
     shellcheck_create_command = ['bash', '-n', destfilepath]
     output = subprocess.check_call(shellcheck_create_command,stdout=sys.stdout)
 
     if not fillonly:      
-      print ("---- Executing shell script %s " % (outdir + os.sep + '<xsl:value-of select="@dest"/>'))
+      if debug:
+        print ("---- Executing shell script %s " % (outdir + os.sep + '<xsl:value-of select="@dest"/>'))
       guioption = None
       if startgui:
         guioption = 'gui'
       else:
         guioption = 'nogui'
-      raysession_create_command = [outdir + os.sep + '<xsl:value-of select='@dest'/>', session_name, outdir, session_manager, guioption, rayZtemplatedir]
+      if debug:
+        debugoption = 'debug'
+      else:
+        debugoption = 'nodebug'
+        
+      raysession_create_command = [outdir + os.sep + '<xsl:value-of select='@dest'/>', session_name, outdir, rayZtemplatedir, session_manager, guioption, debugoption]
       
       output = subprocess.check_call(raysession_create_command,stdout=sys.stdout)
+      
+    print (']==== fillInTemplate:')
+    
     return True
 </xsl:template>
 
@@ -292,7 +318,8 @@ if __name__ == '__main__':
       f.write(content)
       f.close()
 
-      print ("---- %s : checking xml syntax " % destfilepath)
+      if debug:
+        print ("---- %s : checking xml syntax " % destfilepath)
       try:
         doc = etree.XML(content.encode())
       except lxml.etree.XMLSyntaxError as e:
@@ -304,7 +331,8 @@ if __name__ == '__main__':
       if not os.path.samefile(dest1,dest2):
         shutil.copy(dest1, dest2)
       
-    print ("---- %s generated" % destfilepath)
+    if debug:
+      print ("---- %s generated" % destfilepath)
 </xsl:template>
 
 </xsl:stylesheet>

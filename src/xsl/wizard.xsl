@@ -26,6 +26,8 @@ import pprint
 # Project files
 from rayZ_ui import *
 
+_debug = None
+
 hostnameOrIPre = "^(((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))|((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])))$"
 hostnameOrIPQregexp = QtCore.QRegularExpression(hostnameOrIPre)
 
@@ -69,7 +71,8 @@ class DataModel:
   def readConf(self):
     config = configparser.ConfigParser()
     if os.path.isfile(self.configfilename):      
-      print ('Reading ' + self.configfilename)
+      if _debug:
+        print ('Reading ' + self.configfilename)
       config.read(self.configfilename)
       if 'wizard' in config.sections() and 'id' in config['wizard']:
         if not (config['wizard']['id'] == '<xsl:value-of select="@id"/>'):
@@ -79,7 +82,8 @@ class DataModel:
           
           raise Exception('The %s file is not has not been built by %s wizard !' % (self.configfilename, '<xsl:value-of select="@id"/>'))
       else:
-        print ('wizard.id is missing ... Try to use %s anyway !' % self.configfilename)
+        if _debug:
+          print ('wizard.id is missing ... Try to use %s anyway !' % self.configfilename)
     
     self.config = config
     self.config
@@ -90,7 +94,8 @@ class DataModel:
       self.registeredkey[sectionName] = []
     if key not in self.registeredkey[sectionName]:
       self.registeredkey[sectionName].append(key)
-    print ('++key %s registered in section %s' % (key,sectionName))
+    if _debug:
+      print ('++key %s registered in section %s' % (key,sectionName))
       
   def removeRegiteredKey(self, section, property_hided):
     r = []
@@ -111,13 +116,14 @@ class DataModel:
   def cleanConf(self, allFieldNames):
     sections = self.allowedSections
     
-    print ('[==== CleanConf')
-    print ('allowedSections:')
-    print (sections)
-    print ('---')
-    print ('registered keys:')
-    print (self.registeredkey)
-    print ('---')
+    if _debug:
+      print ('[==== CleanConf')
+      print ('allowedSections:')
+      print (sections)
+      print ('---')
+      print ('registered keys:')
+      print (self.registeredkey)
+      print ('---')
   
     new_config = configparser.ConfigParser({}, collections.OrderedDict)
     for section in sections:
@@ -129,8 +135,9 @@ class DataModel:
             new_config[section][ckey] = self.config[section][ckey]
       new_config._sections[section] = collections.OrderedDict(sorted(new_config._sections[section].items(), key=lambda t: t[0]))
     
-    self.printConf()
-    print (']==== CleanConf')
+    if _debug:
+      self.printConf()
+      print (']==== CleanConf')
     return new_config
 
   def printConf(self):
@@ -151,7 +158,8 @@ class DataModel:
     str_config = ff.read()
     ff.close()
     
-    print (str_config)
+    if _debug:
+      print (str_config)
     return str_config
 
   def writeConf(self, allFieldNames):
@@ -172,11 +180,11 @@ class DataModel:
         data[section + '.' + key] = config[section][key]
         
     data['wizard.id'] = '<xsl:value-of select='@id'/>'
-    print (data)
     return data
     
   def writeJSON(self, filename, allFieldNames):    
-    print ('Write datamodel ...')
+    if _debug:
+      print ('Write datamodel ...')
     content = json.dumps(self.createdata(allFieldNames), sort_keys=True, indent=2)
     with open(filename, 'w') as fh:
       fh.write(content)
@@ -185,7 +193,8 @@ class DataModel:
   def isSessionNameAlreadyUsed(self, session_name):    
     self.session_path = self.session_root + os.sep + session_name
     if os.path.isdir(self.session_path):
-      print('Directory "%s" already exist ! Choose another name or delete it first.' % self.session_path ) 
+      if _debug:
+        print('Directory "%s" already exist ! Choose another name or delete it first.' % self.session_path ) 
       return True
     else:
       self.session_name = session_name
@@ -234,7 +243,8 @@ class SessionWizard(QtWidgets.QWizard):
         
         session_root = session_root.replace('"','')
         
-        print ('session_root:"' + session_root + '"') 
+        if _debug:
+          print ('session_root:"' + session_root + '"') 
 
         self.datamodel = DataModel(self, session_root, configfilename)
         self.datamodel.readConf()
@@ -289,12 +299,15 @@ class SessionWizard(QtWidgets.QWizard):
         
     def printPageSteps(self):
       id = self.currentId()
-      print (self.visitedPages())
+      if _debug:
+        print (self.visitedPages())
       for i in range(len(self.pageSteps)):
         if self.pageSteps[i] == id:
-          print ("*(" + str(self.pageSteps[i]) + ")" + self.pagenameByIdx[self.pageSteps[i]])        
+          if _debug:
+            print ("*(" + str(self.pageSteps[i]) + ")" + self.pagenameByIdx[self.pageSteps[i]])        
         else:
-          print ("(" + str(self.pageSteps[i]) + ")" + self.pagenameByIdx[self.pageSteps[i]])
+          if _debug:
+            print ("(" + str(self.pageSteps[i]) + ")" + self.pagenameByIdx[self.pageSteps[i]])
         
     def enableButtons(self):
       id = self.currentId()
@@ -345,8 +358,9 @@ class SessionWizard(QtWidgets.QWizard):
           sections.append(sectionname)
         
       self.datamodel.allowedSections = sections
-      print ('Sections allowed:')
-      print (self.datamodel.allowedSections)
+      if _debug:
+        print ('Sections allowed:')
+        print (self.datamodel.allowedSections)
       
     def writeConf(self):
       self.datamodel.writeConf(self.allFieldNames())
@@ -439,7 +453,7 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         try:
           sectionnames = self.wizard().datamodel.config['wizard']['sectionnames'].split(',')
         except:
-          print("wizard.pages not found")
+          print("wizard.sectionnames property not found or not well formed")
           pass
           
         group = None
@@ -500,7 +514,8 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
     def validatePage(self):
         if self.wizard().startguioption:
           self.wizard().startgui = self.checkStartgui.isChecked()
-          print ("startgui:" + str(self.wizard().startgui))
+          if _debug:
+            print ("startgui:" + str(self.wizard().startgui))
         
         self.wizard().pageSteps = []
         pageSteps = self.wizard().pageSteps
@@ -524,7 +539,8 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         self.wizard().datamodel.data['wizard.sectionnamelist'] = pagenames
         self.wizard().setVariables()
         self.wizard().requires()
-        print("Selected pages:")
+        if _debug:
+          print("Selected pages:")
         self.wizard().stepindex = 0
         self.wizard().printPageSteps()
         return True
@@ -592,12 +608,15 @@ class <xsl:value-of select='@id'/>Page(BasePage):
 -->      
 
     def readData(self, config, datamodel):
-          print('[====== readData')
+          if _debug:
+            print('[====== readData')
           <xsl:apply-templates mode="initializePage_readdata"/>    
-          print(']====== readData')
+          if _debug:
+            print(']====== readData')
         
     def initializePage(self):
-        print ("[==== initializePage " + self.sectionName)
+        if _debug:
+          print ("[==== initializePage " + self.sectionName)
 
         datamodel = self.wizard().datamodel
         data = datamodel.data
@@ -616,10 +635,12 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         <xsl:for-each select='group'>
         self._label_<xsl:value-of select='@id'/>.setText('<xsl:value-of select='label'/>')
         </xsl:for-each>
-        print ("]==== initializePage " + self.sectionName)
+        if _debug:
+          print ("]==== initializePage " + self.sectionName)
 
     def validatePage(self):
-        print ("[==== validatePage " + self.sectionName)
+        if _debug:
+          print ("[==== validatePage " + self.sectionName)
         
         config = self.wizard().datamodel.config
         datamodel = self.wizard().datamodel
@@ -628,15 +649,19 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         
           <xsl:apply-templates mode="validatePage"/>
           
-          datamodel.printConf()
-          pprint.pprint(datamodel.data)
+          if _debug:
+            datamodel.printConf()
+          if _debug:
+            pprint.pprint(datamodel.data)
           return True
         else:
           return False
-        print ("]==== validatePage " + self.sectionName)
+        if _debug:
+          print ("]==== validatePage " + self.sectionName)
         
     def defaults(self):
-        print ("Apply defaults")
+        if _debug:
+          print ("Apply defaults")
         
         config = self.wizard().datamodel.config
         if self.sectionName not in config.sections():
@@ -696,15 +721,16 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
           datamodelfile = self.wizard().jsonfilename
         
         conffile = datamodel.configfilename
-        print(self.wizard().writeJSON(datamodelfile))
+        self.wizard().writeJSON(datamodelfile)
           
         templatedir = os.path.abspath(os.path.dirname(__file__))
-        print ('sys.path' + str(sys.path))
-        print ('-- conf file:' + str(conffile) + '\n-- datamodel file:' + str(datamodelfile) + '\n-- rayZtemplatedir:' + str(templatedir) + '\n-- tmp dir:' + str(tmpdir) + '\n-- startgui:' + str(self.wizard().startgui) + "\n-- session_manager:" + self.wizard().session_manager)
+        if _debug:
+          print ('sys.path' + str(sys.path))
+          print ('-- conf file:' + str(conffile) + '\n-- datamodel file:' + str(datamodelfile) + '\n-- rayZtemplatedir:' + str(templatedir) + '\n-- tmp dir:' + str(tmpdir) + '\n-- startgui:' + str(self.wizard().startgui) + "\n-- session_manager:" + self.wizard().session_manager)
         
         from tmpl_wizard import SessionTemplate
         try:
-          SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager, conffile=conffile)
+          SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager, conffile=conffile, debug=_debug)
           QtWidgets.QApplication.restoreOverrideCursor()
           QtWidgets.QMessageBox.information(self,
                                             "Session creation ...",
@@ -759,8 +785,7 @@ if __name__ == '__main__':
       conffile = arg
       print ('read/write conf file %s' % conffile)
     elif opt in ('-d', "--debug"):
-      global _debug               
-      _debug = 1               
+      _debug = True               
     elif opt in ("-j", "--write-json-file"):
       jsonfilename = arg
       print ("will write a json file '%s' when finishing the wizard steps." % jsonfilename)
@@ -772,6 +797,7 @@ if __name__ == '__main__':
         print ('--session-manager options : "ray_control|nsm"')
         sys.exit(2)
   
+  print ('[==== wizard')
   app = QtWidgets.QApplication(sys.argv)
   wizard = SessionWizard(jsonfilename=jsonfilename, startguioption=startguioption, session_manager=session_manager, configfilename=conffile)
   layout = [QtWidgets.QWizard.CustomButton1, QtWidgets.QWizard.CustomButton2, QtWidgets.QWizard.BackButton, QtWidgets.QWizard.CancelButton, QtWidgets.QWizard.NextButton, QtWidgets.QWizard.FinishButton]
@@ -782,7 +808,9 @@ if __name__ == '__main__':
   wizard.button(QtWidgets.QWizard.CustomButton1).clicked.connect(wizard.defaults)
   wizard.button(QtWidgets.QWizard.CustomButton2).clicked.connect(wizard.readData)
   
-  sys.exit(app.exec_())
+  exitcode = app.exec_()
+  print (']==== wizard')
+  sys.exit(exitcode)
 
 </xsl:template>
 

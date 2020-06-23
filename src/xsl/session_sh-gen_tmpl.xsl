@@ -5,18 +5,33 @@
 # Parameters
 session_name="\$1"
 filltemplate_dir="\$2"
+session_manager="\$3"
 startgui="\$4"
-SESSION_MANAGER="\$3"
 rayZ_templatedir="\$5"
+debug="\$6"
 
 clientCount=0
+
+
+function debug_info() {
+  if [ "\$1" == "debug" ]
+  then
+    exec 4&lt;&gt; /dev/stdout
+  else
+    exec 4&lt;&gt; /dev/null
+  fi
+}
+
+function close_debug_info() {
+  exec 4&gt;&amp;-
+}
 
 ######
 # 1 : template id
 # 2 : data
 # 3 : destination file
 function generate_file_from_template() {
-python3 &lt;&lt;EOF_python_template
+python3 &lt;&lt;EOF_python_template &gt;&amp;4
 import sys
 import os
 sys.path.append("\$rayZ_templatedir")
@@ -48,7 +63,6 @@ EOF_python_nsm
 }
 
 function command_from() {
-echo "\$1"
 python&lt;&lt;EOF_python_cmd
 import shlex
 
@@ -65,51 +79,50 @@ function create_clientID() {
   
   if [ "\$clientCount" == "" ]; then
     echo "clientCount must not be empty !"
-    exit 1
+    error
   fi
   
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
-      echo "__ create client ID __"  
-      echo "set clientID using ray_control"
+      echo "__ create client ID __ (using ray_control)"  &gt;&amp;4
       if [ "\$ACTION" == "add_executable" ]
       then
-        clientID=\$(ray_control \$ACTION "\$PROGRAM" not_start)
+        clientID=\$(ray_control \$ACTION "\$PROGRAM" not_start 2&gt;/dev/null)
         if [ \$? -ne 0 ]
         then
           echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
-          exit 1
+          error
         fi      
       elif [ "\$ACTION" == "add_proxy" ]
       then
-        clientID=\$(ray_control add_executable "\$PROGRAM" via_proxy not_start)
+        clientID=\$(ray_control add_executable "\$PROGRAM" via_proxy not_start 2&gt;/dev/null)
         if [ \$? -ne 0 ]
         then
           echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
-          exit 1
+          error
         fi
       else
         echo -e "\e[1m\e[31mUnknown action '\$ACTION' !\e[0m"
-        exit 1
+        error
       fi
       shortclientID="\$(generate_nsm_clientID)"
     ;;
     nsm)
-      echo "set clientID with rayZ generation"
+      echo "__ create client ID __ (using nsm like ID)"  &gt;&amp;4
       clientCount=\$(( clientCount + 1 ))
       clientID="\$(generate_nsm_clientID)"
       shortclientID="\$clientID"
     ;;
     *)
-      echo "Unknown session manager '\$SESSION_MANAGER' !"
-      exit 1
+      echo "Unknown session manager '\$session_manager' !"
+      error
     ;;
   esac
 }
 
 function create_proxy() {
   
-  echo "__ create proxy __ (\$clientID)"
+  echo "__ create proxy __ (\$clientID)" &gt;&amp;4
   
   description=""
   wait_window=0
@@ -125,19 +138,19 @@ function create_proxy() {
   if [ "\$session_path" == "" ]
   then
     echo -e "\e[1m\e[31mThe session_path must be set !\e[0m"
-    exit 1
+    error
   fi
 
   if [ "\$session_name" == "" ]
   then
     echo -e "\e[1m\e[31mThe session_name must be set !\e[0m"
-    exit 1
+    error
   fi
 
   if [ "\$clientID" == "" ]
   then
     echo -e "\e[1m\e[31mThe clientID must be set !\e[0m"
-    exit 1
+    error
   fi
 
   while [ \$# -gt 0 ]; do  
@@ -157,17 +170,17 @@ function create_proxy() {
       ;;
     *)
       echo "unrecognized arg '$1' ... "
-      exit 1
+      error
       ;;
     esac
   done
 
   if [ "\$label" == "" ]; then
     echo -e "\e[1m\e[31mThe label must be set ! clientID: '\$clientID'\e[0m"
-    exit 1
+    error
   fi
 
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)      
       mkdir -p "\$session_path/\$session_name.\$clientID"
       if [ "\$xdg_config_home" == "" ]; then
@@ -177,7 +190,7 @@ function create_proxy() {
               arguments:"\$arguments" \
               save_signal:"\$save_signal" \
               executable:"\$executable" \
-              stop_signal:"\$stop_signal" 
+              stop_signal:"\$stop_signal" 2&gt;/dev/null
       else
         wrapper=ray-config-session
         ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
@@ -186,7 +199,7 @@ function create_proxy() {
               arguments:"--xdg-config-home \"\$xdg_config_home\" -- \$executable \$arguments" \
               save_signal:"\$save_signal" \
               executable:"ray-config-session" \
-              stop_signal:"\$stop_signal" 
+              stop_signal:"\$stop_signal" 2&gt;/dev/null
       fi
       proxy_dir="\$session_name.\$clientID"
       if [ $? -ne 0 ]
@@ -233,37 +246,37 @@ EOF_nsmproxyb
       fi
       ;;
     *)
-      echo "unknown session-manager paramater '\$SESSION_MANAGER' error in create_proxy"
-      exit 1
+      echo "unknown session-manager paramater '\$session_manager' error in create_proxy"
+      error
       ;;
   esac
 }
 
 function set_session_root_and_path() {
 
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
-      ray_control quit
-      echo "-------- Starting new ray daemon "
-      export RAY_CONTROL_PORT=\$(ray_control start_new ) || error
-      RAY_SESSION_ROOT="\$(ray_control get_root)" || error
+      ray_control quit &gt;&amp;4 2&gt;/dev/null
+      echo "-------- Starting new ray daemon " &gt;&amp;4
+      export RAY_CONTROL_PORT=\$(ray_control start_new 2&gt;/dev/null) || error
+      RAY_SESSION_ROOT="\$(ray_control get_root 2&gt;/dev/null)" || error
       
-      echo "RAY_SESSION_ROOT: '\$RAY_SESSION_ROOT'"
+      echo "RAY_SESSION_ROOT: '\$RAY_SESSION_ROOT'" &gt;&amp;4
       session_root=\${RAY_SESSION_ROOT:-\$HOME/Ray Sessions}
 
       # We don't create the session_path ray_control creates it
       ;;
     nsm)
-      echo "NSM_SESSION_ROOT: '\$NSM_SESSION_ROOT'"  
+      echo "NSM_SESSION_ROOT: '\$NSM_SESSION_ROOT'"   &gt;&amp;4
       session_root=\${NSM_SESSION_ROOT:-\$HOME/NSM Sessions}
       ;;
     *)
-      echo "unknown session-manager '\$SESSION_MANAGER' error in set_session_root_and_path"
-      exit 1
+      echo "unknown session-manager '\$session_manager' error in set_session_root_and_path"
+      error
       ;;
   esac
   
-  echo "SESSION_ROOT : '\$session_root'"
+  echo "SESSION_ROOT : '\$session_root'" &gt;&amp;4
   session_root="\${session_root//\"}"
 
   if [ ! -d "\$session_root" ]; then
@@ -272,7 +285,7 @@ function set_session_root_and_path() {
   fi
 
   session_path="\$session_root/\$session_name"
-  echo "SESSION_PATH : '\$session_path'"
+  echo "SESSION_PATH : '\$session_path'" &gt;&amp;4
   
   session_path="\${session_path//\"}"
   if [ -d "\$session_path" ]; then
@@ -288,20 +301,20 @@ function create_dir_in_client() {
     error
   fi
   
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
       dir="\$session_path/\$proxy_dir/\$1"
       mkdir -p "\$dir" || error
-      echo "\$dir created"
+      echo "\$dir created" &gt;&amp;4
       ;;
     nsm)
       dir="\$session_path/\$proxy_dir/\$1"
       mkdir -p "\$dir" || error
-      echo "\$dir created"
+      echo "\$dir created" &gt;&amp;4
       ;;
     *)
-      echo "unknown session-manager '\$SESSION_MANAGER' error in create_dir_in_client"
-      exit 1
+      echo "unknown session-manager '\$session_manager' error in create_dir_in_client"
+      error
       ;;
   esac
 
@@ -311,7 +324,7 @@ function copy_to_client_dir () {
 
   if [ "\$1" == "" -o "\$2" == "" ]; then
     echo "Error the files or dirs to copy is/are empty (copy_to_client_dir)!"
-    exit 1
+    error
   fi
 
   if [ "\$proxy_dir" == "" ];then
@@ -319,36 +332,36 @@ function copy_to_client_dir () {
     error
   fi
 
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
       dirfile="\$session_path/\$proxy_dir/\$2"
       mkdir -p "\$(dirname "\$dirfile")" || error
-      echo "\$dir created"
+      echo "\$dir created" &gt;&amp;4
       ;;
     nsm)
       dirfile="\$session_path/\$proxy_dir/\$2"
       mkdir -p "\$(dirname "\$dirfile")" || error
-      echo "\$dir created"
+      echo "\$dir created" &gt;&amp;4
       ;;
     *)
-      echo "unknown session-manager '\$SESSION_MANAGER' error in copy_to_client_dir"
-      exit 1
+      echo "unknown session-manager '\$session_manager' error in copy_to_client_dir"
+      error
       ;;
   esac
   
-  echo "Copying file(s) to \$2" 
+  echo "Copying file(s) to \$2" &gt;&amp;4
   cp -rf "\$1" "\$dirfile" || error
   
   
 }
 function set_client_properties() {
-  echo "__ Set client properties __ (\$clientID)"
+  echo "__ Set client properties __ (\$clientID)" &gt;&amp;4
   launched=0
   description=""
   icon=""
     
   if [ "\$ACTION" == "add_proxy" ];then
-    if [ "\$SESSION_MANAGER" == "nsm" ];then
+    if [ "\$session_manager" == "nsm" ];then
       name="\${name:-NSM PROXY \$PROGRAM}"
       executable="nsm-proxy"
     else
@@ -362,10 +375,10 @@ function set_client_properties() {
 
   if [ "\$label" == "" ]; then
     echo -e "\e[1m\e[31mThe label must set ! clientID: '\$clientID'\e[0m"
-    exit 1
+    error
   elif [ "\$clientID" == "" ]; then
     echo -e "\e[1m\e[31mThe clientID must set ! (please call create_clientID)\e[0m"
-    exit 1
+    error
   fi
 
   while [ \$# -gt 0 ]; do  
@@ -378,31 +391,39 @@ function set_client_properties() {
       ;;
     *)
       echo "unrecognized arg '$1' ... "
-      exit 1
+      error
       ;;
     esac
   done
 
   if [ "\$label" == "" ]; then
     echo "The label must set ! clientID: '\$clientID'"
-    exit 1
+    error
   fi
 
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
       ray_control client \$clientID set_properties launched:"\$launched" \
           icon:"\$icon" \
           label:"\$label" \
           executable:"\$executable" \
           icon:"\$icon" \
-          name:"\$name" \
+          name:"\$name" &gt;&amp;4 2&gt;/dev/null
 
       if [ \$? -ne 0 ]
       then
-        echo -e "\e[1m\e[31mCould not set properties !\e[0m"
-        exit 1
+        echo -e "\e[1m\e[31mCould not set properties ! (\$clientID)\e[0m"
+        error
       fi
-      ray_control client \$clientID set_description "\$description"
+      
+      ray_control client \$clientID set_description "\$description" &gt;&amp;4 2&gt;/dev/null || error
+      
+      if [ \$? -ne 0 ]
+      then
+        echo -e "\e[1m\e[31mCould not set description ! (\$clientID)\e[0m"
+        error
+      fi
+      
       ;;
     nsm)
       if [ "\$ACTION" == "add_proxy" ]; then
@@ -420,8 +441,8 @@ EOF_nsmsession_exec
       fi
       ;;
     *)
-      echo "unknown session-manager '\$SESSION_MANAGER' error in set_client_properties"
-      exit 1
+      echo "unknown session-manager '\$session_manager' error in set_client_properties"
+      error
       ;;
   esac
 
@@ -445,7 +466,7 @@ function set_jackclient_properties() {
       ;;
     *)
       echo "unrecognized arg '$1' ... "
-      exit 1
+      error
       ;;
     esac
   done
@@ -455,15 +476,15 @@ function set_jackclient_properties() {
     clienttype="\${ACTION#????}"
   fi
   
-  echo "__ set_jackclient_properties __ ( \$jackclientname ) : windowtitle: \$windowtitle, layer: \$layer, clienttype: \$clienttype, with_gui: \$with_gui"
+  echo "__ set_jackclient_properties __ ( \$jackclientname ) : windowtitle: \$windowtitle, layer: \$layer, clienttype: \$clienttype, with_gui: \$with_gui" &gt;&amp;4
   
-  if [ "\$layer" != "" -a "\$SESSION_MANAGER" == "ray_control" ]; then
-    ray_control client "\$clientID" set_custom_data jacknames "\$jackclientname"
-    ray_control client "\$clientID" set_custom_data windowtitle "\$windowtitle"
-    ray_control client "\$clientID" set_custom_data layer "\$layer"
-    ray_control client "\$clientID" set_custom_data guitoload "\$guitoload"
-    ray_control client "\$clientID" set_custom_data with_gui "\$with_gui"  
-    ray_control client "\$clientID" set_custom_data clienttype "\$clienttype"  
+  if [ "\$layer" != "" -a "\$session_manager" == "ray_control" ]; then
+    ray_control client "\$clientID" set_custom_data jacknames "\$jackclientname" &gt;&amp;4 2&gt;/dev/null
+    ray_control client "\$clientID" set_custom_data windowtitle "\$windowtitle" &gt;&amp;4 2&gt;/dev/null
+    ray_control client "\$clientID" set_custom_data layer "\$layer" &gt;&amp;4 2&gt;/dev/null
+    ray_control client "\$clientID" set_custom_data guitoload "\$guitoload" &gt;&amp;4 2&gt;/dev/null
+    ray_control client "\$clientID" set_custom_data with_gui "\$with_gui"  &gt;&amp;4 2&gt;/dev/null
+    ray_control client "\$clientID" set_custom_data clienttype "\$clienttype" &gt;&amp;4 2&gt;/dev/null
     
   fi
 }
@@ -475,13 +496,13 @@ function init_session() {
   CHECK_SERVER=true
   CHECK_PROGRAMS=true
 
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
       
       echo "-------- Create new session named \$session_name"
-      ray_control new_session "\$session_name"  || error
+      ray_control new_session "\$session_name"  &gt;&amp;4 2&gt;/dev/null || error
 
-      session_path="\$(ray_control get_session_path)" || error
+      session_path="\$(ray_control get_session_path 2&gt;/dev/null)" || error
 
       create_clientID add_executable "ray-jackpatch" "JACK Connections"
       patchID="\$clientID"
@@ -500,7 +521,7 @@ function init_session() {
     ;;
     *)
       echo "unknown session-manager '\$1' error in init_session"
-      exit 1
+      error
       ;;
   esac
   
@@ -508,23 +529,23 @@ function init_session() {
   if [ ! -d "\$filltemplate_dir" ]
   then
     echo -e "\e[1m\e[31mThe '\$filltemplate_dir' is not a directory !\e[0m"
-    exit 1
+    error
   fi
 
   cp -r "\$filltemplate_dir/default" "\$session_path/" || error
-  echo "-------- default dir copied"
+  echo "-------- default dir copied" &gt;&amp;4
 
   cp -r "\$filltemplate_dir/.local" "\$session_path/" || error
-  echo "-------- .local dir copied "
+  echo "-------- .local dir copied " &gt;&amp;4
 
   mkdir -p "\$session_path/ray-scripts" || error  
 }
 
 function ray_patch() {
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
       filename="\$session_path/\$session_name.\$patchID.xml"
-      echo "-------- Install patch.xml to '\$filename'"
+      echo "-------- Install patch.xml to '\$filename'" &gt;&amp;4
       cp "\$filltemplate_dir/default/patch.xml" "\$filename" || error
       cp "\$filltemplate_dir/default/patch.xml" "\$session_path/default/\$session_name.\$patchID.xml" || error
       test -f "\$filltemplate_dir/default/jack_parameters" &amp;&amp; cp "\$filltemplate_dir/default/jack_parameters" "\$session_path/jack_parameters" 
@@ -533,10 +554,10 @@ function ray_patch() {
 }
 
 function ray_scripts() {
-  if [ "\$SESSION_MANAGER" == ray_xml -o "\$SESSION_MANAGER" == ray_control ] &amp;&amp; [ -d "\$filltemplate_dir/ray-scripts" ];then
+  if [ "\$session_manager" == ray_xml -o "\$session_manager" == ray_control ] &amp;&amp; [ -d "\$filltemplate_dir/ray-scripts" ];then
     dir="\$session_path/ray-scripts"
     mkdir -p "\$dir"
-    echo "-------- Copy ray-scripts to '\$session_path/'"
+    echo "-------- Copy ray-scripts to '\$session_path/'" &gt;&amp;4
     cp "\$filltemplate_dir/ray-scripts/"*.sh "\$session_path/ray-scripts/" || error
     cp "\$filltemplate_dir/ray-scripts/.jack_config_script" "\$session_path/ray-scripts/" || error
   fi
@@ -545,21 +566,21 @@ function ray_scripts() {
 
 function end_session() {
 
-  case "\$SESSION_MANAGER" in
+  case "\$session_manager" in
     ray_control)
       
-      echo "-------- Save and close the session"
-      ray_control close || error
+      echo "-------- Save and close the session" &gt;&amp;4
+      ray_control close &gt;&amp;4 2&gt;/dev/null || error
 
       ray_patch
 
       ray_scripts
       
-      echo "-------- Copy raysession.xml to 'default/raysession.xml.backup'"
+      echo "-------- Copy raysession.xml to 'default/raysession.xml.backup'" &gt;&amp;4
       filename="\$session_path/raysession.xml"
       cp "\$filename" "\$session_path/default/raysession.xml.backup" || error
 
-      ray_control quit || error
+      ray_control quit &gt;&amp;4 2&gt;/dev/null || error
       echo -e "\e[1m\e[32mRay Session '\$session_name' in '\$session_path' created successfully.\e[0m"
 
       ;;
@@ -570,8 +591,8 @@ function end_session() {
       cp "\$filltemplate_dir/default/nsm_patch.jackpatch" "\$session_path/default/\$patchLabel.\$patchID.jackpatch" || error
       ;;
     *)
-      echo "unknown session-manager '\$SESSION_MANAGER' error in end_session"
-      exit 1
+      echo "unknown session-manager '\$session_manager' error in end_session"
+      error
       ;;
   esac
   
@@ -584,7 +605,7 @@ function end_session() {
 
 function gui_session() {
   if [ "\$startgui" == "gui" ];then
-    case "\$SESSION_MANAGER" in
+    case "\$session_manager" in
       ray_control)
         raysession --session="\$session_name" &amp;
         ;;
@@ -592,8 +613,8 @@ function gui_session() {
         non-session-manager &amp;
         ;;
       *)
-        echo "unknown session-manager '\$SESSION_MANAGER' error in gui_session"
-        exit 1
+        echo "unknown session-manager '\$session_manager' error in gui_session"
+        error
         ;;
     esac
   fi
@@ -602,7 +623,7 @@ function gui_session() {
 
 function error() {
   echo -e "\e[1m\e[31mAn error occured. See log above.\e[0m"
-  if [ "\$SESSION_MANAGER" == "ray_control" ]; then
+  if [ "\$session_manager" == "ray_control" ]; then
     ray_control script_info "An error occured during the raysession creation ! (see logs for more details)"
     if [ "\$RAY_CONTROL_PORT" != "" ]
     then
@@ -610,6 +631,7 @@ function error() {
       ray_control stop
     fi
   fi
+  close_debug_info
   exit 1
 }
 
@@ -617,12 +639,21 @@ function error() {
 # MAIN
 #
 
-if [ $# -ne 5 ]
+if [ $# -ne 6 ]
 then
   echo "Usage:"
-  echo "  session.sh NEW_RAYSESSION_NAME TEMPLATE_DIR ray_control|ray_xml|nsm gui|nogui"
-  exit 1
+  echo "  session.sh SESSION_NAME TEMPLATE_DIR RAYZ_TEMPLATE_DIR (ray_control|nsm) (gui|nogui) (debug|nodebug)"
+  error
 fi
+
+session_name="\$1"
+filltemplate_dir="\$2"
+rayZ_templatedir="\$3"
+session_manager="\$4"
+startgui="\$5"
+debug="\$6"
+
+debug_info "\$debug"
 
 if [ ! -d "\$rayZ_templatedir" ]; then
   echo "'\$rayZ_templatedir' is not a directory !"
@@ -640,7 +671,8 @@ echo "------ rayZ_templatedir: \$rayZ_templatedir"
 echo "------ filltemplate_dir: \$filltemplate_dir"
 echo "------ session_path: \$session_path"
 echo "------ \$startgui"
-echo "------ \$SESSION_MANAGER"
+echo "------ \$session_manager"
+echo "------ \$debug"
 
 init_session
 
@@ -653,7 +685,7 @@ set_jackclient_properties --jackclientname "system" --windowtitle "pavucontrol" 
 
 <xsl:apply-templates select="page" mode="copy-no-namespaces"/>
 
-if [ "\$SESSION_MANAGER" == "nsm" ]; then
+if [ "\$session_manager" == "nsm" ]; then
   note_file="README"
 else
   note_file="ray-notes"
@@ -677,16 +709,16 @@ end_session
 
 gui_session
 
+close_debug_info
 
 </xsl:template>
 
 <xsl:template match="page" mode="copy-no-namespaces">
-echo "[==== <xsl:value-of select="section-name"/>"
+echo "Begin section:: <xsl:value-of select="section-name"/>" &gt;&amp;4
 
 <xsl:apply-templates mode="copy-no-namespaces"/>
 
-echo "]==== <xsl:value-of select="section-name"/>"
-  
+echo "End section:: <xsl:value-of select="section-name"/>" &gt;&amp;4
 </xsl:template>
 
 <xsl:template match="script" mode="copy-no-namesapces">

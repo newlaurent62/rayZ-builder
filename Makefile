@@ -11,7 +11,7 @@ WIZARD := Jamulus
 RAY_SESSION_ROOT := "/home/laurent/Ray Sessions"
 DEFAULT_FILES := $(patsubst %, %.py, $(wildcard src/wizards/$(WIZARD)))
 ALL_FILES := $(patsubst %, %.py, $(wildcard src/wizards/*))
-TMPL_ARGS :=
+TMPL_ARGS := --debug
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -66,7 +66,7 @@ build: $(DEFAULT_FILES)
 .PHONY: 
 
 exec:
-	$(PYTHON) build/$(TEMPLATES_DIR)/$(WIZARD)/wizard.py --write-json-file=build/$(WIZARD)/datamodel.json --session-manager=nsm --start-gui-option 
+	$(PYTHON) build/$(TEMPLATES_DIR)/$(WIZARD)/wizard.py --write-json-file=build/$(WIZARD)/datamodel.json --session-manager=ray_control --start-gui-option  --debug
 
 test-ray-control-template:
 	$(PYTHON)  build/$(TEMPLATES_DIR)/$(WIZARD)/tmpl_wizard.py --rayZ-template-dir build/$(TEMPLATES_DIR)/$(WIZARD) --read-json-file=src/wizards/$(WIZARD)/test-data/datamodel.json --session-manager=ray_control $(TMPL_ARGS)
