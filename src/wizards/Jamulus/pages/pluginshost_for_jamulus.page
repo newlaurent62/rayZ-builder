@@ -3,7 +3,7 @@
   <title>Calf audio plugins host section</title>
   <short-title>Audio plugins host</short-title>
   <requires executable="calfjackhost" version="0.90.3"/>
-  <group id="users" list-id="global.userslist" display="TabCheckableV">
+  <group id="users" list-id="global.userslist" display="TabCheckableV" min="1">
     <label>Check the users that will have audio plugins and fill there initial configuration</label>
     <field id="jack_inputs">
       <label>Jack input(s)</label>

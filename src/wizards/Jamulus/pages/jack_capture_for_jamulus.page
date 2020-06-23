@@ -13,7 +13,7 @@
       </role-items>
     </combobox>
   </field>
-  <group id="users" list-id="global.userslist" display="ListCheckableV">
+  <group id="users" list-id="global.userslist" display="ListCheckableV" min="1">
     <label>Select the Jamulus user to be recorded</label>
   </group>
   <template-snippet ref-id="session_sh">
