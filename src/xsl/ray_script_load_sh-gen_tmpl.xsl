@@ -75,57 +75,114 @@ function check_server_running() {
   fi
 }
 
-if \$USE_JACK; then
+# CHECK THE PROGRAMS USED BY THIS SESSION
+if \$CHECK_PROGRAMS; then
+  echo -e "\e[1mCheck that executable(s) are available on the system ...\e[0m"
+  missing_executables=""
+  count=0
   
+  previous_path="\$PATH"
+  <xsl:for-each select="//requires">
+    <xsl:choose>
+      <xsl:when test="ancestor::page/@section-name">
+#set section = "<xsl:value-of select="../@section-name"/>"
+      </xsl:when>
+      <xsl:otherwise>
+#set section = None
+      </xsl:otherwise>
+    </xsl:choose>
+#if not section or section in $data['wizard.sectionnamelist']:
+  export PATH="\$RAY_SESSION_PATH/.local/bin:\$PATH"
+  executable="<xsl:value-of select="@executable"/>"
+  if [ "\$(which "\$executable")" == "" ]
+  then
+    echo -e "\e[31m\$executable has not been found.\e[0m"
+    missing_executables="\$missing_executables <xsl:value-of select="@executable"/>"
+    count=\$(( count + 1 ))
+  else
+    echo "\$executable has been found in \$(which "\$executable")."
+  fi
+  export PATH="\$previous_path"
+#end if
+  </xsl:for-each>
+  
+  if [ "\$missing_executables" != "" ]
+  then
+    if [ \$count -gt 1 ]
+    then
+      ray_control script_user_action "\$missing_executables are missing on this system or are not in the PATH. They are used by this RaySession. Do you want to stop loading the session ?"
+    else
+      ray_control script_user_action "\$missing_executables is missing on this system or is not in the PATH. It is used by this RaySession. Do you want to stop loading the session ?"      
+    fi
+    if [ $? -eq 0 ]
+    then
+      echo "The session load has been aborted by the user."
+      ray_control script_info "The session load has been aborted by the user."
+      exit 0
+    fi
+  else
+    echo -e "\e[32mAll executables have been found.\e[0m"
+  fi
+fi
+
+if \$USE_JACK; then
+  echo -e "\e[1mCheck Jack server ...\e[0m"
   if \$USE_JACK_SETTINGS; then
-    if jack_control status; then
-      echo "\get_diff"
+    if jack_control status &gt;/dev/null 2&gt;&amp;1; then
       DIFF_JACK_PARAM="\$(ray-jack_config_script get_diff)"
-      echo "\$DIFF_JACK_PARAM"
-      echo "/get_deff"
       if [ "\$DIFF_JACK_PARAM" != "" ]; then
         if ray_control script_user_action "The jack settings of this ray session differs from the current jack settings ! If you choose ignore, the jack server will be restarted with the jack settings of this ray session otherwise if you click Yes, the session load will be stopped. Your choice ?"; then
             echo "The session load has been aborted by the user."
             ray_control script_info "The session load has been aborted by the user."
             exit 0
         fi    
+      else
+        echo "Jack settings : no diff between current and session declared jack server parameters."
       fi
     fi
     ray-jack_config_script load || exit 0
+    echo "Jack settings loaded."
     ray_control hide_script_info    
   else
-    jack_control status
+    jack_control status &gt;/dev/null 2&gt;&amp;1
     if [ $? -ne 0 ]; then      
-      if ray_control script_user_action "The jack server is not started ! Please start it using qjackctl (or other software). Do you want to stop loading the session ?"; then
+      if ray_control script_user_action 'The jack server is not started ! Please start it using qjackctl or other software. Do you want to stop loading the session ?'; then
         echo "The session load has been aborted by the user."
         ray_control script_info "The session load has been aborted by the user."
         exit 0
       fi
     fi
   fi
+  if jack_control status &gt;/dev/null 2&gt;&amp;1; then
+    echo -e "\e[32mJack is running.\e[0m"
+  else
+    echo -e "\e[31mJack is not running.\e[0m"
+  fi
 fi
 
 # CHECK FOR ADDITIONNAL AUDIO DEVICES DEFINED IN THE SETUP IF anyway
 #if 'alsa_devices' in $data and len($data['alsa_devices']) > 0
 if \$CHECK_ADDITIONNAL_AUDIO_DEVICES; then
-  echo "Check that additionnal device(s) are available ..."
-  COUNT=0
-  MISSING_DEVICES=""
+  echo -e "\e[1mCheck that additionnal device(s) are available ...\e[0m"
+  count=0
+  missing_devices=""
 #for $device in $data['alsa_devices']
   if [ "\$(cat /proc/asound/cards | grep "$device")" == "" ]
   then
-      MISSING_DEVICES="\$MISSING_DEVICES $device"
-      COUNT=\$(( COUNT + 1 ))
+      missing_devices="\$missing_devices $device"
+      count=\$(( count + 1 ))
   fi
 #end for
 
-  if [ "\$MISSING_DEVICES" != "" ]
+  if [ "\$missing_devices" != "" ]
   then
-      if [ \$COUNT -gt 1 ]
+      if [ \$count -gt 1 ]
       then
-        ray_control script_user_action "\$MISSING_DEVICES audio devices are missing on this system. (They are used by this RaySession). Do you want to stop loading the session ?"
+        echo -e "\e[31mMissing device \$missing_devices\e[0m"
+        ray_control script_user_action "\$missing_devices audio devices are missing on this system. They are used by this RaySession. Do you want to stop loading the session ?"
       else
-        ray_control script_user_action "\$MISSING_DEVICES audio device is missing on this system. (It is used by this RaySession). Do you want to stop loading the session ?"
+        echo -e "\e[31mMissing devices \$missing_devices\e[0m"
+        ray_control script_user_action "\$missing_devices audio device is missing on this system. It is used by this RaySession. Do you want to stop loading the session ?"
       fi
       if [ $? -eq 0 ]
       then
@@ -137,39 +194,7 @@ if \$CHECK_ADDITIONNAL_AUDIO_DEVICES; then
 fi
 #end if
 
-# CHECK THE PROGRAM USED BY THIS SESSION
-if \$CHECK_PROGRAMS; then
-  echo "Check that program(s) are available on the system ..."
-  MISSING_PROGRAMS=""
-  COUNT=0
-  
-  previous_path="\$PATH"
-  <xsl:for-each select="//requires">
-  export PATH="\$RAY_SESSION_PATH/.local/bin:\$PATH"
-  if [ "\$(which "<xsl:value-of select="@executable"/>")" == "" ]
-  then
-      MISSING_PROGRAMS="\$MISSING_PROGRAMS <xsl:value-of select="@executable"/>"
-      COUNT=\$(( COUNT + 1 ))
-  fi
-  </xsl:for-each>
-  export PATH="\$previous_path"
-  
-  if [ "\$MISSING_PROGRAMS" != "" ]
-  then
-      if [ \$COUNT -gt 1 ]
-      then
-        ray_control script_user_action "\$MISSING_PROGRAMS are missing on this system or are not in the PATH. (They are used by this RaySession). Do you want to stop loading the session ?"
-      else
-        ray_control script_user_action "\$MISSING_PROGRAMS is missing on this system or is not in the PATH. (It is used by this RaySession). Do you want to stop loading the session ?"      
-      fi
-      if [ $? -eq 0 ]
-      then
-        echo "The session load has been aborted by the user."
-        ray_control script_info "The session load has been aborted by the user."
-        exit 0
-      fi
-  fi
-fi
+<xsl:apply-templates select='//template-snippet[@ref-id="ray_script_load_sh"]' mode="copy-no-namespaces"/>
 
 # set this var true if you want all running clients to stop (see top of this file).
 clear_all_clients=false
@@ -187,4 +212,9 @@ ray_control run_step
 # script here some actions to run once the session is loaded.
 
 </xsl:template>
+
+<xsl:template match="*" mode="copy-no-namespaces"><xsl:element name="{local-name()}"><xsl:copy-of select="@*"/><xsl:apply-templates select="node()" mode="copy-no-namespaces"/></xsl:element></xsl:template>
+
+<xsl:template match="comment()| processing-instruction()" mode="copy-no-namespaces"><xsl:copy/></xsl:template>
+
 </xsl:stylesheet>
