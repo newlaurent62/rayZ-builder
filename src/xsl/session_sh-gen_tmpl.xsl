@@ -258,7 +258,7 @@ function set_session_root_and_path() {
     ray_control)
       ray_control quit &gt;&amp;4 2&gt;/dev/null
       echo "-------- Starting new ray daemon " &gt;&amp;4
-      export RAY_CONTROL_PORT=\$(ray_control start_new 2&gt;/dev/null) || error
+      export RAY_CONTROL_PORT=\$(ray_control start_new_hidden 2&gt;/dev/null) || error
       RAY_SESSION_ROOT="\$(ray_control get_root 2&gt;/dev/null)" || error
       
       echo "RAY_SESSION_ROOT: '\$RAY_SESSION_ROOT'" &gt;&amp;4
