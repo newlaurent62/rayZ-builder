@@ -18,11 +18,11 @@ clientCount=0
 function debug_info() {
   if [ "\$1" == "debug" ]
   then
-    exec 4&lt;&gt; /dev/stdout
-    exec 5&lt;&gt; /dev/stderr
+    exec 4&gt;&amp;1
+    exec 5&gt;&amp;2
   else
-    exec 4&lt;&gt; /dev/null
-    exec 5&lt;&gt; /dev/null
+    exec 4&gt;/dev/null
+    exec 5&gt;/dev/null
   fi
 }
 
@@ -475,10 +475,12 @@ function set_client_properties() {
         echo -e "\e[1m\e[31mCould not set description ! (\$clientID)\e[0m"
         error
       fi
+
+      ray_control client \$clientID set_properties icon:"\$icon"
       
       ;;
     nsm)
-      if [ "\$ACTION" == "add_proxy" ]; then
+      if [ "\$ACTION" == "add_proxy" -o "\$ACTION" == "add_hack" ]; then
       
         cat &lt;&lt; EOF_nsmsession_proxy &gt;&gt; "\$session_path/session.nsm"
 \$label:nsm-proxy:\$clientID
@@ -719,12 +721,12 @@ fi
 
 set_session_root_and_path
 
-echo "------ rayZ_templatedir: \$rayZ_templatedir"
-echo "------ filltemplate_dir: \$filltemplate_dir"
-echo "------ session_path: \$session_path"
-echo "------ \$startgui"
-echo "------ \$session_manager"
-echo "------ \$debug"
+echo "------ arg1: rayZ_templatedir: \$rayZ_templatedir"
+echo "------ arg2: filltemplate_dir: \$filltemplate_dir"
+echo "------ arg3: session_path: \$session_path"
+echo "------ arg4: \$session_manager"
+echo "------ arg5: \$startgui"
+echo "------ arg6: \$debug"
 
 init_session
 

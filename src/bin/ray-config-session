@@ -144,14 +144,20 @@ for (( j=0; j<argc; j++ )); do
 done
 
 COMMAND="${cmd[0]}"
-if [ "$NSM_CLIENT_ID" == "" ]
+if [[ "$NSM_CLIENT_ID" == "" && "$RAY_CLIENT_ID" == "" ]]
 then
-  echo -e "\e[1m\e[31mThe NSM_CLIENT_ID is not set ... Cannot run the program !\e[0m"
+  echo -e "\e[1m\e[31mThe NSM_CLIENT_ID and RAY_CLIENT_ID is not set ... Cannot run the program !\e[0m"
   error
+fi
+
+if [ "$NSM_CLIENT_ID" != "" ]; then
+  CLIENT_ID="$NSM_CLIENT_ID"
+else
+  CLIENT_ID="$RAY_CLIENT_ID"
 fi
 RAY_SESSION_NAME="$(basename "$RAY_SESSION_PATH")"
 
-export XDG_CONFIG_HOME="$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID/$CONFIG_HOME"
+export XDG_CONFIG_HOME="$RAY_SESSION_PATH/$RAY_SESSION_NAME.$CLIENT_ID/$CONFIG_HOME"
 
 USE_CATIA=0
 init_catia_if_needed
@@ -159,9 +165,10 @@ init_catia_if_needed
 echo "- PATH: $PATH"
 echo "- XDG_CONFIG_HOME resolved to: $XDG_CONFIG_HOME"
 echo "- NSM_CLIENT_ID: $NSM_CLIENT_ID"
+echo "- RAY_CLIENT_ID: $RAY_CLIENT_ID"
 echo "- RAY_SESSION_NAME: $RAY_SESSION_NAME"
 echo "- RAY_CONTROL_PORT: $RAY_CONTROL_PORT"
-cd "$RAY_SESSION_PATH/$RAY_SESSION_NAME.$NSM_CLIENT_ID" || error
+cd "$RAY_SESSION_PATH/$RAY_SESSION_NAME.$CLIENT_ID" || error
 echo "- PWD: $(pwd)"
 echo "- USE_CATIA: $USE_CATIA"
 echo "- EXEC: $EXEC"
