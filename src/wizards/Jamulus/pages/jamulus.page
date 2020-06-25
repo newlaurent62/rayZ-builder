@@ -30,6 +30,9 @@
       <line-edit default-value="" blank-allowed="True"><regexp-validator type="jackoutputstereo"/><model-jack io-type="output" channel-type="stereo"/></line-edit>
     </field>
   </group>
+  <template-snippet ref-id="ray_script_load_sh">
+<xi:include href="jamulus_page-ray_script_load_sh.tmpl_snippet" parse="text"/>
+  </template-snippet>  
   <template-snippet ref-id="session_sh">
 <xi:include href="jamulus_page-alsa_devices-session_sh.tmpl_snippet" parse="text"/>
   </template-snippet>

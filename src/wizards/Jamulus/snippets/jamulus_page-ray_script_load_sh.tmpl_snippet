@@ -1,0 +1,18 @@
+#if $data['jamulus.bool_start_server'] == 'True'
+  server="$data['jamulus.server']"
+  port="$data['jamulus.port']"
+
+  echo -e "\e[1mCheck that a jamulus port is not user (\$server, \$port) ...\e[0m"
+  
+  if nc -z -v -u \$server \$port
+  then
+    echo -e "\e[31mA server is already running on \$server \$port, please stop it !\e[0m"
+    ray_control script_user_action "<%= tr("A server is already running on $server $port, please stop it !") %>"
+    if [ $? -eq 0 ]
+    then
+      echo "The session load has been aborted by the user."
+      ray_control script_info "<%= tr("The session load has been aborted by the user.") %>"
+      exit 0
+    fi
+  fi
+#end if

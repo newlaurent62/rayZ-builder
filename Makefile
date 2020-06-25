@@ -140,7 +140,7 @@ prepare-dev-ubuntu:
 	
 prepare-jamulus-ubuntu:
 	sudo apt update
-	sudo apt install calf-plugins guitarix papirus-icon-theme obs-studio obs-plugins
+	sudo apt install netcat-openbsd calf-plugins guitarix papirus-icon-theme obs-studio obs-plugins
 
 prepare-simple_example-ubuntu:
 	sudo apt update
