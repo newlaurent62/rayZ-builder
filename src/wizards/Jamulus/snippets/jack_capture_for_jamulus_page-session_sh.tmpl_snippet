@@ -1,9 +1,13 @@
 
 #if 'jack_capture' in $data['wizard.sectionnamelist']
 #for $username in $data['jack_capture.userslist']
+<script>
+# for i18n / translated XML fields like description, label
+username="$username"
+</script>
 <client 
     type="proxy" 
-    icon="audio-recorder"
+    icon="audio-recorder.svg"
     launched="1"
     save_signal="0" 
     stop_signal="2" 
@@ -12,7 +16,7 @@
     with-gui="false">
   <name>jack_capture</name>
   <label>jack_capture</label>
-  <description>Stereo recording of Jamulus $username. To start the recording, press the play button on the jack transport panel (for example in qjackctl). To stop recording unarm the play button. jack_capture will create a file in \$session_path/\$proxy_dir/data with an incremented number.</description>
+  <description>Stereo recording of Jamulus $username. To start the recording, press the play button on the jack transport panel (for example in qjackctl). To stop recording unarm the play button. jack_capture will create a file in $session_path/$proxy_dir/data with an incremented number.</description>
   <command>bin/jack_capture</command>
   <arguments>--jack-transport -f $data['jack_capture.audioformat'] --jack-name "jack_capture-$username" --manual-connections -b 16 -c 2 --filename-prefix data/\$(date +%Y%m%d)-jamulus</arguments>
   <jack-name>jack_capture-$username</jack-name>

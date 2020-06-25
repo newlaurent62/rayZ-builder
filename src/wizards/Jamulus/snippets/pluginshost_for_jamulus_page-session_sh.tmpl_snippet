@@ -2,6 +2,10 @@
 #if 'audio-plugins' in $data['wizard.sectionnamelist']
 #if 'audio-plugins.userslist' in $data
 #for $username in $data['audio-plugins.userslist']
+<script>
+# for i18n / translated XML fields like description, label
+username="$username"
+</script>
 <client 
     type="proxy" 
     icon="calf"
@@ -13,7 +17,7 @@
     with-gui="true">
   <name>alsaplayer</name>
   <label>Calf FX for $username</label>
-  <description>Rack of audio plugins effects : mono input and Stereo output to Jamulus for $username. Save your presets to the proxy dir in \$session_path/\$proxy_dir/.config/calf_${username}.state to load it next time you start this client rather than the default rack you selected in the wizard.</description>
+  <description>Rack of audio plugins effects : mono input and Stereo output to Jamulus for $username. Save your presets to the proxy dir in $session_path/$proxy_dir/.config/calf_${username}.state to load it next time you start this client rather than the default rack you selected in the wizard.</description>
   <command>bin/CalfHost</command>
   <arguments>calf_${username}_fx .config/calf_${username}.state mono ! $data['audio-plugins.users.' + $username + '.plugins'] ! analyzer </arguments>
   <jack-name>calf_${username}_fx</jack-name>

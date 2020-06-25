@@ -47,6 +47,7 @@ build: $(DEFAULT_FILES)
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/session_xml.xsl" -o:"build/$(WIZARD_ID)/xml/session.xml"
 	xmllint --xinclude --schema "src/xsd/session.xsd" "build/$(WIZARD_ID)/xml/session.xml" > "build/$(WIZARD_ID)/xml/xi-session.xml"
 	saxonb-xslt -s:build/$(WIZARD_ID)/xml/xi-session.xml -xsl:"src/xsl/session_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_sh.tmpl"
+	perl -pi -e "s|xxx-LOCALEPATH-xxx|build/$(TEMPLATES_DIR)/$(WIZARD_ID)/locale|g;" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_sh.tmpl"
 
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/ray_script_load_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray_script_load_sh.tmpl"
 
@@ -62,7 +63,11 @@ build: $(DEFAULT_FILES)
 	test -d src/wizards/$(WIZARD_ID)/rayZ-bin/ && cp -r src/wizards/$(WIZARD_ID)/rayZ-bin/* "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin/" || exit 0
 	test -d src/wizards/$(WIZARD_ID)/rayZ-bin/ && find "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/bin" -type f  | xargs chmod 755 || exit 0
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/wizard.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/wizard.py"
-		
+	perl -p -e "s|xxx-DOMAIN-xxx|$(WIZARD_ID)|g;s|xxx-LOCALEPATH-xxx|locale|g;" < src/i18n/rayZ_i18n.py > "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/rayZ_i18n.py"
+	
+	mkdir -p "build/$(TEMPLATES_DIR)/locale/" && xgettext -o "build/$(TEMPLATES_DIR)/locale/$(WIZARD_ID).pot"   -L python --keyword=tr build/$(TEMPLATES_DIR)/$(WIZARD_ID)/*.py
+	cp -r ./src/i18n/$(WIZARD_ID)/locale "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/"
+
 .PHONY: 
 
 exec:
@@ -79,7 +84,9 @@ fill-template:
 
 rayZ_wizards.py:
 	cp src/rayZ_wizards.py build/rayZ_wizards.py
-	perl -pi -e "s|xxx-TEMPLATES_DIR-xxx|build/$(TEMPLATES_DIR)|g" build/rayZ_wizards.py
+	perl -pi -e "s|xxx-DOMAIN-xxx|rayZ_wizards|g;s|xxx-LOCALEPATH-xxx|build/$(TEMPLATES_DIR)/locale|g;s|xxx-TEMPLATES_DIR-xxx|build/$(TEMPLATES_DIR)|g" build/rayZ_wizards.py
+	mkdir -p "build/$(TEMPLATES_DIR)/locale/" && xgettext -o "build/$(TEMPLATES_DIR)/locale/rayZ_wizards.pot"   -L python --keyword=tr build/rayZ_wizards.py
+	cp -r ./src/i18n/rayZ_wizards/locale "build/$(TEMPLATES_DIR)/"
 
 exec-main: rayZ_wizards.py
 	$(PYTHON) build/rayZ_wizards.py
@@ -107,10 +114,10 @@ uninstall-wrapper:
 
 	
 install: install-catia install-wrapper
-	cp src/rayZ_wizards.py build/rayZ_wizards
-	perl -pi -e "s|xxx-TEMPLATES_DIR-xxx|$(PREFIX)/$(TEMPLATES_DIR)|g" build/rayZ_wizards
 	mkdir -p $(PREFIX)/$(TEMPLATES_DIR) $(PREFIX)/bin
-	install -m 755 build/rayZ_wizards $(PREFIX)/bin/rayZ_wizards
+	cp src/rayZ_wizards.py build/rayZ_wizards.py
+	perl -pi -e "s|xxx-LOCALEPATH-xxx|$(PREFIX)/$(TEMPLATES_DIR)/locale|g;s|xxx-TEMPLATES_DIR-xxx|build/$(TEMPLATES_DIR)|g" build/rayZ_wizards.py
+	install -m 755 build/rayZ_wizards.py $(PREFIX)/bin/rayZ_wizards
 	cp -r build/$(TEMPLATES_DIR)/Jamulus $(PREFIX)/$(TEMPLATES_DIR)
 	cp -r build/$(TEMPLATES_DIR)/simple_example $(PREFIX)/$(TEMPLATES_DIR)
 
@@ -123,10 +130,13 @@ uninstall: uninstall-catia uninstall-wrapper
 clean: 
 	rm -rf build
 	find -name "__pycache__" | xargs rm -rf 
-	
+
+prepare-i18n-ubuntu:
+	sudo apt update
+	sudo apt install gettext poedit
 prepare-dev-ubuntu:
 	sudo apt update
-	sudo apt install git make build-essential python3 python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java default-jre python3-lxml pyqt5-dev-tools qttools5-dev-tools qt5-default libjack-jackd2-dev
+	sudo apt install git make build-essential gettext python3 python3-cheetah libxml2-utils python3-pyqt5 libsaxonb-java default-jre python3-lxml pyqt5-dev-tools qttools5-dev-tools qt5-default libjack-jackd2-dev
 	
 prepare-jamulus-ubuntu:
 	sudo apt update

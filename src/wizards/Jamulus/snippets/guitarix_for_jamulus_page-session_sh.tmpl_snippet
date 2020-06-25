@@ -2,6 +2,10 @@
 #if 'guitarix' in $data['wizard.sectionnamelist']
 #if 'guitarix.userslist' in $data
 #for $username in $data['guitarix.userslist']
+<script>
+# for i18n / translated XML fields like description, label
+username="$username"
+</script>
 <client 
     type="proxy" 
     icon="gx_head"

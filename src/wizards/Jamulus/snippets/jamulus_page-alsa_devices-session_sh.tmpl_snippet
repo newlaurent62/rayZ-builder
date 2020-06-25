@@ -1,6 +1,10 @@
 
 #if 'alsa_in_devices' in $data
 #for $device in $data['alsa_in_devices']
+<script>
+# for i18n / translated XML fields like description, label
+device="$device"
+</script>
 <client 
     type="proxy" 
     icon="alsa_in_x11"
@@ -23,6 +27,10 @@
 
 #if 'alsa_out_devices' in $data
 #for $device in $data['alsa_out_devices']
+<script>
+# for i18n / translated XML fields like description, label
+device="$device"
+</script>
 <client 
     type="proxy" 
     icon="alsa_out_x11"

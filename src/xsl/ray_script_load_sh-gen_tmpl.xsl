@@ -29,7 +29,7 @@
 #                                                                      =
 #=======================================================================
 
-
+#from rayZ_i18n import *
 
 # script here some actions to run before loading the session.
 
@@ -58,17 +58,17 @@ function check_server_running() {
         if [ "\$(systemctl status \$SERVICE | grep "active (running)")" == "" ]
         then
           
-          if ray_control script_user_action "It seems that \$1 is not running in systemd. This session use it. Please start it using 'sudo systemctl start \$SERVICE'. Do you want to stop loading the session ?"; then
+          if ray_control script_user_action "&lt;%= tr("It seems that {servername} is not running in systemd. This session use it. Please start it using 'sudo systemctl start {servicename}'. Do you want to stop loading the session ?").format(servername="$1", servicename="$SERVICE") %&gt;"; then
             echo "The session load has been aborted by the user."
-            ray_control script_info "The session load has been aborted by the user."
+            ray_control script_info "&lt;%= tr("The session load has been aborted by the user.") %&gt;"
             exit 0
           fi
         fi
     else
         echo "\$1 does not exist in systemd."
-        if ray_control script_user_action "It seems that \$1 is not installed in systemd. This session use it. Please install it. Do you want to stop loading the session ?"; then
+        if ray_control script_user_action "&lt;%= tr("It seems that {servername} is not installed in systemd. This session use it. Please install it. Do you want to stop loading the session ?").format(servername="$1") %&gt;"; then
           echo "The session load has been aborted by the user."
-          ray_control script_info "The session load has been aborted by the user."
+          ray_control script_info "&lt;%= tr("The session load has been aborted by the user.") %&gt;"
           exit 0
         fi
     fi
@@ -110,14 +110,14 @@ if \$CHECK_PROGRAMS; then
   then
     if [ \$count -gt 1 ]
     then
-      ray_control script_user_action "\$missing_executables are missing on this system or are not in the PATH. They are used by this session. Do you want to stop loading the session ?"
+      ray_control script_user_action "&lt;%= tr("%s are missing on this system or are not in the PATH. They are used by this session. Do you want to stop loading the session ?") % "$missing_executables" %&gt;"
     else
-      ray_control script_user_action "\$missing_executables is missing on this system or is not in the PATH. It is used by this session. Do you want to stop loading the session ?"      
+      ray_control script_user_action "&lt;%= tr("%s is missing on this system or is not in the PATH. It is used by this session. Do you want to stop loading the session ?") % "$missing_executables" %&gt;" 
     fi
     if [ $? -eq 0 ]
     then
       echo "The session load has been aborted by the user."
-      ray_control script_info "The session load has been aborted by the user."
+      ray_control script_info "&lt;%= tr("The session load has been aborted by the user.") %&gt;"
       exit 0
     fi
   else
@@ -131,9 +131,9 @@ if \$USE_JACK; then
     if jack_control status &gt;/dev/null 2&gt;&amp;1; then
       DIFF_JACK_PARAM="\$(ray-jack_config_script get_diff)"
       if [ "\$DIFF_JACK_PARAM" != "" ]; then
-        if ray_control script_user_action "The jack settings of this ray session differs from the current jack settings ! If you choose ignore, the jack server will be restarted with the jack settings of this ray session otherwise if you click Yes, the session load will be stopped. Your choice ?"; then
+        if ray_control script_user_action "&lt;%= tr("The jack settings of this session differs from the current jack settings ! If you choose ignore, the jack server will be restarted with the session jack settings otherwise if you click Yes, the session load will be stopped. Your choice ?") %&gt;"; then
             echo "The session load has been aborted by the user."
-            ray_control script_info "The session load has been aborted by the user."
+            ray_control script_info "&lt;%= tr("The session load has been aborted by the user.") %&gt;"
             exit 0
         fi    
       else
@@ -146,9 +146,9 @@ if \$USE_JACK; then
   else
     jack_control status &gt;/dev/null 2&gt;&amp;1
     if [ $? -ne 0 ]; then      
-      if ray_control script_user_action 'The jack server is not started ! Please start it using qjackctl or other software. Do you want to stop loading the session ?'; then
+      if ray_control script_user_action "&lt;%= tr("The jack server is not started ! Please start it using qjackctl or other software. Do you want to stop loading the session ?") %&gt;"; then
         echo "The session load has been aborted by the user."
-        ray_control script_info "The session load has been aborted by the user."
+        ray_control script_info "&lt;%= tr("The session load has been aborted by the user.") %&gt;"
         exit 0
       fi
     fi
@@ -179,15 +179,15 @@ if \$CHECK_ADDITIONNAL_AUDIO_DEVICES; then
       if [ \$count -gt 1 ]
       then
         echo -e "\e[31mMissing device \$missing_devices\e[0m"
-        ray_control script_user_action "\$missing_devices audio devices are missing on this system. They are used by this session. Do you want to stop loading the session ?"
+        ray_control script_user_action "&lt;%= tr("%s audio devices are missing on this system. They are used by this session. Do you want to stop loading the session ?") % "$missing_devices" %&gt;"
       else
         echo -e "\e[31mMissing devices \$missing_devices\e[0m"
-        ray_control script_user_action "\$missing_devices audio device is missing on this system. It is used by this session. Do you want to stop loading the session ?"
+        ray_control script_user_action "&lt;%= tr("%s audio device is missing on this system. It is used by this session. Do you want to stop loading the session ?") % "$missing_devices" %&gt;"
       fi
       if [ $? -eq 0 ]
       then
         echo "The session load has been aborted by the user."
-        ray_control script_info "The session load has been aborted by the user."
+        ray_control script_info "&lt;%= tr("The session load has been aborted by the user.") %&gt;"
         exit 0
       fi
   fi

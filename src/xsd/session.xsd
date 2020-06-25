@@ -6,6 +6,7 @@
         <xsd:element name="info">
           <xsd:complexType>
             <xsd:sequence>
+              <xsd:element name="id" type="xsd:string"/>
               <xsd:element name="title" type="xsd:string"/>
               <xsd:element name="category" type="xsd:string"/>
               <xsd:element name="keywords">

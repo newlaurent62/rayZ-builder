@@ -2,6 +2,9 @@
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="text" encoding="utf-8" indent="yes" />
 <xsl:template match="/session">#!/bin/bash
+
+#from rayZ_i18n import *
+
 # Parameters
 session_name="\$1"
 filltemplate_dir="\$2"
@@ -12,18 +15,20 @@ debug="\$6"
 
 clientCount=0
 
-
 function debug_info() {
   if [ "\$1" == "debug" ]
   then
     exec 4&lt;&gt; /dev/stdout
+    exec 5&lt;&gt; /dev/stderr
   else
     exec 4&lt;&gt; /dev/null
+    exec 5&lt;&gt; /dev/null
   fi
 }
 
 function close_debug_info() {
   exec 4&gt;&amp;-
+  exec 5&gt;&amp;-
 }
 
 ######
@@ -87,7 +92,7 @@ function create_clientID() {
       echo "__ create client ID __ (using ray_control)"  &gt;&amp;4
       if [ "\$ACTION" == "add_executable" ]
       then
-        clientID=\$(ray_control \$ACTION "\$PROGRAM" not_start 2&gt;/dev/null)
+        clientID=\$(ray_control \$ACTION "\$PROGRAM" not_start 2&gt;&amp;5)
         if [ \$? -ne 0 ]
         then
           echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
@@ -95,7 +100,15 @@ function create_clientID() {
         fi      
       elif [ "\$ACTION" == "add_proxy" ]
       then
-        clientID=\$(ray_control add_executable "\$PROGRAM" via_proxy not_start 2&gt;/dev/null)
+        clientID=\$(ray_control add_executable "\$PROGRAM" via_proxy not_start 2&gt;&amp;5)
+        if [ \$? -ne 0 ]
+        then
+          echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
+          error
+        fi
+      elif [ "\$ACTION" == "add_hack" ]
+      then
+        clientID=\$(ray_control add_executable "\$PROGRAM" ray_hack not_start 2&gt;&amp;5)
         if [ \$? -ne 0 ]
         then
           echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
@@ -183,24 +196,52 @@ function create_proxy() {
   case "\$session_manager" in
     ray_control)      
       mkdir -p "\$session_path/\$session_name.\$clientID"
-      if [ "\$xdg_config_home" == "" ]; then
-        ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
-              config_file:"\$config_file" \
-              no_save_level:"\$no_save_level" \
-              arguments:"\$arguments" \
-              save_signal:"\$save_signal" \
-              executable:"\$executable" \
-              stop_signal:"\$stop_signal" 2&gt;/dev/null
-      else
-        wrapper=ray-config-session
-        ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
-              config_file:"\$config_file" \
-              no_save_level:"\$no_save_level" \
-              arguments:"--xdg-config-home \"\$xdg_config_home\" -- \$executable \$arguments" \
-              save_signal:"\$save_signal" \
-              executable:"ray-config-session" \
-              stop_signal:"\$stop_signal" 2&gt;/dev/null
-      fi
+      case "\$ACTION" in
+        add_proxy)
+            if [ "\$xdg_config_home" == "" ]; then      
+              ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
+                    config_file:"\$config_file" \
+                    no_save_level:"\$no_save_level" \
+                    arguments:"\$arguments" \
+                    save_signal:"\$save_signal" \
+                    executable:"\$executable" \
+                    stop_signal:"\$stop_signal" 2&gt;&amp;5
+            else
+              ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
+                    config_file:"\$config_file" \
+                    no_save_level:"\$no_save_level" \
+                    arguments:"--xdg-config-home \"\$xdg_config_home\" -- \$executable \$arguments" \
+                    save_signal:"\$save_signal" \
+                    executable:"ray-config-session" \
+                    stop_signal:"\$stop_signal" 2&gt;&amp;5
+              PROGRAM=ray-config-session
+            fi
+            ;;
+        add_hack)
+            if [ "\$xdg_config_home" == "" ]; then      
+              ray_control client \$clientID set_properties wait_win:"\$wait_window" \
+                    config_file:"\$config_file" \
+                    no_save_level:"\$no_save_level" \
+                    arguments:"\$arguments" \
+                    save_sig:"\$save_signal" \
+                    executable:"\$executable" \
+                    stop_sig:"\$stop_signal" 2&gt;&amp;5
+            else
+              ray_control client \$clientID set_properties executable:"ray-config-session" \
+                    wait_win:"\$wait_window" \
+                    config_file:"\$config_file" \
+                    no_save_level:"\$no_save_level" \
+                    arguments:"--xdg-config-home \"\$xdg_config_home\" -- \$executable \$arguments" \
+                    save_sig:"\$save_signal" \
+                    stop_sig:"\$stop_signal" 2&gt;&amp;5
+              PROGRAM=ray-config-session
+            fi        
+            ;;
+        *)
+            echo -e "\e[31mUnknown \$ACTION type ! (create_proxy)"
+            error
+            ;;
+      esac
       proxy_dir="\$session_name.\$clientID"
       if [ $? -ne 0 ]
       then
@@ -256,10 +297,10 @@ function set_session_root_and_path() {
 
   case "\$session_manager" in
     ray_control)
-      ray_control quit &gt;&amp;4 2&gt;/dev/null
+      ray_control quit &gt;&amp;4 2&gt;&amp;5
       echo "-------- Starting new ray daemon " &gt;&amp;4
-      export RAY_CONTROL_PORT=\$(ray_control start_new_hidden 2&gt;/dev/null) || error
-      RAY_SESSION_ROOT="\$(ray_control get_root 2&gt;/dev/null)" || error
+      export RAY_CONTROL_PORT=\$(ray_control start_new_hidden 2&gt;&amp;5) || error
+      RAY_SESSION_ROOT="\$(ray_control get_root 2&gt;&amp;5)" || error
       
       echo "RAY_SESSION_ROOT: '\$RAY_SESSION_ROOT'" &gt;&amp;4
       session_root=\${RAY_SESSION_ROOT:-\$HOME/Ray Sessions}
@@ -360,19 +401,31 @@ function set_client_properties() {
   description=""
   icon=""
     
-  if [ "\$ACTION" == "add_proxy" ];then
-    if [ "\$session_manager" == "nsm" ];then
-      name="\${name:-NSM PROXY \$PROGRAM}"
-      executable="nsm-proxy"
-    else
-      name="\${name:-RAY PROXY \$PROGRAM}"
-      executable="ray-proxy"
-    fi
-  else
-    name="\${name:-\$PROGRAM}"
-    executable="\$PROGRAM"
-  fi
-
+  case "\$ACTION" in
+    add_proxy)
+      if [ "\$session_manager" == "nsm" ];then
+        name="\${name:-NSM PROXY \$PROGRAM}"
+        executable="nsm-proxy"
+      else
+        name="\${name:-RAY PROXY \$PROGRAM}"
+        executable="ray-proxy"
+      fi
+      ;;
+    add_hack)
+      if [ "\$session_manager" == "nsm" ];then
+        name="\${name:-NSM PROXY \$PROGRAM}"
+        executable="nsm-proxy"
+      else
+        name="\${name:-RAY HACK \$PROGRAM}"
+        executable="\$PROGRAM"
+      fi
+      ;;
+    *)
+      name="\${name:-\$PROGRAM}"
+      executable="\$PROGRAM"
+      ;;
+  esac
+  
   if [ "\$label" == "" ]; then
     echo -e "\e[1m\e[31mThe label must set ! clientID: '\$clientID'\e[0m"
     error
@@ -407,8 +460,7 @@ function set_client_properties() {
           icon:"\$icon" \
           label:"\$label" \
           executable:"\$executable" \
-          icon:"\$icon" \
-          name:"\$name" &gt;&amp;4 2&gt;/dev/null
+          name:"\$name" &gt;&amp;4 2&gt;&amp;5
 
       if [ \$? -ne 0 ]
       then
@@ -416,7 +468,7 @@ function set_client_properties() {
         error
       fi
       
-      ray_control client \$clientID set_description "\$description" &gt;&amp;4 2&gt;/dev/null || error
+      ray_control client \$clientID set_description "\$description" &gt;&amp;4 2&gt;&amp;5 || error
       
       if [ \$? -ne 0 ]
       then
@@ -443,7 +495,7 @@ EOF_nsmsession_exec
     *)
       echo "unknown session-manager '\$session_manager' error in set_client_properties"
       error
-      ;;
+<!--       ;; -->
   esac
 
 }
@@ -479,12 +531,12 @@ function set_jackclient_properties() {
   echo "__ set_jackclient_properties __ ( \$jackclientname ) : windowtitle: \$windowtitle, layer: \$layer, clienttype: \$clienttype, with_gui: \$with_gui" &gt;&amp;4
   
   if [ "\$layer" != "" -a "\$session_manager" == "ray_control" ]; then
-    ray_control client "\$clientID" set_custom_data jacknames "\$jackclientname" &gt;&amp;4 2&gt;/dev/null
-    ray_control client "\$clientID" set_custom_data windowtitle "\$windowtitle" &gt;&amp;4 2&gt;/dev/null
-    ray_control client "\$clientID" set_custom_data layer "\$layer" &gt;&amp;4 2&gt;/dev/null
-    ray_control client "\$clientID" set_custom_data guitoload "\$guitoload" &gt;&amp;4 2&gt;/dev/null
-    ray_control client "\$clientID" set_custom_data with_gui "\$with_gui"  &gt;&amp;4 2&gt;/dev/null
-    ray_control client "\$clientID" set_custom_data clienttype "\$clienttype" &gt;&amp;4 2&gt;/dev/null
+    ray_control client "\$clientID" set_custom_data jacknames "\$jackclientname" &gt;&amp;4 2&gt;&amp;5
+    ray_control client "\$clientID" set_custom_data windowtitle "\$windowtitle" &gt;&amp;4 2&gt;&amp;5
+    ray_control client "\$clientID" set_custom_data layer "\$layer" &gt;&amp;4 2&gt;&amp;5
+    ray_control client "\$clientID" set_custom_data guitoload "\$guitoload" &gt;&amp;4 2&gt;&amp;5
+    ray_control client "\$clientID" set_custom_data with_gui "\$with_gui"  &gt;&amp;4 2&gt;&amp;5
+    ray_control client "\$clientID" set_custom_data clienttype "\$clienttype" &gt;&amp;4 2&gt;&amp;5
     
   fi
 }
@@ -500,9 +552,9 @@ function init_session() {
     ray_control)
       
       echo "-------- Create new session named \$session_name"
-      ray_control new_session "\$session_name"  &gt;&amp;4 2&gt;/dev/null || error
+      ray_control new_session "\$session_name"  &gt;&amp;4 2&gt;&amp;5 || error
 
-      session_path="\$(ray_control get_session_path 2&gt;/dev/null)" || error
+      session_path="\$(ray_control get_session_path 2&gt;&amp;5)" || error
 
       create_clientID add_executable "ray-jackpatch" "JACK Connections"
       patchID="\$clientID"
@@ -570,7 +622,7 @@ function end_session() {
     ray_control)
       
       echo "-------- Save and close the session" &gt;&amp;4
-      ray_control close &gt;&amp;4 2&gt;/dev/null || error
+      ray_control close &gt;&amp;4 2&gt;&amp;5 || error
 
       ray_patch
 
@@ -580,7 +632,7 @@ function end_session() {
       filename="\$session_path/raysession.xml"
       cp "\$filename" "\$session_path/default/raysession.xml.backup" || error
 
-      ray_control quit &gt;&amp;4 2&gt;/dev/null || error
+      ray_control quit &gt;&amp;4 2&gt;&amp;5 || error
       echo -e "\e[1m\e[32mRay Session '\$session_name' in '\$session_path' created successfully.\e[0m"
 
       ;;
@@ -727,10 +779,10 @@ echo "End section:: <xsl:value-of select="section-name"/>" &gt;&amp;4
 
 <xsl:template match="client" mode="copy-no-namespaces">
 # assign clientID variable
-create_clientID add_proxy "<xsl:value-of select="command"/>" "<xsl:value-of select="label"/>"
+create_clientID add_hack "<xsl:value-of select="command"/>" "<xsl:value-of select="label"/>"
 
 # create proxy
-create_proxy  --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>" \
+create_proxy  --label "&lt;%= tr("<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>") %&gt;"  \
               --executable "<xsl:value-of select="command"/>" \
               --arguments "<xsl:text> </xsl:text><xsl:value-of select="replace(arguments,'&quot;', '\\&quot;')"/>" \
               --save_signal <xsl:value-of select="@save_signal"/> \
@@ -742,9 +794,9 @@ create_proxy  --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')
 # set client properties
 set_client_properties --icon "<xsl:value-of select="@icon"/>" \
                       --launched <xsl:value-of select="@launched"/> \
-                      --description "<xsl:value-of select="replace(description,'&quot;', '\\&quot;')"/>" \
+                      --description "&lt;%= tr("<xsl:value-of select="replace(description,'&quot;', '\\&quot;')" />") %&gt;" \
                       --name "<xsl:value-of select="replace(name,'&quot;', '\\&quot;')"/>" \
-                      --label "<xsl:value-of select="replace(label,'&quot;', '\\&quot;')"/>"
+                      --label "&lt;%= tr("<xsl:value-of select="replace(label,'&quot;', '\\&quot;')" />") %&gt;"
 <xsl:if test="jack-name">
 set_jackclient_properties <xsl:text> --jackclientname </xsl:text> "<xsl:for-each select="jack-name"><xsl:if test="position() > 1">;</xsl:if><xsl:value-of select="replace(.,'&quot;', '\\&quot;')"/></xsl:for-each>" \
                           <xsl:text> --windowtitle </xsl:text>"<xsl:value-of select="replace(window-title-regexp,'&quot;', '\\&quot;')"/>" \

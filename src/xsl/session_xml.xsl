@@ -4,6 +4,7 @@
 <xsl:template match="/wizard">
   <![CDATA[<session>]]>
     &lt;info&gt;
+      &lt;id&gt;<xsl:value-of select="@id"/>&lt;/id&gt;
       &lt;title&gt;<xsl:value-of select="info/title"/>&lt;/title&gt;
       &lt;category&gt;<xsl:value-of select="info/category"/>&lt;/category&gt;
       &lt;keywords&gt;<xsl:value-of select="info/keywords"/>&lt;/keywords&gt;

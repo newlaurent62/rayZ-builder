@@ -1,12 +1,14 @@
 echo -e "\e[1mCheck icecast2 server ...\e[0m"
-if ! nc -z -v $server $port
+server="$server"
+port="$port"
+if ! nc -z -v \$server \$port
 then
-  echo -e "\e[31mIcecast2 server on $server $port is not responding !\e[0m"
-  ray_control script_user_action "The icecast2 server $server:$port is not responding ... Please start it and ignore the message or stop loading the session"
+  echo -e "\e[31mIcecast2 server on \$server \$port is not responding !\e[0m"
+  ray_control script_user_action "<%= tr("The icecast2 server $server:$port is not responding ... Please start it and ignore the message or stop loading the session") %>"
   if [ $? -eq 0 ]
   then
     echo "The session load has been aborted by the user."
-    ray_control script_info "The session load has been aborted by the user."
+    ray_control script_info "<= tr("The session load has been aborted by the user.") %>"
     exit 0
   fi
 else

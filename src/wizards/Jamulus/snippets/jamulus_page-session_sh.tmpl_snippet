@@ -13,6 +13,10 @@
 #set servargs=''
 #set servdescription='Jamulus server on localhost'
 #end if
+<script>
+# for i18n / translated XML fields like description, label
+servdescription="$servdescription"
+</script>
 <client 
     type="proxy" 
     icon="jamulus-server"
@@ -38,6 +42,12 @@
 </client>
 #end if
 #for $username in $data['global.userslist']
+<script>
+# for i18n / translated XML fields like description, label
+username="$username"
+jamulus_server="$jamulus_server"
+jamulus_port="$jamulus_port"
+</script>
 <client 
     type="proxy" 
     icon="jamulus-client"

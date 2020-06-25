@@ -23,8 +23,9 @@ import getopt
 import traceback
 import pprint
 
-# Project files
+# Project modules
 from rayZ_ui import *
+from rayZ_i18n import *
 
 _debug = None
 
@@ -77,10 +78,10 @@ class DataModel:
       if 'wizard' in config.sections() and 'id' in config['wizard']:
         if not (config['wizard']['id'] == '<xsl:value-of select="@id"/>'):
           QtWidgets.QMessageBox.critical(self,
-                                            "Wizard loading ...",
-                                            "The conf file (%s) has not been built by this wizard (%s)" % (self.configfilename, '<xsl:value-of select="@id"/>'))
+                                            tr("Wizard loading ..."),
+                                            tr("The configuration file ({configfile}) has not been built by this wizard ({wizardid}) !").format(configfile=self.configfilename, wizardid='<xsl:value-of select="@id"/>'))
           
-          raise Exception('The %s file is not has not been built by %s wizard !' % (self.configfilename, '<xsl:value-of select="@id"/>'))
+          raise Exception(tr('The configuration file ({configfile}) has not been built by this wizard ({wizardid}) !').format(configfile=self.configfilename, wizardid='<xsl:value-of select="@id"/>'))
       else:
         if _debug:
           print ('wizard.id is missing ... Try to use %s anyway !' % self.configfilename)
@@ -434,10 +435,10 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
 
         
     def initializePage(self):
-        self.setTitle('<xsl:value-of select='first-page/title'/>')
-        self.labelDescription.setText('<xsl:apply-templates select='first-page/description' mode="description"/>')
+        self.setTitle(tr('<xsl:value-of select='first-page/title'/>'))
+        self.labelDescription.setText(tr('<xsl:apply-templates select='first-page/description' mode="description"/>'))
         if self.wizard().startguioption:
-          self.checkStartgui.setText('Check if you want to start GUI once the Session document has been created')
+          self.checkStartgui.setText(tr('Check if you want to start session manager GUI once the session has been created'))
           self.checkStartgui.show()
         else:
           self.checkStartgui.hide()
@@ -453,7 +454,7 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         try:
           sectionnames = self.wizard().datamodel.config['wizard']['sectionnames'].split(',')
         except:
-          print("wizard.sectionnames property not found or not well formed")
+          print(tr("wizard.sectionnames property not found or not well formed"))
           pass
           
         group = None
@@ -465,33 +466,33 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         allrequired = False
         if not(group):
           group = QtWidgets.QTreeWidgetItem(self.treeApplications)
-          group.setText(0, "<xsl:value-of select="../short-title"/>")          
+          group.setText(0, tr("<xsl:value-of select="../short-title"/>"))          
           group.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
           group.setCheckState(0, QtCore.Qt.Unchecked)
-          group.setToolTip(0,"[optional] <xsl:value-of select="../title"/>")
-          group.setToolTip(1,"[optional] <xsl:value-of select="../title"/>")
+          group.setToolTip(0,tr("[optional] <xsl:value-of select="../title"/>"))
+          group.setToolTip(1,tr("[optional] <xsl:value-of select="../title"/>"))
           
         child = QtWidgets.QTreeWidgetItem(group)
         child.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        child.setText(0, "<xsl:value-of select="short-title"/>")
+        child.setText(0, tr("<xsl:value-of select="short-title"/>"))
         child.setText(1, "<xsl:value-of select="@section-name"/>")
-        child.setToolTip(0,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
-        child.setToolTip(1,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
+        child.setToolTip(0,tr("[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>"))
+        child.setToolTip(1,tr("[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>"))
         if child.text(1) in sectionnames:
           child.setCheckState(0, QtCore.Qt.Checked)
           group.setCheckState(0, QtCore.Qt.Checked)
         else:
           child.setCheckState(0, QtCore.Qt.Unchecked)
           
-        self.hashSteps['<xsl:value-of select="short-title"/>'] = self.wizard().Page_<xsl:value-of select="@id"/>
+        self.hashSteps[tr('<xsl:value-of select="short-title"/>')] = self.wizard().Page_<xsl:value-of select="@id"/>
             </xsl:when>
             <xsl:when test="not(parent::node()/name() = 'page-group')">
         group = None
         parent = QtWidgets.QTreeWidgetItem(self.treeApplications)
-        parent.setText(0, "<xsl:value-of select="short-title"/>")
+        parent.setText(0, tr("<xsl:value-of select="short-title"/>"))
         parent.setText(1, "<xsl:value-of select="@section-name"/>")
-        parent.setToolTip(0,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
-        parent.setToolTip(1,"[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>")
+        parent.setToolTip(0,tr("[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>"))
+        parent.setToolTip(1,tr("[<xsl:value-of select="@use"/>] <xsl:value-of select="title"/>"))
         parent.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
           <xsl:if test="@use = 'optional'">
         allrequired = False
@@ -504,12 +505,12 @@ class <xsl:value-of select='first-page/@id'/>Page(BasePage):
         parent.setCheckState(0, QtCore.Qt.Checked)
         parent.setDisabled(True)
           </xsl:if>
-        self.hashSteps['<xsl:value-of select="short-title"/>'] = self.wizard().Page_<xsl:value-of select="@id"/>
+        self.hashSteps[tr('<xsl:value-of select="short-title"/>')] = self.wizard().Page_<xsl:value-of select="@id"/>
             </xsl:when>
           </xsl:choose>
         </xsl:for-each>
         if allrequired:
-          self.labelMessage.setText('All steps are required.')
+          self.labelMessage.setText(tr('All steps are required.'))
           
     def validatePage(self):
         if self.wizard().startguioption:
@@ -562,51 +563,6 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         layout = QtWidgets.QVBoxLayout(self)
         <xsl:apply-templates mode="__init__add_to_layout"/>
 
-<!--        layout = QtWidgets.QVBoxLayout()
-        <xsl:for-each select='field'>
-        layout.addWidget(self._label_<xsl:value-of select='@id'/>)
-        <xsl:choose>
-        <xsl:when test='@type = "CheckLineEdit"'>
-        layout.addLayout(self._<xsl:value-of select='@id'/>.layout())
-        </xsl:when>
-        <xsl:when test='@type = "SessionNameCheckLineEdit"'>
-        layout.addLayout(self._<xsl:value-of select='@id'/>.layout())
-        </xsl:when>
-        <xsl:when test='@type = "PathLineEdit"'>
-        layout.addLayout(self._<xsl:value-of select='@id'/>.layout())
-        </xsl:when>
-        <xsl:when test='@type = "UsersListEdit"'>
-        self._<xsl:value-of select='@id'/>.addToLayout(layout)
-        </xsl:when>
-        <xsl:when test='@type = "TableWidgetWithComboBox"'>
-        layout.addWidget(self._<xsl:value-of select='@id'/>)
-        </xsl:when>
-        <xsl:otherwise>
-        layout.addWidget(self._<xsl:value-of select='@id'/>)
-        </xsl:otherwise>
-        </xsl:choose>
-        </xsl:for-each>
-        
-        self.setLayout(layout)
-        
-        <xsl:for-each select='field'>
-        <xsl:choose>
-        <xsl:when test='@type = "QComboBox"'>
-        self.registerField(self.sectionName + '.<xsl:value-of select='@id'/>', self._<xsl:value-of select='@id'/>, "currentText")
-        </xsl:when>
-        <xsl:when test='@type = "PathLineEdit"  or @type = "CheckLineEdit" or @type = "SessionNameCheckLineEdit"'>
-        self.registerField(self.sectionName + '.<xsl:value-of select='@id'/>', self._<xsl:value-of select='@id'/>.lineEdit)
-        </xsl:when>
-        
-        <xsl:when test='@type = "UsersListEdit"'>
-        </xsl:when>
-        <xsl:otherwise>
-        self.registerField(self.sectionName + '.<xsl:value-of select='@id'/>', self._<xsl:value-of select='@id'/>)
-        </xsl:otherwise>
-        </xsl:choose>
-        </xsl:for-each>
--->      
-
     def readData(self, config, datamodel):
           if _debug:
             print('[====== readData')
@@ -628,12 +584,12 @@ class <xsl:value-of select='@id'/>Page(BasePage):
         else:
           self.defaults()
 
-        self.setTitle('<xsl:value-of select='title'/>')
+        self.setTitle(tr('<xsl:value-of select='title'/>'))
         <xsl:for-each select='field'>
-        self._label_<xsl:value-of select='@id'/>.setText('<xsl:value-of select='label'/>')
+        self._label_<xsl:value-of select='@id'/>.setText(tr('<xsl:value-of select='label'/>'))
         </xsl:for-each>
         <xsl:for-each select='group'>
-        self._label_<xsl:value-of select='@id'/>.setText('<xsl:value-of select='label'/>')
+        self._label_<xsl:value-of select='@id'/>.setText(tr('<xsl:value-of select='label'/>'))
         </xsl:for-each>
         if _debug:
           print ("]==== initializePage " + self.sectionName)
@@ -698,8 +654,8 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
       self.sectionName = None
 
     def initializePage(self):
-      self.setTitle('<xsl:value-of select='last-page/title'/>')
-      self.labelDescription.setText('<xsl:apply-templates select='last-page/description' mode="description"/>')
+      self.setTitle(tr('<xsl:value-of select='last-page/title'/>'))
+      self.labelDescription.setText(tr('<xsl:apply-templates select='last-page/description' mode="description"/>'))
       
       str_conf = self.wizard().cleanConfAsString()  
       self.textEdit.setPlainText(str_conf)
@@ -733,8 +689,8 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
           SessionTemplate().fillInTemplate(datamodelfile, templatedir, tmpdir, startgui=self.wizard().startgui, session_manager=self.wizard().session_manager, conffile=conffile, debug=_debug)
           QtWidgets.QApplication.restoreOverrideCursor()
           QtWidgets.QMessageBox.information(self,
-                                            "Session creation ...",
-                                            "The Session has been successfully created.")
+                                            tr("Session creation ..."),
+                                            tr("The Session has been successfully created."))
           return True
         except Exception as exception:
           traceback.print_exc()
@@ -742,27 +698,27 @@ class <xsl:value-of select="last-page/@id"/>Page(BasePage):
           print("Exception message: {}".format(exception))          
           QtWidgets.QApplication.restoreOverrideCursor()
           QtWidgets.QMessageBox.critical(self,
-                                            "Session creation ...",
-                                            "An error occured during the creation process (see logs for more details)")
+                                            tr("Session creation ..."),
+                                            tr("An error occured during the creation process (see logs for more details)"))
           return False
       else:
         QtWidgets.QMessageBox.critical(self,
-                                            "Session creation ...",
-                                            "The Session already exists ! '" + self.wizard().datamodel.session_path + "'&lt;br/&gt;Please try another name.")
+                                            tr("Session creation ..."),
+                                            tr("The Session already exists ! '") + self.wizard().datamodel.session_path + tr("'&lt;br/&gt;Please try another name."))
       return False
 
       
 def usage():
-  print ("Usage:")
-  print ("wizard.py [options)")
-  print ("   -h|--help              : print this help text")
-  print ("   -d                     : debug information")
-  print ("   -c|--conf-file         : set the conf filename to read/write")
-  print ("   -j|--write-json-file   : set the JSON file to write. It is used to fill the template and contains user inputs and wizard outputs variables.")
-  print ("   -s|--start-gui-option  : the wizard will display an option for starting raysession software at the end of the document creation.")
-  print ("   -m|--session-manager   : set the session-manager of the resulting document")
-  print ("                             - ray_control : (default) create a raysession document. You will need raysession software for the processing,")
-  print ("                             - nsm         : create a nsm session. You wont need non-session-manager for the document generation,")
+  print (tr("Usage:"))
+  print (tr("wizard.py [options)"))
+  print (tr("   -h|--help              : print this help text"))
+  print (tr("   -d                     : debug information"))
+  print (tr("   -c|--conf-file         : set the conf filename to read/write"))
+  print (tr("   -j|--write-json-file   : set the JSON file to write. It is used to fill the template and contains user inputs and wizard outputs variables."))
+  print (tr("   -s|--start-gui-option  : the wizard will display an option for starting session manager GUI at the end of the session creation."))
+  print (tr("   -m|--session-manager   : set the session-manager of the resulting document"))
+  print (tr("                             - ray_control : (default) create a ray session. You will need RaySession software for the session generation,"))
+  print (tr("                             - nsm         : create a nsm session. You wont need non-session-manager for the session generation,"))
   
 if __name__ == '__main__':
   jsonfilename = None
@@ -783,18 +739,18 @@ if __name__ == '__main__':
       sys.exit()                  
     elif opt in ('-c', '--conf-file'):
       conffile = arg
-      print ('read/write conf file %s' % conffile)
+      print (tr('read/write conf file %s') % conffile)
     elif opt in ('-d', "--debug"):
       _debug = True               
     elif opt in ("-j", "--write-json-file"):
       jsonfilename = arg
-      print ("will write a json file '%s' when finishing the wizard steps." % jsonfilename)
+      print (tr("will write a json file '%s' when finishing the wizard steps.") % jsonfilename)
     elif opt in ("-s", "--start-gui-option"):
       startguioption=True
     elif opt in ("-m", "--session-manager"):
       session_manager=arg
       if session_manager not in ['ray_control', 'nsm']:  
-        print ('--session-manager options : "ray_control|nsm"')
+        print (tr('--session-manager options : "ray_control|nsm"'))
         sys.exit(2)
   
   print ('[==== wizard')
@@ -943,13 +899,13 @@ __init_create_instance RULES
 <xsl:template match="group" mode="__init__create_instance">
         fields=[]
         headers=[]
-        self._label_<xsl:value-of select='@id'/> = CLabel('<xsl:value-of select='label'/>')
+        self._label_<xsl:value-of select='@id'/> = CLabel(tr('<xsl:value-of select='label'/>'))
         <xsl:apply-templates select="field" mode="__init__create_instance"/>
         self._<xsl:value-of select='@id'/> = CGroupOfComponentWidget(None, fields,sectionName=self.sectionName, headerlist=headers<xsl:if test="@min">,minChecked=<xsl:value-of select="@min"/></xsl:if><xsl:if test="@max">,maxChecked=<xsl:value-of select="@max"/></xsl:if>,key='<xsl:value-of select='@id'/>', display='<xsl:value-of select='@display'/>')
 </xsl:template>
 
 <xsl:template match="field" mode="__init__create_instance">
-        self._label_<xsl:value-of select='@id'/> = CLabel('<xsl:value-of select='label'/>')
+        self._label_<xsl:value-of select='@id'/> = CLabel(tr('<xsl:value-of select='label'/>'))
         headers.append(self._label_<xsl:value-of select='@id'/>)
         modelAction = None        
   <xsl:choose>
@@ -962,7 +918,7 @@ __init_create_instance RULES
         fields.append(self._<xsl:value-of select='@id'/>)
     </xsl:when>
     <xsl:when test="checkbox">
-        self._<xsl:value-of select='@id'/> = CCheckBox('<xsl:value-of select='label'/>', defaultvalue=<xsl:value-of select='checkbox/@default-value'/>, sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
+        self._<xsl:value-of select='@id'/> = CCheckBox(tr('<xsl:value-of select='label'/>'), defaultvalue=<xsl:value-of select='checkbox/@default-value'/>, sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
         self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
         fields.append(self._<xsl:value-of select='@id'/>)
     </xsl:when>
@@ -1037,7 +993,7 @@ __init_create_instance RULES
           </xsl:if>
         except Exception as e:
           print (e)
-          print ('Could not initialize the field values for "<xsl:value-of select='@id'/>".')
+          print (tr('Could not initialize the field values for "<xsl:value-of select='@id'/>".'))
     
 </xsl:template>
 

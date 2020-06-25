@@ -13,26 +13,29 @@ import getopt
 import tempfile
 import lxml
 
+# Project modules
+from rayZ_i18n import *
+
 class SessionTemplate:
     
   def fillInTemplate(self, datamodelfile, rayZtemplatedir, outdir, fillonly=False, startgui=False, session_manager=None, conffile=None, debug=None):
     print ('[==== fillInTemplate:')
     if not os.path.isfile(rayZtemplatedir + os.sep + "info_wizard.xml"):
-      raise Exception('%s is not a rayZtemplatedir !' % rayZtemplatedir)
+      raise Exception(tr('%s is not a rayZtemplatedir !') % rayZtemplatedir)
     
     if not os.path.isdir(rayZtemplatedir):
-      raise Exception('rayZtemplatedir "%s" must be a directory !' % rayZtemplatedir)
+      raise Exception(tr('rayZtemplatedir "%s" must be a directory !') % rayZtemplatedir)
     
     sys.path.append(rayZtemplatedir)
 
     if conffile and not os.path.isfile(conffile):
-      raise Exception('conf file "%s" must be a file !' % conffile)
+      raise Exception(tr('conf file "%s" must be a file !') % conffile)
 
     if not os.path.isfile(datamodelfile):
-      raise Exception('datamodel "%s" must be a file !' % datamodelfile)
+      raise Exception(tr('datamodel "%s" must be a file !') % datamodelfile)
 
     if not os.path.isdir(outdir):
-      raise Exception('outdir "%s" must be a directory !' % outdir)
+      raise Exception(tr('outdir "%s" must be a directory !') % outdir)
         
     srcpath = rayZtemplatedir + os.sep + 'default'
     if os.path.isdir(srcpath):
@@ -105,17 +108,17 @@ class SessionTemplate:
     <xsl:apply-templates select='template/fill-template[@type="create-session"][1]'/>
 
 def usage():
-  print ("Usage:")
-  print ("tmpl_wizard.py [options)")
-  print ("   -h|--help                  : print this help text")
-  print ("   -d                         : debug information")
-  print ("   -j|--read-json-file  arg   : set the JSON file to read. It is used to fill template and contains wizard inputs. (default to ./datamodel.json)")
-  print ("   -t|--rayZ-template-dir arg : set the rayZ template directory that contains the template related to this wizard. (default to ~/.local/share/raysession-templates/<xsl:value-of select="@id"/>")
-  print ("   -f|--fill-only             : fill the template only (do not create the raysession")
-  print ("   -s|--start-gui             : Once the raysession document has been created start the raysession GUI.")
-  print ("   -m|--session-manager       : set the session-manager of the resulting document")
-  print ("                                - ray_control : create a raysession document. You will need raysession software for the processing,")
-  print ("                                - nsm         : create a nsm session. You wont need non-session-manager for the document generation,")
+  print (tr("Usage:"))
+  print (tr("tmpl_wizard.py [options)"))
+  print (tr("   -h|--help                  : print this help text"))
+  print (tr("   -d                         : debug information"))
+  print (tr("   -j|--read-json-file  arg   : set the JSON file to read. It is used to fill template and contains wizard inputs. (default to %s)") % "./datamodel.json")
+  print (tr("   -t|--rayZ-template-dir arg : set the rayZ template directory that contains the template related to this wizard. (default to %s)") % "~/.local/share/raysession-templates/<xsl:value-of select="@id"/>")
+  print (tr("   -f|--fill-only             : fill the template only (do not create the raysession"))
+  print (tr("   -s|--start-gui             : Once the session has been created start the session manager GUI."))
+  print (tr("   -m|--session-manager       : set the session-manager of the resulting document"))
+  print (tr("                                - ray_control : create a ray session document. You will need RaySession software for the processing,"))
+  print (tr("                                - nsm         : create a nsm session. You wont need non-session-manager for the document generation,"))
 
 if __name__ == '__main__':
   datamodelfile = "./datamodel.json"
@@ -140,10 +143,10 @@ if __name__ == '__main__':
         _debug = True               
     elif opt in ("-j", "--read-json-file"):
         datamodelfile = arg
-        print ("will write a json file '%s' when finishing the wizard steps." % datamodelfile)
+        print (tr("will write a json file '%s' when finishing the wizard steps.") % datamodelfile)
     elif opt in ("-t", "--rayZ-template-dir"):
         rayZtemplatedir = arg
-        print ("rayZ template dir is '%s'" % rayZtemplatedir)
+        print (tr("rayZ template dir is '%s'") % rayZtemplatedir)
     elif opt in ("-f", "--fill-only"):
         fillonly = True
     elif opt in ("-s", "--start-gui"):
@@ -151,13 +154,13 @@ if __name__ == '__main__':
     elif opt in ("-m", "--session-manager"):
       session_manager=arg
       if session_manager not in ['ray_control', 'nsm']:  
-        print ('--session-manager options : "ray_control|nsm"')
+        print (tr('--session-manager options : "ray_control|nsm"'))
         sys.exit(2)
   
   tmpdir = tempfile.mkdtemp()
   
   if SessionTemplate().fillInTemplate(datamodelfile, rayZtemplatedir, tmpdir, fillonly=fillonly, startgui=startgui, session_manager=session_manager, debug=_debug) == 0:          
-    print('The session has been successfully created.')
+    print(tr('The session has been successfully created.'))
   
 </xsl:template>
 

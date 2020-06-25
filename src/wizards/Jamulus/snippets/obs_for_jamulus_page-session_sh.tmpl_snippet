@@ -1,27 +1,21 @@
-#if 'obs_facebook' in $data['wizard.sectionnamelist'] or 'obs_youtube' in $data['wizard.sectionnamelist'] or 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] or 'obs_icecast2_video' in $data['wizard.sectionnamelist']
-#if 'obs_facebook' in $data['wizard.sectionnamelist'] 
-#set obssection = 'obs_facebook'
-#set streamingtype = 'facebook'
-#set startrecording = ''
-#set $obs_description = 'Obs video streaming to facebook.'
-#elif 'obs_youtube' in $data['wizard.sectionnamelist'] 
-#set obssection = 'obs_youtube'
-#set streamingtype = 'youtube'
-#set startrecording = ''
-#set $obs_description = 'Obs video streaming to youtube.'
-#elif 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] 
+#if 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] or 'obs_icecast2_video' in $data['wizard.sectionnamelist']
+#if 'obs_icecast2_audio' in $data['wizard.sectionnamelist'] 
 #set obssection = 'obs_icecast2_audio'
 #set streamingtype = 'icecast2_audio_mp3'
-#set startrecording = '--startrecording'
-#set $obs_description = 'Obs mp3 audio streaming to icecast2 (to read the stream open the URL in vlc, web browser or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' ).'
+#set $format = 'mp3'
 #elif 'obs_icecast2_video' in $data['wizard.sectionnamelist']
 #set obssection = 'obs_icecast2_video'
 #set streamingtype = 'icecast2_video_ts'
-#set startrecording = ''
-#set $obs_description = 'Obs mp2ts video streaming to icecast2 (to read the stream open the URL in vlc or other stream reader http://' + $data[$obssection + '.server'] + ':' + $data[$obssection + '.port'] + $data[$obssection + '.mount'] + ' ).' 
+#set $format = 'mp2ts'
 #end if
-
 #if len($data[$obssection + '.obs_connectedlist']) == 1
+<script>
+# for i18n / translated XML fields like description, label
+server="$data[$obssection + '.server']"
+port="$data[$obssection + '.port']"
+mount="$data[$obssection + '.mount']"
+format="$format"
+</script>
 <client 
     type="proxy" 
     icon="com.obsproject.Studio"
@@ -34,9 +28,9 @@
     with-gui="true">
   <name>obs studio</name>
   <label>obs</label>
-  <description>$obs_description</description>
+  <description>Obs streaming to icecast2 in $format (to read the stream open the URL in vlc or other stream reader http://$server:$port$mount ).</description>
   <command>obs</command>
-  <arguments>--profile $streamingtype --scene $streamingtype $startrecording</arguments>
+  <arguments>--profile $streamingtype --scene $streamingtype</arguments>
   <jack-name>OBS Stream</jack-name>
   <window-title-regexp>OBS.*?$streamingtype</window-title-regexp>
   <nsm-protocol>
