@@ -17,7 +17,7 @@ username="$username"
     with-gui="true"
     xdg-config-home=".config">
   <name>Guitarix</name>
-  <label>Guitar amp and FX for $username</label>
+  <label>Amp &amp; FX for $username</label>
   <description>Virtual guitar amplifier and effects : mono input and Stereo output to Jamulus for $username.</description>
   <command>guitarix</command>
   <arguments>--name guitarix-$username --rcset=Gold</arguments>
