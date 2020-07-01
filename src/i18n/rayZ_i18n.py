@@ -14,9 +14,6 @@ if debug:
   print ('localedir: %s, domain: %s' % (localedir, domain))
   
 
-try:
-    traduction = gettext.translation(domain, localedir)
-    tr = traduction.gettext
-except:
-    tr = gettext.gettext
+traduction = gettext.translation(domain, localedir, fallback=True)
+tr = traduction.gettext
 
