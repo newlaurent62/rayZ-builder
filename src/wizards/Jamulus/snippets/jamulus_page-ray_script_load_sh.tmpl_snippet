@@ -2,7 +2,7 @@
   server="$data['jamulus.server']"
   port="$data['jamulus.port']"
 
-  echo -e "\e[1mCheck that a jamulus port is not user (\$server, \$port) ...\e[0m"
+  echo -e "\e[1mCheck that a jamulus port is not used ...\e[0m"
   
   if nc -z -v -u \$server \$port
   then
@@ -14,5 +14,7 @@
       ray_control script_info "<%= tr("The session load has been aborted by the user.") %>"
       exit 0
     fi
+  else
+    echo -e "\e[32mPort is free (\$server \$port).\e[0m"
   fi
 #end if
