@@ -92,7 +92,9 @@ function create_clientID() {
       echo "__ create client ID __ (using ray_control)"  &gt;&amp;4
       if [ "\$ACTION" == "add_executable" ]
       then
+        
         clientID=\$(ray_control \$ACTION "\$PROGRAM" not_start 2&gt;&amp;5)
+        
         if [ \$? -ne 0 ]
         then
           echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
@@ -100,7 +102,10 @@ function create_clientID() {
         fi      
       elif [ "\$ACTION" == "add_proxy" ]
       then
+        
         clientID=\$(ray_control add_executable "\$PROGRAM" via_proxy not_start 2&gt;&amp;5)
+        
+
         if [ \$? -ne 0 ]
         then
           echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
@@ -108,7 +113,9 @@ function create_clientID() {
         fi
       elif [ "\$ACTION" == "add_hack" ]
       then
+        
         clientID=\$(ray_control add_executable "\$PROGRAM" ray_hack not_start 2&gt;&amp;5)
+        
         if [ \$? -ne 0 ]
         then
           echo -e "\e[1m\e[31mCould not create proxy with ray_control !\e[0m"
@@ -199,6 +206,7 @@ function create_proxy() {
       case "\$ACTION" in
         add_proxy)
             if [ "\$xdg_config_home" == "" ]; then      
+              
               ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
                     config_file:"\$config_file" \
                     no_save_level:"\$no_save_level" \
@@ -206,7 +214,10 @@ function create_proxy() {
                     save_signal:"\$save_signal" \
                     executable:"\$executable" \
                     stop_signal:"\$stop_signal" 2&gt;&amp;5
+              
+                    
             else
+              
               ray_control client \$clientID set_proxy_properties wait_window:"\$wait_window" \
                     config_file:"\$config_file" \
                     no_save_level:"\$no_save_level" \
@@ -214,11 +225,13 @@ function create_proxy() {
                     save_signal:"\$save_signal" \
                     executable:"ray-config-session" \
                     stop_signal:"\$stop_signal" 2&gt;&amp;5
+                              
               PROGRAM=ray-config-session
             fi
             ;;
         add_hack)
             if [ "\$xdg_config_home" == "" ]; then      
+                          
               ray_control client \$clientID set_properties wait_win:"\$wait_window" \
                     config_file:"\$config_file" \
                     no_save_level:"\$no_save_level" \
@@ -226,7 +239,9 @@ function create_proxy() {
                     save_sig:"\$save_signal" \
                     executable:"\$executable" \
                     stop_sig:"\$stop_signal" 2&gt;&amp;5
+              
             else
+              
               ray_control client \$clientID set_properties executable:"ray-config-session" \
                     wait_win:"\$wait_window" \
                     config_file:"\$config_file" \
@@ -234,6 +249,7 @@ function create_proxy() {
                     arguments:"--xdg-config-home \"\$xdg_config_home\" -- \$executable \$arguments" \
                     save_sig:"\$save_signal" \
                     stop_sig:"\$stop_signal" 2&gt;&amp;5
+                                
               PROGRAM=ray-config-session
             fi        
             ;;
@@ -297,10 +313,14 @@ function set_session_root_and_path() {
 
   case "\$session_manager" in
     ray_control)
+      
       ray_control quit &gt;&amp;4 2&gt;&amp;5
+      
       echo "-------- Starting new ray daemon " &gt;&amp;4
+      
       export RAY_CONTROL_PORT=\$(ray_control start_new_hidden 2&gt;&amp;5) || error
       RAY_SESSION_ROOT="\$(ray_control get_root 2&gt;&amp;5)" || error
+      
       
       echo "RAY_SESSION_ROOT: '\$RAY_SESSION_ROOT'" &gt;&amp;4
       session_root=\${RAY_SESSION_ROOT:-\$HOME/Ray Sessions}
@@ -456,17 +476,19 @@ function set_client_properties() {
 
   case "\$session_manager" in
     ray_control)
+      
       ray_control client \$clientID set_properties launched:"\$launched" \
           icon:"\$icon" \
           label:"\$label" \
           executable:"\$executable" \
           name:"\$name" &gt;&amp;4 2&gt;&amp;5
-
+      
       if [ \$? -ne 0 ]
       then
         echo -e "\e[1m\e[31mCould not set properties ! (\$clientID)\e[0m"
         error
       fi
+      
       
       ray_control client \$clientID set_description "\$description" &gt;&amp;4 2&gt;&amp;5 || error
       
@@ -474,10 +496,7 @@ function set_client_properties() {
       then
         echo -e "\e[1m\e[31mCould not set description ! (\$clientID)\e[0m"
         error
-      fi
-
-      ray_control client \$clientID set_properties icon:"\$icon"
-      
+      fi      
       ;;
     nsm)
       if [ "\$ACTION" == "add_proxy" -o "\$ACTION" == "add_hack" ]; then
@@ -554,12 +573,17 @@ function init_session() {
     ray_control)
       
       echo "-------- Create new session named \$session_name"
+      
       ray_control new_session "\$session_name"  &gt;&amp;4 2&gt;&amp;5 || error
+      
 
+      
       session_path="\$(ray_control get_session_path 2&gt;&amp;5)" || error
+      
 
       create_clientID add_executable "ray-jackpatch" "JACK Connections"
       patchID="\$clientID"
+
       set_client_properties --icon "curve-connector" \
                             --launched 1 \
                             --description "Manage save/restore jack conections." \
@@ -624,8 +648,9 @@ function end_session() {
     ray_control)
       
       echo "-------- Save and close the session" &gt;&amp;4
+      
       ray_control close &gt;&amp;4 2&gt;&amp;5 || error
-
+      
       ray_patch
 
       ray_scripts
