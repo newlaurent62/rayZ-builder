@@ -13,7 +13,10 @@ domain = 'xxx-DOMAIN-xxx'
 if debug:
   print ('localedir: %s, domain: %s' % (localedir, domain))
   
-# Set up your magic function
-t = gettext.translation(domain, localedir)
-tr = t.gettext
+
+try:
+    traduction = gettext.translation(domain, localedir)
+    tr = traduction.gettext
+except:
+    tr = gettext.gettext
 
