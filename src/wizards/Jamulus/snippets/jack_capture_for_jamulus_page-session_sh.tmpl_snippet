@@ -7,7 +7,7 @@ username="$username"
 </script>
 <client 
     type="proxy" 
-    icon="audio-recorder.svg"
+    icon="/usr/share/icons/Papirus/32x32/apps/audio-recorder"
     launched="1"
     save_signal="0" 
     stop_signal="2" 

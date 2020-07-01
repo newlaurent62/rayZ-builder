@@ -8,7 +8,7 @@ username="$username"
 </script>
 <client 
     type="proxy" 
-    icon="gx_head"
+    icon="/usr/share/pixmaps/gx_head"
     launched="1"
     save_signal="0" 
     stop_signal="15" 
