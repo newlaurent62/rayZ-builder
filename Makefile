@@ -15,7 +15,7 @@ TMPL_ARGS := --debug
 # -----------------------------------------------------------------------------------------------------------------------------------------
 
 
-all: $(ALL_FILES)
+all: $(ALL_FILES) rayZ_wizards.py
 
 build: $(DEFAULT_FILES)
 
@@ -115,9 +115,10 @@ uninstall-wrapper:
 	
 install: install-catia install-wrapper
 	mkdir -p $(PREFIX)/$(TEMPLATES_DIR) $(PREFIX)/bin
-	cp src/rayZ_wizards.py build/rayZ_wizards.py
-	perl -pi -e "s|xxx-LOCALEPATH-xxx|$(PREFIX)/$(TEMPLATES_DIR)/locale|g;s|xxx-TEMPLATES_DIR-xxx|build/$(TEMPLATES_DIR)|g" build/rayZ_wizards.py
-	install -m 755 build/rayZ_wizards.py $(PREFIX)/bin/rayZ_wizards
+	cp src/rayZ_wizards.py build/rayZ_wizards
+	perl -pi -e "s|xxx-DOMAIN-xxx|rayZ_wizards|g;s|xxx-LOCALEPATH-xxx|$(PREFIX)/$(TEMPLATES_DIR)/locale|g;s|xxx-TEMPLATES_DIR-xxx|build/$(TEMPLATES_DIR)|g" build/rayZ_wizards
+	cp -r ./src/i18n/rayZ_wizards/locale "$(PREFIX)/$(TEMPLATES_DIR)/"
+	install -m 755 build/rayZ_wizards $(PREFIX)/bin/rayZ_wizards
 	cp -r build/$(TEMPLATES_DIR)/Jamulus $(PREFIX)/$(TEMPLATES_DIR)
 	cp -r build/$(TEMPLATES_DIR)/simple_example $(PREFIX)/$(TEMPLATES_DIR)
 
