@@ -173,6 +173,7 @@
   <xsd:complexType name="field">
     <xsd:sequence>
       <xsd:element name="label" type="xsd:string"/>
+      <xsd:element name="description" type="xsd:string" minOccurs="0"/>
       
       <!-- INPUT CHECK TYPE -->                    
       <xsd:choice>

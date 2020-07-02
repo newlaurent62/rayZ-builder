@@ -7,6 +7,7 @@
     <label>Check the users that will have audio plugins and fill there initial configuration</label>
     <field id="jack_inputs">
       <label>Jack input(s)</label>
+      <description><![CDATA[Example:<br/><i>1->L</i><br/><br/>Indicates that system:capture_1 connects to Audio plugins input mono<br/>You can have several inputs: simply leave a space between inputs]]></description>
       <line-edit default-value="" blank-allowed="True"><regexp-validator type="jackinputmono"/><model-jack io-type="input" channel-type="mono"/></line-edit>
     </field>
     <field id="plugins">

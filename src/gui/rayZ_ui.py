@@ -257,6 +257,7 @@ class CCheckBox(QtWidgets.QCheckBox, UI):
 
   def copyUI(self, parent=None):
     component = CCheckBox(self.text(), sectionName=self.sectionName()(), key=self.key, minChecked=self.minChecked, maxChecked=self.maxChecked, parent=parent)
+    component.setToolTip(self.toolTip())
     modelaction = self.modelAction()
     if modelaction:
       component.setModelAction(modelaction.copyUI(parent=combo))
@@ -307,6 +308,7 @@ class CComboBox(QtWidgets.QComboBox, UI):
 
   def copyUI(self, parent=None):
     combo = ComboBox(itemlist=self.itemlist, roleitemlist=self.roleitemlist, sectionName=self.sectionName(),key=self.key, defaultvalue=self.defaultvalue, parent=parent)
+    combo.setToolTip(self.toolTip())
     modelaction = self.modelAction()
     if modelaction:
       combo.setModelAction(modelaction.copyUI(parent=combo))
@@ -368,6 +370,7 @@ class CListWidget(QtWidgets.QListWidget, UI):
 
   def copyUI(self, parent=None):
     list = ListWidget(itemlist=self.itemlist, roleitemlist=self.roleitemlist, selectedlist=self.selectedlist,selectionMode=self.selectionMode, parent=parent)
+    list.setToolTip(self.toolTip())
     modelaction = self.modelAction()
     if modelaction:
       list.setModelAction(modelaction.copyUI(parent=combo))
@@ -509,6 +512,7 @@ class CLineEdit(QtWidgets.QWidget, UI):
   def copyUI(self, parent):
     sectionName = super().sectionName()
     anobject = CLineEdit(parent=parent, defaultvalue=self.defaultvalue, sectionName=sectionName, key=self.key, inputMask=self.inputMask, blankAllowed=self.blankAllowed,message=self.message)
+    anobject.setToolTip(self.toolTip())
     validator = self.validator()
     if validator:
       copyOfvalidator = validator.copyUI(parent=anobject) 
@@ -1017,7 +1021,8 @@ class CListOfComboBox(QtWidgets.QWidget, UI):
     self.transform(config, datamodel, key)
     
   def copyUI(self, parent):
-    component = CListOfComboBox(itemlist=self.itemlist, roleitemlist=self.roleitemlist, defaultvalue=self.defaultvalue, parent=parent, sectionName=self.sectionName(), count=self.count, key=self.key, display=self.display, seperator=self.seperator, ignoreblank=self.ignoreblank)
+    component = CListOfComboBox(itemlist=self.itemlist, roleitemlist=self.roleitemlist, defaultvalue=self.defaultvalue, parent=parent, sectionName=self.sectionName(), count=self.count, key=self.key, display=self.display,
+    seperator=self.seperator, ignoreblank=self.ignoreblank)
     modelaction = self.modelAction()
     if modelaction:
       component.setModelAction(modelaction.copyUI(parent=combo))

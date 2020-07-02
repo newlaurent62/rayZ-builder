@@ -877,7 +877,9 @@ __init_add_to_layout RULES
 <xsl:template match='title|short-title|requires|template-snippet|template' mode="__init__add_to_layout"/>
 
 <xsl:template match="field" mode="__init__add_to_layout">
+    <xsl:if test="not(checkbox)">
         layout.addWidget(self._label_<xsl:value-of select='@id'/>)
+    </xsl:if>
         layout.addWidget(self._<xsl:value-of select='@id'/>)
 </xsl:template>
 
@@ -915,11 +917,17 @@ __init_create_instance RULES
         self._<xsl:value-of select='@id'/> = CLineEdit(sectionName=self.sectionName, key='<xsl:value-of select='@id'/>', defaultvalue='<xsl:value-of select="line-edit/@default-value"/>', blankAllowed=<xsl:value-of select='line-edit/@blank-allowed'/>, message=False<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
         self._<xsl:value-of select='@id'/>.setValidator(validator)
         self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        <xsl:if test="description">
+        self._<xsl:value-of select="@id"/>.setToolTip(tr('<xsl:value-of select="description"/>'))
+        </xsl:if>
         fields.append(self._<xsl:value-of select='@id'/>)
     </xsl:when>
     <xsl:when test="checkbox">
         self._<xsl:value-of select='@id'/> = CCheckBox(tr('<xsl:value-of select='label'/>'), defaultvalue=<xsl:value-of select='checkbox/@default-value'/>, sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
         self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        <xsl:if test="description">
+        self._<xsl:value-of select="@id"/>.setToolTip(tr('<xsl:value-of select="description"/>'))
+        </xsl:if>
         fields.append(self._<xsl:value-of select='@id'/>)
     </xsl:when>
     <xsl:when test="combobox">
@@ -928,6 +936,9 @@ __init_create_instance RULES
         <xsl:apply-templates select="combobox/*"/>
         self._<xsl:value-of select='@id'/> = CComboBox(itemlist=itemlist, roleitemlist=roleitemlist, defaultvalue='<xsl:value-of select='combobox/@default-value'/>', sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
         self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        <xsl:if test="description">
+        self._<xsl:value-of select="@id"/>.setToolTip(tr('<xsl:value-of select="description"/>'))
+        </xsl:if>
         fields.append(self._<xsl:value-of select='@id'/>)
     </xsl:when>
     <xsl:when test="listbox">
@@ -937,6 +948,9 @@ __init_create_instance RULES
         <xsl:apply-templates select="listbox/*"/>
         self._<xsl:value-of select='@id'/> = CListWidget(itemlist=itemlist, roleitemlist=roleitemlist, selectedlist=selectedlist, selectionMode=<xsl:value-of select='listbox/@selection-mode'/>, sectionName=self.sectionName, key='<xsl:value-of select='@id'/>'<xsl:if test="not (ancestor::group)">, parent=self</xsl:if>)
         self._<xsl:value-of select='@id'/>.setModelAction(modelAction)
+        <xsl:if test="description">
+        self._<xsl:value-of select="@id"/>.setToolTip(tr('<xsl:value-of select="description"/>'))
+        </xsl:if>
         fields.append(self._<xsl:value-of select='@id'/>)
     </xsl:when>
     <xsl:when test="list-of-combobox">

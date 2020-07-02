@@ -4,9 +4,10 @@
   <short-title>Virtual guitar amplifier</short-title>
   <requires executable="guitarix" version="0.9.73"/> 
   <group id="users" display="ListCheckableH" list-id="global.userslist" min="1">
-    <label>Check the jamulus users that need a virtual guitar amplifier and effects and input the jack input(s) of the amplifier for each user checked &lt;br/&gt;Example for &lt;b&gt;inputs: 1-&gt;L&lt;/b&gt; = system:capture_1 to Guitarix input (mono)&lt;br/&gt; You can also add another device to the jack setup by using: (ALSA short name):(input or output number). Example: U22:1-&gt;L (input), ...</label>
+    <label>Check the jamulus users that need a virtual guitar amplifier and effects</label>
     <field id="jack_inputs">
       <label>Jack input(s)</label>
+      <description><![CDATA[Example:<br/><i>1->L</i><br/><br/>Indicates that system:capture_1 connects to Guitarix input mono<br/>You can have several inputs: simply leave a space between inputs]]></description>
       <line-edit default-value="" blank-allowed="True"><regexp-validator type="jackinputmono"/><model-jack io-type="input" channel-type="mono"/></line-edit>
     </field>
   </group>
