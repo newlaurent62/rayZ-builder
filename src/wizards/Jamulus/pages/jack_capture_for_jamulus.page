@@ -5,6 +5,7 @@
   <requires executable="jack_capture" version="0.9.73"/> 
   <field id='audioformat'>
     <label>The output audio format</label>
+    <description><![CDATA[The wav audio format takes more disk space but needs less CPU.<br/> Ogg and mp3 formats are greedy of cpu]]></description>
     <combobox default-value="WAV format file">
       <role-items>
         <item id='mp3' label='MP3 format file'/>
