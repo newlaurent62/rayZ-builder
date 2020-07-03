@@ -1,0 +1,13 @@
+#if $data['global.bool_optimize'] == 'True' and 'jack' not in $data['wizard.sectionnamelist']
+
+  if ! \$USE_JACK_SETTINGS && \$USE_JACK; then
+    echo -e "\e[1mRemove pulseaudio sink and source from jack ...\e[0m"
+    pactl unload-module module-jack-sink && pactl unload-module module-jack-source
+  fi
+
+#elif $data['global.bool_optimize'] == 'False'
+  
+  echo "set-default-sink jack_out" | pacmd
+  echo "set-default-source jack_in" | pacmd
+  
+#end if
