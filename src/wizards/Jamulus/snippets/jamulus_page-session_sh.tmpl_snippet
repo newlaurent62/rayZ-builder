@@ -2,20 +2,24 @@
 #if 'jamulus' in $data['wizard.sectionnamelist']
 #set $jamulus_server=$data['jamulus.server']
 #set $jamulus_port=$data['jamulus.port']
-
-#if $data['jamulus.bool_start_server'] == 'True'
-#set servargs = ''
-#set servdescription = ''
-#if $data['jamulus.bool_multitrack_record'] == 'True'
-#set servargs=' --recording data'
-#set servdescription='Jamulus server on localhost with multitrack recording activated'
+#if $data['global.bool_optimize'] == 'True'
+#set servargs = '--nogui'
+#set nogui='( nogui )'
 #else
-#set servargs=''
-#set servdescription='Jamulus server on localhost'
+#set servargs = ''
+#set nogui=''
+#end if
+#if $data['jamulus.bool_start_server'] == 'True'
+#if $data['jamulus.bool_multitrack_record'] == 'True'
+#set servargs=$servargs + ' --recording data'
+#set servdescription='Jamulus server ' + $nogui + ' on localhost with multitrack recording activated'
+#else
+#set servdescription='Jamulus server on localhost ' + $nogui
 #end if
 <script>
 # for i18n / translated XML fields like description, label
 servdescription="$servdescription"
+nogui="$nogui"
 </script>
 <client 
     type="proxy" 
@@ -27,7 +31,7 @@ servdescription="$servdescription"
     no_save_level="2"
     with-gui="true">
   <name>jamulus server</name>
-  <label>jamulus-server</label>
+  <label>jamulus-server $nogui</label>
   <description>$servdescription</description>
   <command>bin/Jamulus</command>
   <arguments>--server --port $jamulus_port --inifile ".config/Jamulus/server.ini"  $servargs</arguments>
@@ -73,8 +77,11 @@ jamulus_port="$jamulus_port"
   </nsm-protocol>
 </client>
 <script>
-generate_file_from_template "jamulus_ini" "{'username': '$username'}" "\$proxy_dir/.config/Jamulus/${username}.ini" || error
-
+#if $data['global.bool_optimize'] == 'True'
+  generate_file_from_template "jamulus_client_minimal_ini" "{'username': '$username'}" "\$proxy_dir/.config/Jamulus/${username}.ini" || error
+#else
+  generate_file_from_template "jamulus_client_ini" "{'username': '$username'}" "\$proxy_dir/.config/Jamulus/${username}.ini" || error
+#end if
 </script>
 #end for
 #end if
