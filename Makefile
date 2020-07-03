@@ -50,7 +50,7 @@ build: $(DEFAULT_FILES)
 	perl -pi -e "s|xxx-LOCALEPATH-xxx|build/$(TEMPLATES_DIR)/$(WIZARD_ID)/locale|g;" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/session_sh.tmpl"
 
 	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/ray_script_load_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray_script_load_sh.tmpl"
-
+	saxonb-xslt -s:build/$(TEMPLATES_DIR)/$(WIZARD_ID)/xi-wizard.xml -xsl:"src/xsl/ray_script_close_sh-gen_tmpl.xsl" -o:"build/$(TEMPLATES_DIR)/$(WIZARD_ID)/ray_script_close_sh.tmpl"
 
 	cheetah3 c -R --nobackup --idir "build/$(TEMPLATES_DIR)/$(WIZARD_ID)" --odir "build//$(TEMPLATES_DIR)/$(WIZARD_ID)"
 	mkdir -p "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/local/bin" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/local/share/icons" "build/$(TEMPLATES_DIR)/$(WIZARD_ID)/default"
@@ -105,6 +105,7 @@ uninstall-catia:
 	rm -f $(PREFIX)/bin/switch-to-catia.sh
 	
 install-wrapper:
+	mkdir -p $(PREFIX)/bin
 	install -m 755 src/bin/ray-config-session $(PREFIX)/bin/ray-config-session
 	install -m 755 src/bin/nsm-config-session $(PREFIX)/bin/nsm-config-session
 
@@ -114,7 +115,7 @@ uninstall-wrapper:
 
 	
 install: install-catia install-wrapper
-	mkdir -p $(PREFIX)/$(TEMPLATES_DIR) $(PREFIX)/bin
+	mkdir -p $(PREFIX)/$(TEMPLATES_DIR)
 	cp src/rayZ_wizards.py build/rayZ_wizards
 	perl -pi -e "s|xxx-DOMAIN-xxx|rayZ_wizards|g;s|xxx-LOCALEPATH-xxx|$(PREFIX)/$(TEMPLATES_DIR)/locale|g;s|xxx-TEMPLATES_DIR-xxx|build/$(TEMPLATES_DIR)|g" build/rayZ_wizards
 	cp -r ./src/i18n/rayZ_wizards/locale "$(PREFIX)/$(TEMPLATES_DIR)/"
