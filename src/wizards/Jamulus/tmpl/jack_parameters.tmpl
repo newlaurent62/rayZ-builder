@@ -20,5 +20,10 @@ jack_started:1
 /driver/dither:n
 /driver/shorts:0
 /driver/midi-driver:seq
+#if $data['global.bool_optimize'] == 'True'
+pulseaudio_sinks:0
+pulseaudio_sources:0
+#else
 pulseaudio_sinks:2
 pulseaudio_sources:2
+#end if
