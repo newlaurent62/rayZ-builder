@@ -20,6 +20,7 @@
   ],
   "global.requirelist": [],
   "global.session_name": "XFGHY_Jamulus",
+  "global.bool_optimize": "True",
   "global.users": "bass,vocal,mixer",
   "global.userslist": [
     "bass",
@@ -57,7 +58,7 @@
   "jamulus.requirelist": [
     "Jamulus"
   ],
-  "jamulus.server": "collectif-paris.ddns.net",
+  "jamulus.server": "localhost",
   "jamulus.users.bass.jack_inputs.inLlist": [],
   "jamulus.users.bass.jack_inputs.inRlist": [],
   "jamulus.users.bass.jack_outputs.outLlist": [],
