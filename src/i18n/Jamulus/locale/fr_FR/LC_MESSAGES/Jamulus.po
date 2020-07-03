@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-02 11:03+0200\n"
-"PO-Revision-Date: 2020-07-02 11:11+0200\n"
+"POT-Creation-Date: 2020-07-03 12:01+0200\n"
+"PO-Revision-Date: 2020-07-03 12:03+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -35,7 +35,7 @@ msgstr ""
 #: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:339
 #: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:358
 #: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:411
-#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:443
+#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:454
 msgid "The session load has been aborted by the user."
 msgstr "Le chargement de la session a été abandonné par l'utilisateur."
 
@@ -107,12 +107,12 @@ msgstr ""
 "Le périphérique audio %s est manquant sur le système. Il est utilisé par "
 "cette session. Voulez-vous stopper le chargement de la session en cours ?"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:437
+#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:448
 msgid "A server is already running on $server $port, please stop it !"
 msgstr "Un server tourne déjà sur $server $port, SVP arrêtez le !"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:470
-#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:507
+#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:482
+#: build/share/rayZ-builder/session-templates/Jamulus/ray_script_load_sh.py:519
 msgid ""
 "The icecast2 server $server:$port is not responding ... Please start it and "
 "ignore the message or stop loading the session"
@@ -138,31 +138,31 @@ msgstr "Périphérique de lecture $device"
 msgid "Playback device on sound card hw:$device"
 msgstr "Périphérique de lecture sur la carte son hw:$device"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1021
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1045
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1020
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1044
 msgid "jamulus-server"
 msgstr "serveur jamulus"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1041
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1040
 msgid "$servdescription"
 msgstr "$servdescription"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1087
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1117
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1086
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1116
 msgid "Jamulus $username"
 msgstr "Jamulus $username"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1113
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1112
 msgid "Jamulus for $username connected to $jamulus_server:$jamulus_port"
 msgstr ""
 "Jamulus pour $username connecté au serveur  $jamulus_server:$jamulus_port"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1183
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1204
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1193
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1214
 msgid "Amp & FX for $username"
 msgstr "Amp & FX pour $username"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1200
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1210
 msgid ""
 "Virtual guitar amplifier and effects : mono input and Stereo output to "
 "Jamulus for $username."
@@ -170,12 +170,12 @@ msgstr ""
 "Amplificateur guitare virtuel et effets : entrée mono et sortie stéréo vers "
 "Jamulus pour $username."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1257
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1284
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1267
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1294
 msgid "Audio Plugins for $username"
 msgstr "Plugins audio pour $username"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1280
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1290
 #, python-brace-format
 msgid ""
 "Rack of audio plugins effects : mono input and Stereo output to Jamulus for "
@@ -189,12 +189,12 @@ msgstr ""
 "au prochain démarrage de ce client plutôt que le rack que vous avez "
 "configuré dans l'assistant."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1336
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1360
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1346
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1370
 msgid "jack_capture"
 msgstr "jack_capture"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1356
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1366
 msgid ""
 "Stereo recording of Jamulus $username. To start the recording, press the "
 "play button on the jack transport panel (for example in qjackctl). To stop "
@@ -207,15 +207,15 @@ msgstr ""
 "jack_capture crééra un fichier dans $session_path/$proxy_dir/data avec un "
 "nombre incrémenté."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1429
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1453
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1524
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1548
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1439
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1463
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1534
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1558
 msgid "obs"
 msgstr "obs"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1449
-#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1544
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1459
+#: build/share/rayZ-builder/session-templates/Jamulus/session_sh.py:1554
 msgid ""
 "Obs streaming to icecast2 in $format (to read the stream open the URL in vlc "
 "or other stream reader http://$server:$port$mount )."
@@ -248,24 +248,24 @@ msgstr "datamodel \"%s\" doit être un fichier !"
 msgid "outdir \"%s\" must be a directory !"
 msgstr "outdir \"%s\" doit être un répertoire !"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:387
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2739
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:410
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2778
 msgid "Usage:"
 msgstr "Usage:"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:388
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:411
 msgid "tmpl_wizard.py [options)"
 msgstr "tmpl_wizard.py [options]"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:389
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:412
 msgid "   -h|--help                  : print this help text"
 msgstr "   -h|--help                  : affiche cette aide"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:390
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:413
 msgid "   -d                         : debug information"
 msgstr "   -d                         : information de debug"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:391
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:414
 #, python-format
 msgid ""
 "   -j|--read-json-file  arg   : set the JSON file to read. It is used to "
@@ -275,7 +275,7 @@ msgstr ""
 "est utilisé pour remplir le template et contient les entrées de l'assistant "
 "(%s par défaut)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:392
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:415
 #, python-format
 msgid ""
 "   -t|--rayZ-template-dir arg : set the rayZ template directory that "
@@ -284,7 +284,7 @@ msgstr ""
 "   -t|--rayZ-template-dir arg : paramètre le répertoire rayZ template qui "
 "contient le template de l'assistant. (%s par défaut)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:393
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:416
 msgid ""
 "   -f|--fill-only             : fill the template only (do not create the "
 "raysession"
@@ -292,7 +292,7 @@ msgstr ""
 "   -f|--fill-only             : remplit le template seulement (créé une "
 "session temporaire)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:394
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:417
 msgid ""
 "   -s|--start-gui             : Once the session has been created start the "
 "session manager GUI."
@@ -300,7 +300,7 @@ msgstr ""
 "   -s|--start-gui             : Une fois que la session a été créée, l'IGU "
 "du gestionnaire de session est démarrée."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:395
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:418
 msgid ""
 "   -m|--session-manager       : set the session-manager of the resulting "
 "document"
@@ -308,7 +308,7 @@ msgstr ""
 "   -m|--session-manager       : paramètre le gestionnaire de session affilié "
 "à cette session"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:396
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:419
 msgid ""
 "                                - ray_control : create a ray session "
 "document. You will need RaySession software for the processing,"
@@ -316,7 +316,7 @@ msgstr ""
 "                                - ray_control : créé une session ray. Vous "
 "aurez besoin du logiciel RaySession pour créer la session,"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:397
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:420
 msgid ""
 "                                - nsm         : create a nsm session. You "
 "wont need non-session-manager for the document generation,"
@@ -324,23 +324,23 @@ msgstr ""
 "                                - nsm         : créé une session nsm. Vous "
 "n'aurez pas besoin du gestionnaire de session nsm pour créer la session,"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:422
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2774
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:445
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2813
 #, python-format
 msgid "will write a json file '%s' when finishing the wizard steps."
 msgstr "écrira un fichier json '%s' quand vous aurez complété l'assistant."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:425
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:448
 #, python-format
 msgid "rayZ template dir is '%s'"
 msgstr "le répertoire rayZ template  est '%s'"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:433
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2780
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:456
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2819
 msgid "--session-manager options : \"ray_control|nsm\""
 msgstr "--session-manager options : \"ray_control|nsm\""
 
-#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:439
+#: build/share/rayZ-builder/session-templates/Jamulus/tmpl_wizard.py:462
 msgid "The session has been successfully created."
 msgstr "La session a été créée avec succès."
 
@@ -485,12 +485,19 @@ msgid "All steps are required."
 msgstr "Toutes les étapes sont requises."
 
 #: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:675
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:768
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:793
 msgid "The session name"
 msgstr "Le nom de la session"
 
 #: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:690
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:770
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:694
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:795
+msgid ""
+"Optimize resources usage (CPU, memory, network, remove pulseaudio bridge)"
+msgstr ""
+
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:700
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:797
 msgid ""
 "The user names of the musician connected on this computer (each have a "
 "channel on the jamulus server)"
@@ -498,66 +505,66 @@ msgstr ""
 "Les noms des musiciens connectés sur cet ordinateur (chacun disposera d'un "
 "canal sur le serveur Jamulus)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:766
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:791
 msgid "Virtual studio setup section"
 msgstr "Section configuration du studio virtuel"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:848
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:994
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:885
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1031
 msgid "Select the interface"
 msgstr "Sélectionnez l'interface"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:864
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1608
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:901
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1645
 msgid "Could not initialize the field values for \"\"."
 msgstr "Ne peut pas initialiser les valeurs du champs pour \"\"."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:873
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:996
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:910
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1033
 msgid "Frames / Periods"
 msgstr "Frames / Periods"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:896
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:998
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:933
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1035
 msgid "Sample rate (Jamulus only supports 48000 Hz)"
 msgstr "La fréquence d'échantillonage (Jamulus seulement 48000 Hz seulement)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:992
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1029
 msgid "Jack settings section"
 msgstr "Section des paramètres jack"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1092
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1289
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1129
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1326
 msgid "Jamulus server (hostname or IP address)"
 msgstr "Serveur Jamulus (nom de la machine ou adresse IP)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1107
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1291
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1144
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1328
 msgid "Jamulus port"
 msgstr "Port Jamulus"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1122
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1126
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1293
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1159
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1163
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1330
 msgid "Start Jamulus server on this machine"
 msgstr "Démarrez un serveur Jamulus sur cette machine"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1132
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1136
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1295
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1169
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1173
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1332
 msgid "Activate server multitrack recording"
 msgstr "Activer l'enregistrement multipistes"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1144
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1297
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1181
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1334
 msgid "Set the jack audio inputs/outputs"
 msgstr "Paramétrer les entrées/sorties audio jack"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1146
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1183
 msgid "Jack inputs"
 msgstr "Entrées jack"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1160
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1197
 msgid ""
 "Example:<br/><i>1->L</i><br/><br/>Indicates that system:capture_1 connects "
 "to Jamulus input Left<br/>You can have several inputs: simply leave a space "
@@ -567,11 +574,11 @@ msgstr ""
 "Jamulus input Left<br/>Vous pouvez avoir plusieurs entrées : laissez "
 "simplement un espace entre vos entrées"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1164
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1201
 msgid "Jack outputs"
 msgstr "Sorties Jack"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1178
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1215
 msgid ""
 "Example:<br/><i>L->1 R->2</i><br/><br/>Indicates that Jamulus input Left "
 "connects to system:playback_1<br/>Jamulus input Right connects to system:"
@@ -583,24 +590,24 @@ msgstr ""
 "playback_2<br/>Vous pouvez avoir plusieurs sorties : laissez simplement un "
 "espace entre les sorties"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1287
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1324
 msgid "Jamulus section"
 msgstr "Section Jamulus"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1407
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1490
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1444
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1527
 msgid ""
 "Check the jamulus users that need a virtual guitar amplifier and effects"
 msgstr ""
 "Cochez les utilisateurs Jamulus qui ont besoin d'un ampli guitare virtuel et "
 "d'effets"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1409
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1574
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1446
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1611
 msgid "Jack input(s)"
 msgstr "Entrée(s) Jack"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1423
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1460
 msgid ""
 "Example:<br/><i>1->L</i><br/><br/>Indicates that system:capture_1 connects "
 "to Guitarix input mono<br/>You can have several inputs: simply leave a space "
@@ -610,12 +617,12 @@ msgstr ""
 "Guitarix input mono<br/>Vous pouvez avoir plusieurs entrées : laissez "
 "simplement un espace entre vos entrées"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1488
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1525
 msgid "Virtual guitar amplifier section (Guitarix)"
 msgstr "[optionnel] Section d'amplificateur guitare virtuel (Guitarix)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1572
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1678
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1609
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1715
 msgid ""
 "Check the users that will have audio plugins and fill there initial "
 "configuration"
@@ -623,7 +630,7 @@ msgstr ""
 "Cochez les utilisateurs qui auront des plugins audio et remplissez leur "
 "configuration initiale"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1588
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1625
 msgid ""
 "Example:<br/><i>1->L</i><br/><br/>Indicates that system:capture_1 connects "
 "to Audio plugins input mono<br/>You can have several inputs: simply leave a "
@@ -633,7 +640,7 @@ msgstr ""
 "Audio plugins input mono<br/>Vous pouvez avoir plusieurs entrées : laissez "
 "simplement un espace entre vos entrées"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1592
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1629
 msgid ""
 "Select the rack effects you want to apply to your instrument or voice "
 "(pipeline from left to right)"
@@ -641,126 +648,134 @@ msgstr ""
 "Sélectionnez le rack d'effets que vous voulez appliquer à votre instrument "
 "ou votre voix (pipeline de gauche à droite)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1676
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1713
 msgid "Calf audio plugins host section"
 msgstr "[optionnel] Section hôte de plugins audio Calf"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1758
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1855
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1795
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1894
 msgid "The output audio format"
 msgstr "Le format audio de sortie"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1781
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1857
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1813
+msgid ""
+"The wav audio format takes more disk space but needs less CPU. Ogg and mp3 "
+"formats are greedy of cpu"
+msgstr ""
+"Le format wav prend plus d'espace disque mais a besoin de moins de CPU. Les "
+"formats Ogg et mp3 sont gourmand en CPU"
+
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1820
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1896
 msgid "Select the Jamulus user to be recorded"
 msgstr "Sélectionnez le ou les utilisateurs à enregistrer"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1853
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1892
 msgid "Jack_capture section (stereo recording)"
 msgstr "Section jack_capture (enregistrement stéréo)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1945
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2180
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2324
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2547
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1984
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2219
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2363
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2586
 msgid "Icecast2 server (hostname or IP address)"
 msgstr "Serveur Icecast2 (nom de la machine ou adresse IP)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1960
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2182
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2339
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2549
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1999
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2221
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2378
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2588
 msgid "Icecast2 port"
 msgstr "Port Icecast2"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1975
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2184
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2354
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2551
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2014
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2223
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2393
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2590
 msgid "Source"
 msgstr "Source"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:1990
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2186
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2369
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2553
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2029
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2225
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2408
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2592
 msgid "Password"
 msgstr "Mot de passe"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2005
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2188
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2384
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2555
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2044
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2227
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2423
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2594
 msgid "Mount point"
 msgstr "Point de montage"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2022
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2190
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2401
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2557
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2061
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2229
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2440
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2596
 msgid "Select the Jamulus user to stream"
 msgstr "Sélectionnez l'utilisateur Jamulus à diffuser"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2178
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2217
 msgid "Obs audio streaming through icecast2 section"
 msgstr "Section diffusion audio grâce à Obs à travers icecast2"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2545
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2584
 msgid "Obs video streaming through icecast2 section"
 msgstr "Section diffusion vidéo grâce à Obs à travers icecast2"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2684
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2723
 msgid "Validate"
 msgstr "Valider"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2685
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2724
 msgid "...\n"
 msgstr "...\n"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2719
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2728
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2733
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2758
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2767
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2772
 msgid "Session creation ..."
 msgstr "Création de la session ..."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2720
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2759
 msgid "The Session has been successfully created."
 msgstr "La session a été créée avec succès."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2729
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2768
 msgid ""
 "An error occured during the creation process (see logs for more details)"
 msgstr ""
 "Une erreur est survenue pendant la création (consultez les logs pour plus "
 "d'informations)"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2734
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2773
 msgid "The Session already exists ! '"
 msgstr "La session existe déjà !'"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2734
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2773
 msgid "'<br/>Please try another name."
 msgstr "'<br/>SVP essayez un autre nom."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2740
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2779
 msgid "wizard.py [options)"
 msgstr "wizard.py [options]"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2741
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2780
 msgid "   -h|--help              : print this help text"
 msgstr "   -h|--help              : affiche cette aide"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2742
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2781
 msgid "   -d                     : debug information"
 msgstr "   -d                     : information de debug"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2743
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2782
 msgid "   -c|--conf-file         : set the conf filename to read/write"
 msgstr ""
 "   -c|--conf-file         : paramètre le fichier de configuration à lire/"
 "écrire"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2744
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2783
 msgid ""
 "   -j|--write-json-file   : set the JSON file to write. It is used to fill "
 "the template and contains user inputs and wizard outputs variables."
@@ -769,7 +784,7 @@ msgstr ""
 "utilisé pour remplir le template et contient les entrées saisies dans "
 "l'assistant ainsi que des variables calculées en sortie."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2745
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2784
 msgid ""
 "   -s|--start-gui-option  : the wizard will display an option for starting "
 "session manager GUI at the end of the session creation."
@@ -777,14 +792,14 @@ msgstr ""
 "   -s|--start-gui-option  : L'assistant affichera une option pour démarrer "
 "l'IGU du gestionnaire de session une fois la session créée."
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2746
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2785
 msgid ""
 "   -m|--session-manager   : set the session-manager of the resulting document"
 msgstr ""
 "   -m|--session-manager   : paramètre le gestionnaire de session de la "
 "session générée"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2747
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2786
 msgid ""
 "                             - ray_control : (default) create a ray session. "
 "You will need RaySession software for the session generation,"
@@ -792,7 +807,7 @@ msgstr ""
 "                             - ray_control : (par défaut) créé une session "
 "ray. Vous aurez besoin du logiciel RaySession pour générer la session,"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2748
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2787
 msgid ""
 "                             - nsm         : create a nsm session. You wont "
 "need non-session-manager for the session generation,"
@@ -800,7 +815,7 @@ msgstr ""
 "                             - nsm         : créé une session nsm. Vous "
 "n'aurez pas besoin du gestionnaire nsm pour générer une session,"
 
-#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2769
+#: build/share/rayZ-builder/session-templates/Jamulus/wizard.py:2808
 #, python-format
 msgid "read/write conf file %s"
 msgstr "lecture/écriture du fichier de configuration %s"
