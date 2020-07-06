@@ -13,7 +13,7 @@ case "$1" in
     #end if
     #if ('obs_icecast2_audio.server' in $data and $data['obs_icecast2_audio.server'] == 'localhost') or ('obs_icecast2_video.server' in $data and  $data['obs_icecast2_video.server'] == 'localhost')
     echo -e "Starting icecast2 server because it is used by this session ..."
-    && systemctl start icecast2
+    systemctl start icecast2
     #end if
     echo -e "Stopping various services ..."
     systemctl is-active --quiet lm-sensors && systemctl stop lm-sensors
@@ -30,22 +30,22 @@ case "$1" in
       
     nmcli radio wifi on 
 
-    systemctl start apport
+    systemctl is-enabled --quiet apport && systemctl start apport
     #if $data['jamulus.bool_start_server']
     echo -e "jamulus service restarted ..."
-    systemctl start jamulus
+    systemctl is-enabled --quiet jamulus && systemctl start jamulus
     #end if
     #if ('obs_icecast2_audio.server' in $data and $data['obs_icecast2_audio.server'] == 'localhost') or ('obs_icecast2_video.server' in $data and  $data['obs_icecast2_video.server'] == 'localhost')
     echo -e "Stop icecast2 server ...\e[0m"
-    systemctl is-active --quiet icecast2 && systemctl stop icecast2 
+    systemctl is-active --quiet icecast2 && systemctl stop icecast2
     #end if
-    systemctl start lm-sensors
-    systemctl start zfs-mount
-    systemctl start zfs-share
-    systemctl start zfs-zed
-    systemctl start whoopsie
-    systemctl start unattended-upgrades
-    echo -e "\e[1mEnd audio session stop"    
+    systemctl is-enabled --quiet lm-sensors && systemctl start lm-sensors
+    systemctl is-enabled --quiet zfs-mount && systemctl start zfs-mount
+    systemctl is-enabled --quiet zfs-share && systemctl start zfs-share
+    systemctl is-enabled --quiet zfs-zed && systemctl start zfs-zed
+    systemctl is-enabled --quiet whoopsie && systemctl start whoopsie
+    systemctl is-enabled --quiet unattended-upgrades && systemctl start unattended-upgrades
+    echo -e "\e[1mEnd audio session stop"
     ;;
   *)
     echo "Usage: $0 start|stop"
