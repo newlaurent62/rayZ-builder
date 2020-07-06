@@ -6,5 +6,7 @@
     echo "set-default-sink jack_out" | pacmd
     echo "set-default-source jack_in" | pacmd
   fi
-  
+
 #end if
+
+lxqt-sudo "\$RAY_SESSION_PATH/.local/bin/audio-session.sh" stop

@@ -1,0 +1,56 @@
+#!/bin/bash
+
+case "$1" in
+  "start")
+    echo -e "\e[1mBegin audio session start \$action"
+    echo -e "\e[1mOptimize/Prepare environment for audio ...\e[0m"
+    nmcli radio wifi off
+
+    systemctl is-active --quiet apport && systemctl stop apport
+    #if $data['jamulus.bool_start_server']
+    echo -e "Stopping Jamulus service because a Jamulus server will be start in this session ..."
+    systemctl is-active --quiet jamulus && systemctl stop jamulus
+    #end if
+    #if ('obs_icecast2_audio.server' in $data and $data['obs_icecast2_audio.server'] == 'localhost') or ('obs_icecast2_video.server' in $data and  $data['obs_icecast2_video.server'] == 'localhost')
+    echo -e "Starting icecast2 server because it is used by this session ..."
+    systemctl is-active --quiet icecast2 && systemctl start icecast2
+    #end if
+    echo -e "Stopping various services ..."
+    systemctl is-active --quiet lm-sensors && systemctl stop lm-sensors
+    systemctl is-active --quiet zfs-mount && systemctl stop zfs-mount
+    systemctl is-active --quiet zfs-share && systemctl stop zfs-share
+    systemctl is-active --quiet zfs-zed && systemctl stop zfs-zed
+    systemctl is-active --quiet whoopsie && systemctl stop whoopsie
+    systemctl is-active --quiet unattended-upgrades && systemctl stop unattended-upgrades
+    echo -e "\e[1mEnd audio session start"    
+    ;;
+  "stop")
+    echo -e "\e[1mBegin audio session stop"
+    echo -e "\e[1mRestore default environment ...\e[0m"
+      
+    nmcli radio wifi on 
+
+    systemctl is-active --quiet apport && systemctl start apport
+    #if $data['jamulus.bool_start_server']
+    echo -e "jamulus service restarted ..."
+    systemctl is-active --quiet jamulus && systemctl start jamulus
+    #end if
+    #if ('obs_icecast2_audio.server' in $data and $data['obs_icecast2_audio.server'] == 'localhost') or ('obs_icecast2_video.server' in $data and  $data['obs_icecast2_video.server'] == 'localhost')
+    echo -e "Stop icecast2 server ...\e[0m"
+    systemctl is-active --quiet icecast2 && systemctl stop icecast2 
+    #end if
+    systemctl is-active --quiet lm-sensors && systemctl start lm-sensors
+    systemctl is-active --quiet zfs-mount && systemctl start zfs-mount
+    systemctl is-active --quiet zfs-share && systemctl start zfs-share
+    systemctl is-active --quiet zfs-zed && systemctl start zfs-zed
+    systemctl is-active --quiet whoopsie && systemctl start whoopsie
+    systemctl is-active --quiet unattended-upgrades && systemctl start unattended-upgrades
+    echo -e "\e[1mEnd audio session stop"    
+    ;;
+  *)
+    echo "Usage: $0 start|stop"
+    echo "   start : prepare/optimize env for audio session"
+    echo "   stop : restore env"
+    exit 1
+    ;;
+esac

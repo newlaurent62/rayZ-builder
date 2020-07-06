@@ -11,3 +11,6 @@
   echo "set-default-source jack_in" | pacmd
   
 #end if
+
+lxqt-sudo "\$RAY_SESSION_PATH/.local/bin/audio-session.sh" start
+

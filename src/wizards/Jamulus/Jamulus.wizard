@@ -57,6 +57,7 @@ Please select the sections you need to setup in your virtual studio.
     <description>...</description>
   </last-page>
   <template>
+    <fill-template id="audio_session_sh" type="conf" dest=".local/bin/audio-session.sh"/>
     <fill-template id="ray_script_load_sh" type="conf" dest="ray-scripts/load.sh"/>
     <fill-template id="ray_script_close_sh" type="conf" dest="ray-scripts/close.sh"/>
     <fill-template id="patch_xml" type="patch_xml" dest="default/patch.xml"/>
